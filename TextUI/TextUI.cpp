@@ -26,6 +26,7 @@
 #include <vector>
 #include <iostream>
 #include <stdio.h>
+#include <time.h>
 #include "TextUI.h"
 #include "boost/format.hpp"
 
@@ -106,6 +107,52 @@ std::string TextUI::getMonthName(const time_t &taskDate) {
 	}
 }
 
+
+std::string TextUI::getQualifierName(const time_t &taskDate) {
+    struct tm localTime = convertToLocalTime(taskDate);
+	
+	time_t currentTime;
+    time(&currentTime);
+    struct tm * nowTime;
+    nowTime = localtime (&currentTime);
+
+	if(localTime.tm_year == nowTime->tm_year)	//if the year is same
+	{
+		if (localTime.tm_yday == nowTime->tm_yday)
+		{
+			return "Today";
+		}
+		else if(localTime.tm_yday == nowTime->tm_yday -1)
+		{
+			return "Yesterday";
+		}
+		else if(localTime.tm_yday == nowTime->tm_yday +1)
+		{
+			return "Tomorrow";
+		}
+	}
+	else //if year is different
+	{
+		//to check if yesterday, check whether localTime's is 31 Dec and nowTime is 1 Jan and localTime's year is nowTime's year - 1
+		if(localTime.tm_year == nowTime->tm_year - 1 
+			&& localTime.tm_mday == 31 && localTime.tm_mon == 11 
+			&&  nowTime->tm_mday == 1 && nowTime->tm_mon == 0)
+		{
+			return "Yesterday";
+		}
+
+		
+		//to check if tomorrow, check whether localTime's is 1 Jan and nowTime is 31 Dec and localTime's year is nowTime's year + 1
+		if(localTime.tm_year == nowTime->tm_year + 1 
+			&& localTime.tm_mday == 1 && localTime.tm_mon == 0 
+			&&  nowTime->tm_mday == 31 && nowTime->tm_mon == 11)
+		{
+			return "Tomorrow";
+		}
+	}
+	return "";
+}
+
 std::string TextUI::getTimeName(const time_t &taskDate) {
     struct tm localTime = convertToLocalTime(taskDate);
 	std::string timeString = "";
@@ -147,14 +194,26 @@ std::string TextUI::getTimeName(const time_t &taskDate) {
 
 void TextUI::printDateBar(const time_t &taskDate) {
     //todo: add support for yesterday, today, tomorrow qualifiers
+	
+
     if (isUnscheduled(taskDate)) {
 	    std::cout << UNSCHEDULED_DATE_BAR << std::endl << std::endl;
+
     } else {
+		
+		std::string qualifier = getQualifierName(taskDate);
 	    std::string wkdayName = getWkDayName(taskDate);
 	    std::string monthName = getMonthName(taskDate);
         struct tm localTime = convertToLocalTime(taskDate);
 	    std::string day = std::to_string(localTime.tm_mday);
-	    std::cout << format(DEFAULT_DATE_BAR) % wkdayName % monthName % day;
+		if(qualifier == "")
+		{
+			std::cout << format(DEFAULT_DATE_BAR) % wkdayName % monthName % day;
+		}
+		else
+		{
+			std::cout << format(QUALIFIER_DATE_BAR) % qualifier % wkdayName % monthName % day;
+		}
 	    std::cout << std::endl << std::endl;
     }
 }
