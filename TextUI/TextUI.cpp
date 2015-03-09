@@ -23,6 +23,9 @@
 // 3. [8:45am - 11:30am]    Brunch with Jane			    <--- TASK  
 // 4. [12pm]			    Submit CS2103 CE2			    <--- TASK
 //
+// 
+
+#define _CRT_SECURE_NO_WARNINGS
 #include <vector>
 #include <iostream>
 #include <stdio.h>
@@ -41,6 +44,8 @@ std::string TextUI::QUALIFIER_DATE_BAR =
 
 std::string TextUI::DEFAULT_DATE_BAR = 
 	"[%1% %2% %3%] =======================================";
+std:: string TextUI::NO_SCHEDULE = 
+	"No schedule available. Start writing one today!";
 
 struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
     struct tm tmStruct;
@@ -278,10 +283,15 @@ void TextUI::showOutput(DS::UIObject uiObj) {
 
 	DS::TaskList taskList = uiObj.taskList;
 	DS::dayIter iter;
+	if (taskList.empty()){
+		std:: cout << NO_SCHEDULE << std::endl;
+	}
+	else{
 	for (iter = taskList.begin(); iter != taskList.end(); ++iter) {
 		DS::SINGLE_DAY curDay = *iter;
 		printDateBar(curDay.taskDate);
 		printTasks(curDay.tasksThisDay);
+	}
 	}
 }
 

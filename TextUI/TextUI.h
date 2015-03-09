@@ -10,6 +10,7 @@ private:
 	static const std::string UNSCHEDULED_DATE_BAR;
 	static std::string QUALIFIER_DATE_BAR;
 	static std::string DEFAULT_DATE_BAR;
+	static std:: string NO_SCHEDULE;
 
     static struct tm convertToLocalTime(const time_t &taskDate); 
 	static bool isUnscheduled(const time_t &taskDate);
