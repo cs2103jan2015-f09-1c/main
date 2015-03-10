@@ -46,7 +46,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\YanYi\Documents\Visual Studio 2012\Projects\MyCal\TextUI;C:\Users\YanYi\Documents\Visual Studio 2012\Projects\MyCal\MyCal;C:\Users\YanYi\Documents\Visual Studio 2012\Projects\MyCal\Storage;C:\Program Files\boost\boost_1_57_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/Interpreter;$(SolutionDir)/Command;$(SolutionDir)/Storage;$(SolutionDir)/TextUI;$(SolutionDir)/Controller;$(SolutionDir)/TaskMaster;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -60,6 +60,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SolutionDir)/Interpreter;$(SolutionDir)/Command;$(SolutionDir)/Storage;$(SolutionDir)/TextUI;$(SolutionDir)/Controller;$(SolutionDir)/TaskMaster;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -68,16 +69,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Controller.h" />
-    <ClInclude Include="DataStructure.h" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\Command\Command.vcxproj">
+      <Project>{6f3d4173-e831-4527-b82e-113a7c0af81d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Controller\Controller.vcxproj">
+      <Project>{a8e750c9-bd07-433a-a3eb-1a4f6a9d1951}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Interpreter\Interpreter.vcxproj">
+      <Project>{7e930f3c-d8d1-4c60-9018-9ebbce7a0a99}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Storage\Storage.vcxproj">
       <Project>{8523459c-aa5b-47bb-b367-3de39d0ae156}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\TaskMaster\TaskMaster.vcxproj">
+      <Project>{2c173256-f1a1-418f-ad91-055f8a7bc84c}</Project>
     </ProjectReference>
     <ProjectReference Include="..\TextUI\TextUI.vcxproj">
       <Project>{d9797dc5-bb94-41ff-b9dc-c9b1d79ab7cf}</Project>

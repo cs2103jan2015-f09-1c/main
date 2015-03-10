@@ -1,88 +1,134 @@
 #include "Storage.h"
+#include <fstream>
+#include <sstream>
 
-DS::TaskList Storage::getAllTasks() const {
-    return _sessionStore.back();
-}
+const std::string Storage::SETTINGS_FILENAME = "settings.txt";
+const std::string Storage::TASKLIST_FILENAME = "tasklist.txt";
 
-void Storage::updateStorage(DS::CHANGES changes, DS::TaskList taskList) {
-    _sessionStore.push_back(taskList);
-    //write to storageSettings.txt
-    //overwrite mostRecentChange.txt
-    //overwrite taskList.txt
-}
+Storage* Storage::_instance = 0;
 
-DS::CHANGES Storage::undoLastAction() {
-    if (_sessionStore.size() > 1) {
-        _sessionStore.pop_back();
-        DS::CHANGES sampleChange; // = read from mostRecentChange.txt
-        //write to files again to update change
-        return sampleChange;
-    } else {
-        //throw exception
-        //
-        DS::CHANGES sampleChange;
-        return sampleChange;
+Storage* Storage::getInstance() {
+    if (_instance == 0) {
+        _instance = new Storage;
     }
+    return _instance;
 }
 
-unsigned Storage::getMaxID() const {
-	return _curMaxID;
+void Storage::resetInstance() {
+    delete _instance;
+    _instance = NULL;
+}
+
+TaskList Storage::getTaskList() const {
+    return _sessionStore;
+}
+
+void Storage::updateStorage(TaskList taskList) {
+    //update _taskList
+    writeToTaskList();
+}
+
+void Storage::setStorageLoc(std::string loc) {
+    _taskListLoc = loc;
+    //copy file over
+    writeToSettings();
+}
+
+std::string Storage::getStorageLoc() const {
+    return _taskListLoc;
 }
 
 Storage::Storage(void) {
+    //_sessionStore.loadTaskList(taskList);
 }
 
 
 Storage::~Storage(void) {
 }
 
-void Storage::saveStorageSettings(std::string fileLoc, unsigned maxID) {
-    //save to storageSettings.txt in the following format
-    //taskListLocation: <File Location>
-    //currentMaxID: 5
-    //should overwrite the exisiting file
+std::string Storage::time_tToString(time_t theTime) {
+    tm timeStruct;
+    localtime_s(&timeStruct, &theTime);
+    std::ostringstream oss;
+    oss << timeStruct.tm_sec << " ";
+    oss << timeStruct.tm_min << " ";
+    oss << timeStruct.tm_hour << " ";
+    oss << timeStruct.tm_mday << " ";
+    oss << timeStruct.tm_mon << " ";
+    oss << timeStruct.tm_year << " ";
+    oss << timeStruct.tm_wday << " ";
+    oss << timeStruct.tm_yday << " ";
+    oss << timeStruct.tm_isdst;
+    return oss.str();
 }
 
-void Storage::saveRecentChange(DS::CHANGES change) {
-    //should  overwrite the exisiting file
-    //save to mostRecentChange.txt in the following format
-    //taskid: xxx
-    //commandType: edit (postpone/add/delete/confirm/done) 
+time_t Storage::stringTotime_t(std::string str) {
+    time_t theTime;
+    tm timeStruct;
+    std::istringstream iss(str);
+    int val;
 
-    //BEFORE
-    //list all task details
+    iss >> val;
+    timeStruct.tm_sec = val;
+    iss >> val;
+    timeStruct.tm_min = val;
+    iss >> val;
+    timeStruct.tm_hour = val;
+    iss >> val;
+    timeStruct.tm_mday = val;
+    iss >> val;
+    timeStruct.tm_mon = val;
+    iss >> val;
+    timeStruct.tm_year = val;
+    iss >> val;
+    timeStruct.tm_wday = val;
+    iss >> val;
+    timeStruct.tm_yday = val;
+    iss >> val;
+    timeStruct.tm_isdst = val;
 
-   // AFTER
-    //list all task details
-
+    theTime = mktime(&timeStruct);
+    return theTime;
 }
-void Storage::saveTaskList(DS::TaskList taskList) {
-        //should  overwrite the exisiting file
 
-    //save to the location specified in _taskListLoc
-    //sample format:
-    /*    
-    [date xxx]
-    taskID: 1 
-    taskName: 
-    taskDate: 
-    taskStart:
-    taskEnd: 
-    isDone: 
+void Storage::overwriteFile(std::string file, std::string contents) {
+	std::ofstream writeFile(file);
+	writeFile << contents;
+	writeFile.close();
+}
 
-    TaskID: 2
-    //details
+void Storage::writeToSettings() {
+    //This overwrites the exisiting file
+    //save to settings.txt in the following format:
+    //<File Location>
+    overwriteFile(SETTINGS_FILENAME, _taskListLoc);
+}
 
-    TaskID: 3
-    //details
 
-    [date yyy]
-    taskID: 7
-    taskName: 
-    taskDate: //redundant, but easier to leave it
-    taskStart:
-    taskEnd: 
-    isDone: 
-    */
+void Storage::writeToTaskList() {
+    //This overwrites the exisiting file
+    //save to tasklist.txt in the following format:
+    // <taskid>
+    // <taskname>
+    // <taskbegin>
+    // <taskend>
+    // <isfloating>
+    // <isDone>
+    TaskList::TList list = _sessionStore.getAll();
+    TaskList::taskIt it;
+    std::ostringstream oss;
+    for (it = list.begin(); it != list.end(); ++it) {
+        std::string begin = time_tToString(it->getTaskBegin());
+        std::string end = time_tToString(it->getTaskEnd());
+        std::string isfloating = it->isFloating() ? "float" : "nofloat";
+        std::string isDone = it->isDone() ? "done" : "notDone";
+        oss << it->getTaskID() << std::endl;
+        oss << it->getTaskName() << std::endl;
+        oss << begin << std::endl;
+        oss << end << std::endl;
+        oss << isfloating << std::endl;
+        oss << it->isDone() << std::endl;
+    }
 
+    overwriteFile(TASKLIST_FILENAME, oss.str());
  }

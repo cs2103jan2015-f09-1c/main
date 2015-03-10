@@ -1,20 +1,17 @@
 #include "Interpreter.h"
-DS::TASK Interpreter::parseAddCmd(std::string task) {
+Task Interpreter::parseAddCmd(std::string input) {
     //think of how to break down the string into attributes 
     //which we can store into DS::TASK
     //tip- user needs to put colon ":" before specifying details
     //(refer to dropbox commoncommands.txt)
 
-    DS::TASK taskObj;
-    //do something
-    return taskObj;
+    Task a;
+    return a;
 }
 
-DS::TASK Interpreter::parseEditCmd(std::string task) {
-
-    DS::TASK taskObj;
-    //do something
-    return taskObj;
+Task Interpreter::parseEditCmd(std::string input) {
+    Task a;
+    return a;
 }
 
 Interpreter::Interpreter(void) {

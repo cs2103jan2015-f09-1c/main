@@ -1,28 +1,32 @@
 #pragma once
-#include <deque>
 #include <string>
-#include "DataStructure.h"
+#include "TaskList.h"
 
 class Storage {
 public:
-    DS::TaskList getAllTasks() const;
-    void updateStorage(DS::CHANGES changes, DS::TaskList taskList);
-    DS::CHANGES undoLastAction();
-    unsigned getMaxID() const;
-
-	Storage(void);
-	~Storage(void);
-
+    static Storage* getInstance();
+    static void resetInstance(); 
+    TaskList getTaskList() const;
+    void updateStorage(TaskList taskList);
+    void setStorageLoc(std::string loc);
+    std::string getStorageLoc() const;
 
 private:
-    void saveRecentChange(DS::CHANGES change);
-    void saveStorageSettings(std::string fileLoc, unsigned maxID);
-    void saveTaskList(DS::TaskList taskList);
+    static const std::string SETTINGS_FILENAME;
+    static const std::string TASKLIST_FILENAME;
+    Storage(void);
+	~Storage(void);
 
-	typedef std::deque<DS::TaskList> Store;
-	Store _sessionStore;
-	unsigned _curMaxID;
+    std::string time_tToString(time_t theTime);
+    time_t stringTotime_t(std::string str);
+
+    void overwriteFile(std::string file, std::string contents);
+    void writeToSettings();
+    void writeToTaskList();
+    
+    static Storage* _instance;
+    TaskList _sessionStore;
 	std::string _taskListLoc; //tastList.txt's location
 };
 
-extern Storage *storageObj;
+

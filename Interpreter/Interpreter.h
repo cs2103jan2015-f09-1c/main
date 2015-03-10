@@ -1,12 +1,12 @@
 #pragma once
 #include <string>
-#include "DataStructure.h"
+#include "Task.h"
 
 class Interpreter
 {
 public:
-    DS::TASK parseAddCmd(std::string task);
-    DS::TASK parseEditCmd(std::string task);
+    static Task parseAddCmd(std::string input);
+    static Task parseEditCmd(std::string input);
 
     Interpreter(void);
     ~Interpreter(void);

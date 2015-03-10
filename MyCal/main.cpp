@@ -1,19 +1,11 @@
 #include "Controller.h"
+#include "UIObject.h"
 #include "TextUI.h"
-#include "DataStructure.h"
-#include "Storage.h"
-
-void cleanMyCal() {
-    delete storageObj;
-}
 
 void initMyCal() {
 	//Perform initial setup
-	//load the deque, NumberedList
 	TextUI::printWelcomeMsg();
 }
-
-Storage *storageObj = new Storage;
 
 int main(int argc, char *argv[]) {
 	
@@ -25,13 +17,12 @@ int main(int argc, char *argv[]) {
 		std::string userInput;
 		userInput = TextUI::getInput();
 
-		DS::UIObject controllerOutput;
+		UIObject controllerOutput;
 		controllerOutput = controllerService.handleInput(userInput);
 
 		TextUI::showOutput(controllerOutput);
 	}
 
-    cleanMyCal();
 
 	return 0;
 }

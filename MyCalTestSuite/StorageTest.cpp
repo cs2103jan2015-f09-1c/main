@@ -3,45 +3,33 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-static DS::TaskList taskList;
-static DS::CHANGES changes;
-
 namespace MyCalTestSuite {
-    TEST_MODULE_INITIALIZE(SetupStorageTest) {
-        //initialize a taskList object
-        //todo: add in more tasks over several days
-        DS::TASK task1;
-	    task1.taskID = 1;
-	    task1.taskName = "eat hamburger";
-        time(&task1.taskStart);
-        time(&task1.taskEnd); //todo: change to different end time
-
-        DS::TASK task2;
-	    task2.taskID = 2;
-	    task2.taskName = "do CS2103 tutorial!";
-        time(&task2.taskStart);
-        time(&task2.taskEnd); //todo: change to different end time
-
-	    DS::SINGLE_DAY singleDay;
-        singleDay.taskDate = task1.taskStart;
-	    singleDay.tasksThisDay.push_back(task1);
-        singleDay.tasksThisDay.push_back(task2);
-
-	     
-	    (taskList).push_back(singleDay);
-
-        //initialize a change object
-        changes.after = task2;
-        changes.before = task1;
-        changes.cmdType = DS::CommandType::EDIT;
-    }
     
 	TEST_CLASS(StorageTest) {
 	public:
-		TEST_METHOD(TestUpdateStorage) {     
-            Storage mockStorage;
-            mockStorage.updateStorage(changes, taskList);
-            Assert::AreEqual(0, 0);
+        time_t sampleTime() {
+            time_t rawTime;
+            tm sampleTime;
+            sampleTime.tm_hour = 7;
+            sampleTime.tm_isdst = 0;
+            sampleTime.tm_mday = 9;
+            sampleTime.tm_min = 23;
+            sampleTime.tm_mon = 2;
+            sampleTime.tm_sec = 45;
+            sampleTime.tm_wday = 1;
+            sampleTime.tm_yday = 67;
+            sampleTime.tm_year = 115;
+           
+            rawTime = mktime(&sampleTime);
+            return rawTime;
+        }
+
+		TEST_METHOD(TestUpdateStorage) {  
+            //Storage *storage = Storage::getInstance();
+            //storage->setStorageLoc("apple");
+            //Assert::AreEqual(std::string("a"), ttt);
+            
+            //Storage::resetInstance();
 		}
 
 	};
