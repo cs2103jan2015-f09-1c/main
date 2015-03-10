@@ -46,7 +46,7 @@ Storage::Storage(void) {
 Storage::~Storage(void) {
 }
 
-std::string time_tToString(time_t theTime) {
+std::string Storage::time_tToString(time_t theTime) {
     tm timeStruct;
     localtime_s(&timeStruct, &theTime);
     std::ostringstream oss;
@@ -62,10 +62,10 @@ std::string time_tToString(time_t theTime) {
     return oss.str();
 }
 
-time_t stringTotime_t(std::string str) {
+time_t Storage::stringTotime_t(std::string str) {
     time_t theTime;
     tm timeStruct;
-    std::istringstream iss;
+    std::istringstream iss(str);
     int val;
 
     iss >> val;

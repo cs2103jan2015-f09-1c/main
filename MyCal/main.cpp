@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 		UIObject controllerOutput;
 		controllerOutput = controllerService.handleInput(userInput);
 
-		//TextUI::showOutput(controllerOutput);
+		TextUI::showOutput(controllerOutput);
 	}
 
 

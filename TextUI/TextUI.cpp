@@ -213,9 +213,9 @@ std::string TextUI::getInput() {
 	std::cin >> userInput;
 	return userInput;
 }
-/*
-void TextUI::showOutput(DS::UIObject uiObj) {
-	std::cout << uiObj.headerText << std::endl;
+
+void TextUI::showOutput(UIObject uiObj) {
+	/*std::cout << uiObj.headerText << std::endl;
 
 	DS::TaskList taskList = uiObj.taskList;
 	DS::dayIter iter;
@@ -223,8 +223,8 @@ void TextUI::showOutput(DS::UIObject uiObj) {
 		DS::SINGLE_DAY curDay = *iter;
 		printDateBar(curDay.taskDate);
 		printTasks(curDay.tasksThisDay);
-	}
-}*/
+	}*/
+}
 
 TextUI::TextUI(void) {
 }
