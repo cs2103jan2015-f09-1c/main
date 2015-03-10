@@ -1,8 +1,10 @@
 #pragma once
+#include "UIObject.h"
+
 class CommandInterface {
 public:
     CommandInterface(void);
     virtual ~CommandInterface(void);
-    void execute();
+    UIObject execute();
 };
 

@@ -5,8 +5,8 @@
 class Storage {
 public:
     static Storage* getInstance();
-    static void resetInstance();
-    TaskList::TList getAllTasks() const;
+    static void resetInstance(); 
+    TaskList getTaskList() const;
     void updateStorage(TaskList taskList);
     void setStorageLoc(std::string loc);
     std::string getStorageLoc() const;

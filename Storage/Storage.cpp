@@ -19,12 +19,12 @@ void Storage::resetInstance() {
     _instance = NULL;
 }
 
-TaskList::TList Storage::getAllTasks() const {
-    return _sessionStore.getAll();
+TaskList Storage::getTaskList() const {
+    return _sessionStore;
 }
 
 void Storage::updateStorage(TaskList taskList) {
-    //overwrite taskList.txt
+    //update _taskList
     writeToTaskList();
 }
 

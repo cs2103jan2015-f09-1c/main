@@ -21,8 +21,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TaskMaster", "TaskMaster\Ta
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Controller", "Controller\Controller.vcxproj", "{A8E750C9-BD07-433A-A3EB-1A4F6A9D1951}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utilities", "Utilities\Utilities.vcxproj", "{DAB17620-E8A3-4E3C-8B31-C6ED17F02755}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Command", "Command\Command.vcxproj", "{6F3D4173-E831-4527-B82E-113A7C0AF81D}"
 EndProject
 Global
@@ -59,10 +57,6 @@ Global
 		{A8E750C9-BD07-433A-A3EB-1A4F6A9D1951}.Debug|Win32.Build.0 = Debug|Win32
 		{A8E750C9-BD07-433A-A3EB-1A4F6A9D1951}.Release|Win32.ActiveCfg = Release|Win32
 		{A8E750C9-BD07-433A-A3EB-1A4F6A9D1951}.Release|Win32.Build.0 = Release|Win32
-		{DAB17620-E8A3-4E3C-8B31-C6ED17F02755}.Debug|Win32.ActiveCfg = Debug|Win32
-		{DAB17620-E8A3-4E3C-8B31-C6ED17F02755}.Debug|Win32.Build.0 = Debug|Win32
-		{DAB17620-E8A3-4E3C-8B31-C6ED17F02755}.Release|Win32.ActiveCfg = Release|Win32
-		{DAB17620-E8A3-4E3C-8B31-C6ED17F02755}.Release|Win32.Build.0 = Release|Win32
 		{6F3D4173-E831-4527-B82E-113A7C0AF81D}.Debug|Win32.ActiveCfg = Debug|Win32
 		{6F3D4173-E831-4527-B82E-113A7C0AF81D}.Debug|Win32.Build.0 = Debug|Win32
 		{6F3D4173-E831-4527-B82E-113A7C0AF81D}.Release|Win32.ActiveCfg = Release|Win32

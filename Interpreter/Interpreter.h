@@ -5,8 +5,8 @@
 class Interpreter
 {
 public:
-    Task parseAddCmd(std::string task);
-    Task parseEditCmd(std::string task);
+    static Task parseAddCmd(std::string input);
+    static Task parseEditCmd(std::string input);
 
     Interpreter(void);
     ~Interpreter(void);

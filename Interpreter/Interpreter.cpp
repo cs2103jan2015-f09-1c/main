@@ -1,5 +1,5 @@
 #include "Interpreter.h"
-Task Interpreter::parseAddCmd(std::string task) {
+Task Interpreter::parseAddCmd(std::string input) {
     //think of how to break down the string into attributes 
     //which we can store into DS::TASK
     //tip- user needs to put colon ":" before specifying details
@@ -9,7 +9,7 @@ Task Interpreter::parseAddCmd(std::string task) {
     return a;
 }
 
-Task Interpreter::parseEditCmd(std::string task) {
+Task Interpreter::parseEditCmd(std::string input) {
     Task a;
     return a;
 }

@@ -72,12 +72,10 @@
     <ClInclude Include="TaskList.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="TaskMaster.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Task.cpp" />
     <ClCompile Include="TaskList.cpp" />
-    <ClCompile Include="TaskMaster.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,8 @@
 #include <sstream>
 #include "Controller.h"
 #include "CommandType.h"
+#include "Interpreter.h"
+#include "AddCmd.h"
 
 bool Controller::isRunning() const {
     return _isRunning;
@@ -10,7 +12,10 @@ UIObject Controller::handleInput(std::string input) {
     CommandType::Command cmdType = CommandType::determineCmdType(input);  
     switch (cmdType) {
         case CommandType::ADD: {
-            
+            AddCmd addCmdObj;
+            Task task = Interpreter::parseAddCmd(input);
+            addCmdObj.prepareTask(task);
+            return addCmdObj.execute();
         }
         case CommandType::DELETE: {
         }
