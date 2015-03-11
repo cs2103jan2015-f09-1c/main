@@ -210,7 +210,7 @@ void TextUI::printHelp() {
 
 std::string TextUI::getInput() {
 	std::string userInput;
-	std::cin >> userInput;
+	std::getline(std::cin, userInput);
 	return userInput;
 }
 
