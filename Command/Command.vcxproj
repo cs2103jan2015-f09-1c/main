@@ -69,11 +69,13 @@
     <ClInclude Include="AddCmd.h" />
     <ClInclude Include="CommandInterface.h" />
     <ClInclude Include="CommandType.h" />
+    <ClInclude Include="StorageCmd.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AddCmd.cpp" />
     <ClCompile Include="CommandInterface.cpp" />
     <ClCompile Include="CommandType.cpp" />
+    <ClCompile Include="StorageCmd.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
