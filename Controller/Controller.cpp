@@ -3,6 +3,7 @@
 #include "CommandType.h"
 #include "Interpreter.h"
 #include "AddCmd.h"
+#include "EditCmd.h"
 
 bool Controller::isRunning() const {
     return _isRunning;
@@ -20,6 +21,10 @@ UIObject Controller::handleInput(std::string input) {
         case CommandType::DELETE: {
         }
         case CommandType::EDIT: {
+            EditCmd editCmdObj;
+            Task task = Interpreter::parseEditCmd(input);
+            editCmdObj.prepareTask(task);
+            return editCmdObj.execute();
         }
         case CommandType::POSTPONE: {
         }

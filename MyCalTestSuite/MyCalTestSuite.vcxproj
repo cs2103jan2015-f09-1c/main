@@ -102,6 +102,9 @@
     <ProjectReference Include="..\TaskMaster\TaskMaster.vcxproj">
       <Project>{2c173256-f1a1-418f-ad91-055f8a7bc84c}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\TextUI\TextUI.vcxproj">
+      <Project>{d9797dc5-bb94-41ff-b9dc-c9b1d79ab7cf}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
