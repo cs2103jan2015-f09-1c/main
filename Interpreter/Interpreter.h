@@ -2,13 +2,33 @@
 #include <string>
 #include "Task.h"
 
+typedef struct Cal
+{
+	int year;
+	int month;
+	int day;
+	int wday;        //value 0-6 represents Sun,Mon,...,Sat
+	int time;        //start time
+	int endtime;     //end time
+	std::string event;       //event
+}CalEvent;
+
 class Interpreter
 {
 public:
-    static Task parseAddCmd(std::string input);
-    static Task parseEditCmd(std::string input);
+	static Task parseAddCmd(std::string input);
+	static Task parseEditCmd(std::string input);
 
-    Interpreter(void);
-    ~Interpreter(void);
+	Interpreter(void);
+	~Interpreter(void);
+private:
+
+	static void parse(std::string event, CalEvent *calEventOut);//event:  input string£»calEventOut: output result
+
+	static int IsLeapYear(int year); //return = 1 means leap year
+	static int  month_days(int year, int month); //return number of days in a particular month
+	static void wDaySearch(int year, int month, int day, int *wday); //output: wday:(0-6: Sun,Mon,....,Sat)
+	static void Monthday(int year, int yearDay, int *pMonth, int *pDay); //input: year,yearDay
+	//output: the date of a particular day in a year
+
 };
-
