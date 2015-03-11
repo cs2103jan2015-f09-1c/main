@@ -1,7 +1,11 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
+#include <stdio.h>
+#include <fstream>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+static const std::string SAMPLE_TASKLIST_LOC = "../../";
 
 namespace MyCalTestSuite {
     
@@ -69,20 +73,102 @@ namespace MyCalTestSuite {
             return list;
         }
 
-		TEST_METHOD(TestSetStorageLoc) {  
-            Storage *storage = Storage::getInstance();
-            std::string newStorageLoc = "C:/Users/YanYi/Documents/Visual Studio 2012/Projects/MyCal/Storage";
-            
-            storage->setStorageLoc(newStorageLoc);
-            std::string storageLocExpected = storage->getStorageLoc();
+        bool isFileExist(const char *fileName) {
+            std::ifstream infile(fileName);
+            return infile.good();
+        }
 
-            Assert::AreEqual(storageLocExpected, newStorageLoc);
+        void backupExistingFiles() {
+            //copy settings.txt and tasklist.txt to safe place
+            if (isFileExist("settings.txt")) {
+                rename("settings.txt", "settings_backup.txt");
+            }
+
+            if (isFileExist("tasklist.txt")) {
+                rename("tasklist.txt", "tasklist_backup.txt");
+            }
+        }
+
+        void restoreExistingFiles() {
+            //restore original files
+            if (isFileExist("settings_backup.txt")) {
+                rename("settings_backup.txt", "settings.txt");
+            }
+
+            if (isFileExist("tasklist_backup.txt")) {
+                rename("tasklist_backup.txt", "tasklist.txt");
+            }
+        }
+
+        void createSettingsFile(std::string contents) {
+	        std::ofstream writeFile("settings.txt");
+	        writeFile << contents;
+	        writeFile.close();
+        }
+        
+        void removeTaskListFile(std::string path) {
+            std::string filename = path + "tasklist.txt";
+            remove(filename.c_str());
+        }
+
+        void removeSettingsFile() {
+            remove("settings.txt");
+        }
+
+        std::string readFile(std::string filepath) {
+            std::string line;
+            std::ifstream read(filepath); 
+            std::ostringstream oss;
+            while (std::getline(read, line)) {
+                oss << line;
+            }
+
+            return oss.str();
+        }
+
+		TEST_METHOD(TestSetStorageLoc) {
+            std::string initialTaskListLoc = "";
+            std::string newTaskListLoc = "../";       
+            std::string initialFile = initialTaskListLoc + "tasklist.txt";
+            std::string movedFile = newTaskListLoc + "tasklist.txt";
+
+            backupExistingFiles();
+            createSettingsFile(initialTaskListLoc);
+
+            Storage *storage = Storage::getInstance();
+            storage->updateStorage(sampleTaskList());
+
+            //File not moved yet and should exist
+            Assert::IsTrue(isFileExist(initialFile.c_str()));
+            //File should not be in new location
+            Assert::IsFalse(isFileExist(movedFile.c_str()));
+            //Original contents of file
+            std::string originalContents = readFile(initialFile);
+            
+            //Modify storage location
+            storage->setStorageLoc(newTaskListLoc);
+            std::string storageLocExpected = storage->getStorageLoc();
+            Assert::AreEqual(storageLocExpected, newTaskListLoc);
+
+            //File is moved and should not exist
+            Assert::IsFalse(isFileExist(initialFile.c_str()));            
+            //File should be in new location
+            Assert::IsTrue(isFileExist(movedFile.c_str()));
+            //Contents should be unchanged
+            std::string newContents = readFile(movedFile);
+            Assert::AreEqual(originalContents, newContents);
 
             Storage::resetInstance();
-            //todo: test copying of file over
+            removeTaskListFile(newTaskListLoc);
+            removeSettingsFile();
+            restoreExistingFiles();
 		}
-
+        
         TEST_METHOD(TestUpdateStorage) {
+            std::string taskListLoc = "";
+            backupExistingFiles();
+            createSettingsFile(taskListLoc);
+
             Storage *storage = Storage::getInstance();
             storage->updateStorage(sampleTaskList());
             TaskList listAfterUpdate = storage->getTaskList();
@@ -111,9 +197,12 @@ namespace MyCalTestSuite {
 
             Storage *storage2 = Storage::getInstance();
             TaskList listAfterInit = storage2->getTaskList();
-            Assert::AreEqual(oss.str(), listAfterUpdate.toString());
+            Assert::AreEqual(oss.str(), listAfterInit.toString());
             Storage::resetInstance();    
-        }
 
+            removeSettingsFile();
+            removeTaskListFile(taskListLoc);
+            restoreExistingFiles();
+        }
 	};
 }
