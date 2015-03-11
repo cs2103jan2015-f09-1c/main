@@ -1,7 +1,7 @@
 // TextUI Component is only responsible for:
 // 1) displaying of messages and printing out tasks. 
 // 2) Getting user input
-// As much as possible, ordering of tasks and deciding what  
+// As much as possible, ordering of tasks and deciding what 
 // header text to print is done by the Task Master.
 //
 // TextUI has no idea whether it is a add, edit or whatever. 
@@ -45,7 +45,7 @@ std::string TextUI::QUALIFIER_DATE_BAR =
 std::string TextUI::DEFAULT_DATE_BAR = 
 	"[%1% %2% %3%] =======================================";
 std:: string TextUI::NO_SCHEDULE = 
-	"No schedule available. Start writing one today!";
+	"No schedule available. Start writing one now!";
 
 struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
     struct tm tmStruct;
@@ -198,9 +198,7 @@ std::string TextUI::getTimeName(const time_t &taskDate) {
 }
 
 void TextUI::printDateBar(const time_t &taskDate) {
-    //todo: add support for yesterday, today, tomorrow qualifiers
-	
-
+  
     if (isUnscheduled(taskDate)) {
 	    std::cout << UNSCHEDULED_DATE_BAR << std::endl << std::endl;
 
@@ -222,21 +220,41 @@ void TextUI::printDateBar(const time_t &taskDate) {
 	    std::cout << std::endl << std::endl;
     }
 }
-/*
-void TextUI::printTasks(const std::vector<DS::TASK> &tasks) {
-    std::vector<DS::TASK>::const_iterator it;
-	for (it = tasks.begin() ; it != tasks.end(); ++it)
-	{
-		DS::TASK data = *it;
-		std::string timeStart = "";
-		if(!isUnscheduled(data.taskStart))
+
+void TextUI::printTasks(TaskList::TList tasks) {
+    TaskList::taskIt it;
+    
+	std::string lastDate = "";
+	for (it = tasks.begin(); it != tasks.end(); ++it){
+	
+		std::string nowDate = "";
+		if(it->isFloating())
 		{
-			timeStart = getTimeName(data.taskStart);
+			nowDate = "empty";
 		}
-		std::string timeEnd = "";
-		if(!isUnscheduled(data.taskEnd))
+		else
 		{
-			timeEnd = getTimeName(data.taskEnd);
+			nowDate = it->getDateStr();
+		}
+
+		//if different date then print date bar
+		if(lastDate != nowDate)
+		{
+			printDateBar(it->getTaskBegin());
+		}
+		lastDate = nowDate;
+
+		std::string timeStart = "";
+		
+		if(!isUnscheduled(it->getTaskBegin()))
+		{
+			timeStart =  it->getBeginStr();
+		}
+		
+		std::string timeEnd = "";
+		if(!isUnscheduled(it->getTaskEnd() ))
+		{
+			timeEnd = it->getEndStr();
 		}
 		std::string timePrint = "";
 		if(timeStart == "" && timeEnd == "")
@@ -253,19 +271,17 @@ void TextUI::printTasks(const std::vector<DS::TASK> &tasks) {
 		}
 
 
-		std::cout << data.taskID << "." << '\t' << timePrint << '\t' << data.taskName << std::endl;
+		std::cout << it->getTaskID() << "." << '\t' << timePrint << '\t' << it->getTaskName() << std::endl;
 	}
 	std::cout << std::endl;
 }
-*/
+
+
 void TextUI::printWelcomeMsg() {
 	std::cout << WELCOME_MSG << std::endl;
-    
-	//TEST DATE BAR:
-
 	time_t curTime;
     time(&curTime);
-	printDateBar(curTime);
+//	printDateBar(curTime);
 }
 
 void TextUI::printHelp() {
@@ -278,26 +294,21 @@ std::string TextUI::getInput() {
 	return userInput;
 }
 
-void TextUI::showOutput(UIObject uiObj) {
-	/*std::cout << uiObj.headerText << std::endl;
 
-	DS::TaskList taskList = uiObj.taskList;
-	DS::dayIter iter;
-	if (taskList.empty()){
+void TextUI::showOutput(UIObject uiObj) {
+
+	std::cout << uiObj.getHeaderText() << std::endl;
+
+	if(uiObj.getTaskList().empty()){
 		std:: cout << NO_SCHEDULE << std::endl;
 	}
 	else{
-	for (iter = taskList.begin(); iter != taskList.end(); ++iter) {
-		DS::SINGLE_DAY curDay = *iter;
-		printDateBar(curDay.taskDate);
-		printTasks(curDay.tasksThisDay);
-<<<<<<< HEAD
+		printTasks(uiObj.getTaskList());
 	}
-	}
-=======
-	}*/
->>>>>>> 75c5beb8861effc4168aea89e6a7df88a25d9aaa
+
 }
+
+
 
 TextUI::TextUI(void) {
 }
