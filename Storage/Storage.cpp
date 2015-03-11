@@ -39,56 +39,53 @@ std::string Storage::getStorageLoc() const {
 }
 
 Storage::Storage(void) {
-    //_sessionStore.loadTaskList(taskList);
+    initSessionStore();
 }
 
 
 Storage::~Storage(void) {
 }
 
-std::string Storage::time_tToString(time_t theTime) {
-    tm timeStruct;
-    localtime_s(&timeStruct, &theTime);
-    std::ostringstream oss;
-    oss << timeStruct.tm_sec << " ";
-    oss << timeStruct.tm_min << " ";
-    oss << timeStruct.tm_hour << " ";
-    oss << timeStruct.tm_mday << " ";
-    oss << timeStruct.tm_mon << " ";
-    oss << timeStruct.tm_year << " ";
-    oss << timeStruct.tm_wday << " ";
-    oss << timeStruct.tm_yday << " ";
-    oss << timeStruct.tm_isdst;
-    return oss.str();
-}
+void Storage::initSessionStore() {
+    std::string line;
+    std::ifstream readFile(TASKLIST_FILENAME);  
+    
+    int counter = 0;
 
-time_t Storage::stringTotime_t(std::string str) {
-    time_t theTime;
-    tm timeStruct;
-    std::istringstream iss(str);
-    int val;
+    Task curTask;
+    while (std::getline(readFile, line)) {
+        counter++;
+        unsigned id;
+        time_t begin;
+        time_t end;
 
-    iss >> val;
-    timeStruct.tm_sec = val;
-    iss >> val;
-    timeStruct.tm_min = val;
-    iss >> val;
-    timeStruct.tm_hour = val;
-    iss >> val;
-    timeStruct.tm_mday = val;
-    iss >> val;
-    timeStruct.tm_mon = val;
-    iss >> val;
-    timeStruct.tm_year = val;
-    iss >> val;
-    timeStruct.tm_wday = val;
-    iss >> val;
-    timeStruct.tm_yday = val;
-    iss >> val;
-    timeStruct.tm_isdst = val;
+        switch(counter) {
+        case 1:
+            id = std::stoul(line);
+            curTask.setTaskID(id);
+            break;
+        case 2:
+            curTask.setTaskName(line);
+            break;
+        case 3:
+            begin = std::stoul(line);
+            curTask.setTaskBegin(begin);
+            break;
+        case 4:
+            end = std::stoul(line);
+            curTask.setTaskEnd(end);
+            break;
+        case 5:
+            if (line == "done") {
+                curTask.markDone();
+            } 
 
-    theTime = mktime(&timeStruct);
-    return theTime;
+            counter = 0;
+            _sessionStore.add(curTask);
+            break;
+        }
+    }
+    //todo: read from loc
 }
 
 void Storage::overwriteFile(std::string file, std::string contents) {
