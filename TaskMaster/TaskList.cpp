@@ -21,6 +21,7 @@ void TaskList::update(Task task) {
 
         if (foundTask(targetId, curId)) {
             replaceTask(it, task);
+            sortByDate();
             break;
         }
     }
@@ -57,7 +58,8 @@ std::string TaskList::toString() const {
         oss << it->getTaskName() << std::endl;
         oss << it->getDateStr() << std::endl ;
         oss << it->getBeginStr() << " - ";
-        oss << it->getEndStr() << std::endl << std::endl;
+        oss << it->getEndStr() << std::endl;
+        oss << it->isDone() << std::endl << std::endl;
     }
 
     return oss.str();
