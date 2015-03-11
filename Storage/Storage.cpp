@@ -109,23 +109,17 @@ void Storage::writeToTaskList() {
     // <taskname>
     // <taskbegin>
     // <taskend>
-    // <isfloating>
     // <isDone>
     TaskList::TList list = _sessionStore.getAll();
     TaskList::taskIt it;
     std::ostringstream oss;
     for (it = list.begin(); it != list.end(); ++it) {
-        std::string begin = time_tToString(it->getTaskBegin());
-        std::string end = time_tToString(it->getTaskEnd());
-        std::string isfloating = it->isFloating() ? "float" : "nofloat";
-        std::string isDone = it->isDone() ? "done" : "notDone";
         oss << it->getTaskID() << std::endl;
         oss << it->getTaskName() << std::endl;
-        oss << begin << std::endl;
-        oss << end << std::endl;
-        oss << isfloating << std::endl;
+        oss << it->getTaskBegin() << std::endl;
+        oss << it->getTaskEnd() << std::endl;
         oss << it->isDone() << std::endl;
     }
 
-    overwriteFile(TASKLIST_FILENAME, oss.str());
+    overwriteFile(TASKLIST_FILENAME, oss.str()); //how to save to different dir?
  }
