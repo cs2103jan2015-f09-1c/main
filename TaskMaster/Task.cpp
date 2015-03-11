@@ -59,7 +59,12 @@ time_t Task::getTaskEnd() const {
 
 void Task::setTaskBegin(time_t begin) {
     _taskBegin = begin;
-    _isFloating = false;
+
+    if (_taskBegin == 0) {
+        _isFloating = true;
+    } else {
+        _isFloating = false;
+    }
 }
 
 void Task::setTaskEnd(time_t end) {

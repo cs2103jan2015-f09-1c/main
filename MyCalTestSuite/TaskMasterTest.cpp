@@ -31,6 +31,7 @@ namespace MyCalTestSuite {
             task.setTaskName("apple");
             task.setTaskBegin(sampleTime());
             task.setTaskEnd(sampleTime() + 5400);
+            task.markDone();
             return task;
         }
 
@@ -47,6 +48,7 @@ namespace MyCalTestSuite {
             task.setTaskName("durian");
             task.setTaskBegin(sampleTime() + 1000);
             task.setTaskEnd(sampleTime() + 5400);
+            task.markDone();
             return task;
         }
 
@@ -93,29 +95,43 @@ namespace MyCalTestSuite {
             std::ostringstream oss;
             oss << "orange" << std::endl;
             oss << "Sat Mar 07" << std::endl;
-            oss << "05:23 AM - 07:23 AM" << std::endl << std::endl;
+            oss << "05:23 AM - 07:23 AM" << std::endl;
+            oss << "0" << std::endl << std::endl;
+
             oss << "apple" << std::endl;
             oss << "Mon Mar 09" << std::endl;
-            oss << "07:23 AM - 08:53 AM" << std::endl << std::endl;
+            oss << "07:23 AM - 08:53 AM" << std::endl;
+            oss << "1" << std::endl << std::endl;
+
             oss << "durian" << std::endl;
             oss << "Mon Mar 09" << std::endl;
-            oss << "07:40 AM - 08:53 AM" << std::endl << std::endl;
+            oss << "07:40 AM - 08:53 AM" << std::endl;
+            oss << "1" << std::endl << std::endl;
+
             Assert::AreEqual(oss.str(), list.toString());
 
             list.add(sampleTask4());
             std::ostringstream oss2;
             oss2 << "orange" << std::endl;
             oss2 << "Sat Mar 07" << std::endl;
-            oss2 << "05:23 AM - 07:23 AM" << std::endl << std::endl;
+            oss2 << "05:23 AM - 07:23 AM" << std::endl;
+            oss2 << "0" << std::endl << std::endl;
+
             oss2 << "nus" << std::endl;
             oss2 << "Sun Mar 08" << std::endl;
-            oss2 << "11:23 AM - 01:53 PM" << std::endl << std::endl;
+            oss2 << "11:23 AM - 01:53 PM" << std::endl;
+            oss2 << "0" << std::endl << std::endl;
+
             oss2 << "apple" << std::endl;
             oss2 << "Mon Mar 09" << std::endl;
-            oss2 << "07:23 AM - 08:53 AM" << std::endl << std::endl;
+            oss2 << "07:23 AM - 08:53 AM" << std::endl;
+            oss2 << "1" << std::endl << std::endl;
+
             oss2 << "durian" << std::endl;
             oss2 << "Mon Mar 09" << std::endl;
-            oss2 << "07:40 AM - 08:53 AM" << std::endl << std::endl;
+            oss2 << "07:40 AM - 08:53 AM" << std::endl;
+            oss2 << "1" << std::endl << std::endl;
+
             Assert::AreEqual(oss2.str(), list.toString());
         }
 

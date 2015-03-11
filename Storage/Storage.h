@@ -8,7 +8,7 @@ public:
     static void resetInstance(); 
     TaskList getTaskList() const;
     void updateStorage(TaskList taskList);
-    void setStorageLoc(std::string loc);
+    void setStorageLoc(std::string newLoc);
     std::string getStorageLoc() const;
 
 private:
@@ -17,10 +17,10 @@ private:
     Storage(void);
 	~Storage(void);
 
-    std::string time_tToString(time_t theTime);
-    time_t stringTotime_t(std::string str);
-
-    void overwriteFile(std::string file, std::string contents);
+    void loadTaskListLoc();
+    void initSessionStore();
+    void overwriteFile(std::string file, std::string contents, std::string loc);
+    void moveTaskList(std::string oldLoc, std::string newLoc);
     void writeToSettings();
     void writeToTaskList();
     

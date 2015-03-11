@@ -1,6 +1,8 @@
 #include "Storage.h"
 #include <fstream>
 #include <sstream>
+#include <iostream>
+#include <stdio.h>
 
 const std::string Storage::SETTINGS_FILENAME = "settings.txt";
 const std::string Storage::TASKLIST_FILENAME = "tasklist.txt";
@@ -24,13 +26,13 @@ TaskList Storage::getTaskList() const {
 }
 
 void Storage::updateStorage(TaskList taskList) {
-    //update _taskList
+    _sessionStore = taskList;
     writeToTaskList();
 }
 
-void Storage::setStorageLoc(std::string loc) {
-    _taskListLoc = loc;
-    //copy file over
+void Storage::setStorageLoc(std::string newLoc) {
+    moveTaskList(_taskListLoc, newLoc);
+    _taskListLoc = newLoc;
     writeToSettings();
 }
 
@@ -39,62 +41,77 @@ std::string Storage::getStorageLoc() const {
 }
 
 Storage::Storage(void) {
-    //_sessionStore.loadTaskList(taskList);
+    loadTaskListLoc();
+    initSessionStore();
 }
 
 
 Storage::~Storage(void) {
 }
 
-std::string Storage::time_tToString(time_t theTime) {
-    tm timeStruct;
-    localtime_s(&timeStruct, &theTime);
-    std::ostringstream oss;
-    oss << timeStruct.tm_sec << " ";
-    oss << timeStruct.tm_min << " ";
-    oss << timeStruct.tm_hour << " ";
-    oss << timeStruct.tm_mday << " ";
-    oss << timeStruct.tm_mon << " ";
-    oss << timeStruct.tm_year << " ";
-    oss << timeStruct.tm_wday << " ";
-    oss << timeStruct.tm_yday << " ";
-    oss << timeStruct.tm_isdst;
-    return oss.str();
+void Storage::loadTaskListLoc() {
+    std::ifstream readFile(SETTINGS_FILENAME);
+    std::string line;
+
+    std::getline(readFile, line);
+    _taskListLoc = line;
 }
 
-time_t Storage::stringTotime_t(std::string str) {
-    time_t theTime;
-    tm timeStruct;
-    std::istringstream iss(str);
-    int val;
+void Storage::initSessionStore() {
+    std::string filepath = _taskListLoc + TASKLIST_FILENAME;
+    std::ifstream readFile(filepath);  
 
-    iss >> val;
-    timeStruct.tm_sec = val;
-    iss >> val;
-    timeStruct.tm_min = val;
-    iss >> val;
-    timeStruct.tm_hour = val;
-    iss >> val;
-    timeStruct.tm_mday = val;
-    iss >> val;
-    timeStruct.tm_mon = val;
-    iss >> val;
-    timeStruct.tm_year = val;
-    iss >> val;
-    timeStruct.tm_wday = val;
-    iss >> val;
-    timeStruct.tm_yday = val;
-    iss >> val;
-    timeStruct.tm_isdst = val;
+    Task *curTask = NULL;
+    std::string line;
+    int counter = 0;
 
-    theTime = mktime(&timeStruct);
-    return theTime;
+    while (std::getline(readFile, line)) {
+        counter++;
+        unsigned id;
+        time_t begin;
+        time_t end;
+
+        switch(counter) {
+        case 1:
+            curTask = new Task;
+            id = std::stoul(line);
+            curTask->setTaskID(id);
+            break;
+        case 2:
+            curTask->setTaskName(line);
+            break;
+        case 3:
+            begin = std::stoul(line);
+            curTask->setTaskBegin(begin);
+            break;
+        case 4:
+            end = std::stoul(line);
+            curTask->setTaskEnd(end);
+            break;
+        case 5:
+            if (line == "1") {
+                curTask->markDone();
+            } 
+
+            counter = 0;
+            _sessionStore.add(*curTask);
+            delete curTask;
+        }
+    }
 }
 
-void Storage::overwriteFile(std::string file, std::string contents) {
-	std::ofstream writeFile(file);
+void Storage::overwriteFile(std::string file, std::string contents, std::string loc="") {
+    std::string filepath = loc + file;
+	std::ofstream writeFile(filepath);
 	writeFile << contents;
 	writeFile.close();
+}
+
+void Storage::moveTaskList(std::string oldLoc, std::string newLoc) {
+    std::string oldpath = oldLoc + TASKLIST_FILENAME;
+    std::string newpath = newLoc + TASKLIST_FILENAME;
+
+    rename(oldpath.c_str(), newpath.c_str());
 }
 
 void Storage::writeToSettings() {
@@ -112,23 +129,17 @@ void Storage::writeToTaskList() {
     // <taskname>
     // <taskbegin>
     // <taskend>
-    // <isfloating>
     // <isDone>
     TaskList::TList list = _sessionStore.getAll();
     TaskList::taskIt it;
     std::ostringstream oss;
     for (it = list.begin(); it != list.end(); ++it) {
-        std::string begin = time_tToString(it->getTaskBegin());
-        std::string end = time_tToString(it->getTaskEnd());
-        std::string isfloating = it->isFloating() ? "float" : "nofloat";
-        std::string isDone = it->isDone() ? "done" : "notDone";
         oss << it->getTaskID() << std::endl;
         oss << it->getTaskName() << std::endl;
-        oss << begin << std::endl;
-        oss << end << std::endl;
-        oss << isfloating << std::endl;
+        oss << it->getTaskBegin() << std::endl;
+        oss << it->getTaskEnd() << std::endl;
         oss << it->isDone() << std::endl;
     }
 
-    overwriteFile(TASKLIST_FILENAME, oss.str());
+    overwriteFile(TASKLIST_FILENAME, oss.str(), _taskListLoc); 
  }
