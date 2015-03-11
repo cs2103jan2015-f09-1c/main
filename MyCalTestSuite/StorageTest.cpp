@@ -24,13 +24,96 @@ namespace MyCalTestSuite {
             return rawTime;
         }
 
-		TEST_METHOD(TestUpdateStorage) {  
-            //Storage *storage = Storage::getInstance();
-            //storage->setStorageLoc("apple");
-            //Assert::AreEqual(std::string("a"), ttt);
+        Task sampleTask1() {
+            Task task;
+            task.setTaskID((unsigned) 1);
+            task.setTaskName("cs2103 tutorial");
+            task.setTaskBegin(sampleTime());
+            task.setTaskEnd(sampleTime() + 5400);
+            return task;
+        }
+
+        Task sampleTask2() {
+            Task task;
+            task.setTaskID((unsigned) 3);
+            task.setTaskName("Performance @ UCC");
+            task.setTaskBegin(sampleTime() - 180000);
+            task.setTaskEnd(sampleTime() - 172800);
+            task.markDone();
+            return task;
+        }
+
+        Task sampleTask3() {
+            Task task;
+            task.setTaskID((unsigned) 4);
+            task.setTaskName("Buy gift for John");
+            task.markDone();
+            return task;
+        }
+
+        Task sampleTask4() {
+            Task task;
+            task.setTaskID((unsigned) 5);
+            task.setTaskName("Go to NTU");
+            task.setTaskBegin(sampleTime() - 72000);
+            task.setTaskEnd(sampleTime() - 63000);
+            return task;
+        }
+
+        TaskList sampleTaskList() {
+            TaskList list;
+            list.add(sampleTask3());
+            list.add(sampleTask1());
+            list.add(sampleTask2());
+            list.add(sampleTask4());
+            return list;
+        }
+
+		TEST_METHOD(TestSetStorageLoc) {  
+            Storage *storage = Storage::getInstance();
+            std::string newStorageLoc = "C:/Users/YanYi/Documents/Visual Studio 2012/Projects/MyCal/Storage";
             
-            //Storage::resetInstance();
+            storage->setStorageLoc(newStorageLoc);
+            std::string storageLocExpected = storage->getStorageLoc();
+
+            Assert::AreEqual(storageLocExpected, newStorageLoc);
+
+            Storage::resetInstance();
+            //todo: test copying of file over
 		}
+
+        TEST_METHOD(TestUpdateStorage) {
+            Storage *storage = Storage::getInstance();
+            storage->updateStorage(sampleTaskList());
+            TaskList listAfterUpdate = storage->getTaskList();
+            std::ostringstream oss;
+            oss << "Buy gift for John" << std::endl;
+            oss << "Thu Jan 01" << std::endl;
+            oss << "08:00 AM - 08:00 AM" << std::endl;
+            oss << "1" << std::endl << std::endl;
+
+            oss << "Performance @ UCC" << std::endl;
+            oss << "Sat Mar 07" << std::endl;
+            oss << "05:23 AM - 07:23 AM" << std::endl;
+            oss << "1" << std::endl << std::endl;
+
+            oss << "Go to NTU" << std::endl;
+            oss << "Sun Mar 08" << std::endl;
+            oss << "11:23 AM - 01:53 PM" << std::endl;
+            oss << "0" << std::endl << std::endl;
+
+            oss << "cs2103 tutorial" << std::endl;
+            oss << "Mon Mar 09" << std::endl;
+            oss << "07:23 AM - 08:53 AM" << std::endl;
+            oss << "0" << std::endl << std::endl;  
+            Assert::AreEqual(oss.str(), listAfterUpdate.toString());
+            Storage::resetInstance();        
+
+            Storage *storage2 = Storage::getInstance();
+            TaskList listAfterInit = storage2->getTaskList();
+            Assert::AreEqual(oss.str(), listAfterUpdate.toString());
+            Storage::resetInstance();    
+        }
 
 	};
 }
