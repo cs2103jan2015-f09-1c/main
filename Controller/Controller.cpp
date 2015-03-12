@@ -2,6 +2,7 @@
 #include "Controller.h"
 #include "CommandType.h"
 #include "Interpreter.h"
+#include "Storage.h"
 #include "AddCmd.h"
 #include "EditCmd.h"
 #include "StorageCmd.h"
@@ -59,6 +60,7 @@ UIObject Controller::handleInput(std::string input) {
             return storageCmdObj.execute();
         }
         case CommandType::EXIT_PROGRAM: {
+            Storage::resetInstance();
             exit(EXIT_SUCCESS);
         }
         case CommandType::INVALID: {
