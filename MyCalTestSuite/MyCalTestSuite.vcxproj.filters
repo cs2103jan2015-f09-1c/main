@@ -33,6 +33,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TextUITest.cpp">
+    <ClCompile Include="InterpreterTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

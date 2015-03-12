@@ -1,8 +1,8 @@
 #include "Storage.h"
 #include <fstream>
 #include <sstream>
-#include <iostream>
 #include <stdio.h>
+#include <windows.h>
 
 const std::string Storage::SETTINGS_FILENAME = "settings.txt";
 const std::string Storage::TASKLIST_FILENAME = "tasklist.txt";
@@ -37,6 +37,11 @@ void Storage::setStorageLoc(std::string newLoc) {
 }
 
 std::string Storage::getStorageLoc() const {
+    if (_taskListLoc == "") {
+        std::string path = getExePath();
+        return path;
+    }
+
     return _taskListLoc;
 }
 
@@ -47,6 +52,17 @@ Storage::Storage(void) {
 
 
 Storage::~Storage(void) {
+}
+
+std::string Storage::getExeFileName() const {
+  char buffer[MAX_PATH];
+  GetModuleFileName( NULL, buffer, MAX_PATH );
+  return std::string(buffer);
+}
+
+std::string Storage::getExePath() const {
+  std::string f = getExeFileName();
+  return f.substr(0, f.find_last_of( "\\/" ));
 }
 
 void Storage::loadTaskListLoc() {

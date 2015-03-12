@@ -88,6 +88,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="InterpreterTest.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -97,6 +98,9 @@
     <ClCompile Include="TextUITest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Interpreter\Interpreter.vcxproj">
+      <Project>{7e930f3c-d8d1-4c60-9018-9ebbce7a0a99}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Storage\Storage.vcxproj">
       <Project>{8523459c-aa5b-47bb-b367-3de39d0ae156}</Project>
     </ProjectReference>

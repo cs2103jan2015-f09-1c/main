@@ -14,9 +14,12 @@ public:
 private:
     static const std::string SETTINGS_FILENAME;
     static const std::string TASKLIST_FILENAME;
+
     Storage(void);
 	~Storage(void);
 
+    std::string getExeFileName() const;
+    std::string getExePath() const;
     void loadTaskListLoc();
     void initSessionStore();
     void overwriteFile(std::string file, std::string contents, std::string loc);
