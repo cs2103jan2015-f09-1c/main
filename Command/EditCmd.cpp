@@ -24,9 +24,7 @@ UIObject EditCmd::execute() {
 	taskList.update(_task);
 
 	//return UI Object
-	TaskList::taskIt it;
-	TaskList::TList _taskList = taskList.getAll();	
-	temp.setHeaderText("-----Editing task "+std::to_string(it->getTaskID())+"-----");
+	temp.setHeaderText("Successfuly Edited");
 
 	/*		
     //edit the task
