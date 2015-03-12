@@ -44,8 +44,6 @@ std::string TextUI::QUALIFIER_DATE_BAR =
 
 std::string TextUI::DEFAULT_DATE_BAR = 
 	"[%1% %2% %3%] =======================================";
-std:: string TextUI::NO_SCHEDULE = 
-	"No schedule available. Start writing one now!";
 
 struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
     struct tm tmStruct;
@@ -223,6 +221,7 @@ void TextUI::printDateBar(const time_t &taskDate) {
 
 void TextUI::printTasks(TaskList::TList tasks) {
     TaskList::taskIt it;
+	 int counter = 1;
     
 	std::string lastDate = "";
 	for (it = tasks.begin(); it != tasks.end(); ++it){
@@ -271,7 +270,8 @@ void TextUI::printTasks(TaskList::TList tasks) {
 		}
 
 
-		std::cout << it->getTaskID() << "." << '\t' << timePrint << '\t' << it->getTaskName() << std::endl;
+		std::cout <<  counter << "." << '\t' << timePrint << '\t' << it->getTaskName() << std::endl;
+	    counter++;
 	}
 	std::cout << std::endl;
 }
@@ -298,17 +298,8 @@ std::string TextUI::getInput() {
 void TextUI::showOutput(UIObject uiObj) {
 
 	std::cout << uiObj.getHeaderText() << std::endl;
-
-	if(uiObj.getTaskList().empty()){
-		std:: cout << NO_SCHEDULE << std::endl;
-	}
-	else{
-		printTasks(uiObj.getTaskList());
-	}
-
+	printTasks(uiObj.getTaskList());
 }
-
-
 
 TextUI::TextUI(void) {
 }
