@@ -4,6 +4,7 @@
 #include "Interpreter.h"
 #include "AddCmd.h"
 #include "EditCmd.h"
+#include "StorageCmd.h"
 
 bool Controller::isRunning() const {
     return _isRunning;
@@ -39,6 +40,10 @@ UIObject Controller::handleInput(std::string input) {
         case CommandType::CONFIRM: {
         }
         case CommandType::STORAGE: {
+            StorageCmd storageCmdObj;
+            std::string cmdDetails = Interpreter::parseStoreCmd(input);
+            storageCmdObj.cmdType(cmdDetails);
+            return storageCmdObj.execute();
         }
         case CommandType::EXIT_PROGRAM: {
         }

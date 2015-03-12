@@ -17,10 +17,6 @@ void EditCmd::prepareTask(Task task) {
 UIObject EditCmd::execute() {
     UIObject temp;
 
-    //The storage functions are not completed yet
-    //so just hardcode a tasklist to test AddCmd
-    
-    //get current tasks
     Storage* storage = Storage::getInstance();
     TaskList taskList = storage->getTaskList();
 
@@ -30,11 +26,9 @@ UIObject EditCmd::execute() {
 	//return UI Object
 	TaskList::taskIt it;
 	TaskList::TList _taskList = taskList.getAll();	
-	temp.setHeaderText("-----Editing task " + std::to_string(it->getTaskID()) + "-----");
+	temp.setHeaderText("-----Editing task "+std::to_string(it->getTaskID())+"-----");
 
-	
-
-	/*
+	/*		
     //edit the task
 	TaskList::taskIt it;
 	TaskList::TList _taskList = taskList.getAll();
@@ -43,10 +37,7 @@ UIObject EditCmd::execute() {
         unsigned curId = it->getTaskID();
 
         if (targetId == curId) { //found
-			temp.setTask(*it);
-			std::string input;
 			temp.setHeaderText("-----Editing task "+std::to_string(it->getTaskID())+"-----");
-		//	std::getline(std::cin, input);
 			
         }
 		else{ //not found
@@ -55,7 +46,7 @@ UIObject EditCmd::execute() {
     }
 	*/
 
-    //storage->updateStorage(taskList);    
+    storage->updateStorage(taskList);    
 
 
     return temp;
