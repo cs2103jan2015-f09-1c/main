@@ -10,6 +10,7 @@ public:
     void updateStorage(TaskList taskList);
     void setStorageLoc(std::string newLoc);
     std::string getStorageLoc() const;
+    unsigned getNextID() const;
 
 private:
     static const std::string SETTINGS_FILENAME;
@@ -28,6 +29,7 @@ private:
     void writeToTaskList();
     
     static Storage* _instance;
+    unsigned _maxID;
     TaskList _sessionStore;
 	std::string _taskListLoc; //tastList.txt's location
 };
