@@ -15,6 +15,7 @@ public:
     void update(Task task);
     void remove(unsigned id);
     TList getDay(time_t day) const; //get tasks of a certain day
+    TList getToday() const;
     TList getAll() const;
     void loadTaskList(TList list);
     int totalTasks() const;

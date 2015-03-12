@@ -53,6 +53,13 @@ TaskList::TList TaskList::getDay(time_t day) const {
     return retList.getAll();
 }
 
+TaskList::TList TaskList::getToday() const {
+    time_t curTime;
+    time(&curTime); 
+
+    return getDay(curTime);    
+}
+
 TaskList::TList TaskList::getAll() const {
     return _taskList;
 }
