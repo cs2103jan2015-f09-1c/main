@@ -3,10 +3,8 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace MyCalTestSuite
-{
-	TEST_CLASS(TextUITest)
-	{
+namespace MyCalTestSuite {
+	TEST_CLASS(TextUITest) 	{
 	public: time_t sampleTime() {
             time_t rawTime;
             tm sampleTime;
@@ -69,15 +67,18 @@ namespace MyCalTestSuite
             return list;
         }
 		
-		TEST_METHOD(TestHeaderText)
-		{
+		TEST_METHOD(TestHeaderText) {
 			UIObject uiObj;
 
 			uiObj.setHeaderText("Successfully edited");
 			Assert::AreEqual(std::string("Successfully edited"), uiObj.getHeaderText());
 		}
 
-		//TEST_ME
+		TEST_METHOD(TestPrintTasks)	{
+			UIObject uiObj;
+
+			uiObj.setHeaderText("Test Print Tasks");
+		}
 
 	};
 }
