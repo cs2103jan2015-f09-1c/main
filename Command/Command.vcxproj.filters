@@ -25,11 +25,22 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EditCmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="StorageCmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DeleteCmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SearchCmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CommandInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="CommandType.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -39,8 +50,13 @@
     <ClCompile Include="EditCmd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CommandInterface.cpp">
     <ClCompile Include="StorageCmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DeleteCmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SearchCmd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
