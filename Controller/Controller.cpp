@@ -19,6 +19,10 @@ UIObject Controller::handleInput(std::string input) {
             return addCmdObj.execute();
         }
         case CommandType::DELETE: {
+            DeleteCmd delCmdObj;
+            Task task = Interpreter::parseDelCmd(input);
+            delCmdObj.prepareTask(task);
+            return delCmdObj.execute();
         }
         case CommandType::EDIT: {
             EditCmd editCmdObj;
@@ -37,6 +41,9 @@ UIObject Controller::handleInput(std::string input) {
             return inProgress;
         }
         case CommandType::SEARCH: {
+            UIObject inProgress;
+            inProgress.setHeaderText("This feature is work in progress");
+            return inProgress;
         }
         case CommandType::VIEW: {
             UIObject inProgress;

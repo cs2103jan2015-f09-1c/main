@@ -19,8 +19,17 @@ private:
     static const size_t NUM_CHARS_STORAGE;
 	static void parse(std::string event, CalEvent *calEventOut);//event:  input string£»calEventOut: output result
 
+	static bool Search(std::string keyword, Task task){
+		std::string line = task.getTaskName();
+		if (line.find(keyword) != std::string::npos){
+			return true;
+	}
+	else{
+		return false;
+	}
+	}
 	static int IsLeapYear(int year); //return = 1 means leap year
-	static int  month_days(int year, int month); //return number of days in a particular month
+	static int month_days(int year, int month); //return number of days in a particular month
 	static void wDaySearch(int year, int month, int day, int *wday); //output: wday:(0-6: Sun,Mon,....,Sat)
 	static void Monthday(int year, int yearDay, int *pMonth, int *pDay); //input: year,yearDay
 	//output: the date of a particular day in a year
@@ -29,6 +38,7 @@ public:
     static Task parseAddCmd(std::string input);
     static Task parseEditCmd(std::string input);
     static std::string parseStoreCmd(std::string input);
+    static Task parseDelCmd(std::string input);
 
 	Interpreter(void);
 	~Interpreter(void);

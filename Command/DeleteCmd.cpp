@@ -14,9 +14,6 @@ void DeleteCmd::prepareTask(Task task) {
 
 UIObject DeleteCmd::execute() {
     UIObject temp;
-
-    //The storage functions are not completed yet
-    //so just hardcode a tasklist to test AddCmd
     
     //get current tasks
     Storage* storage = Storage::getInstance();
@@ -29,6 +26,7 @@ UIObject DeleteCmd::execute() {
     storage->updateStorage(taskList);    
 
     //return UI Object 
-	temp.setHeaderText("Deteted "+(_task.getTaskName())+" on "+(_task.getDateStr())+" at "+(_task.getBeginStr())+" \n " "Remaining tasks for that day: ");
+	temp.setHeaderText("Deleted "+(_task.getTaskName())+" on "+(_task.getDateStr())+" at "+(_task.getBeginStr())+" \n " "Remaining tasks for that day: ");
+    temp.setTaskList(taskList.getToday());
     return temp;
 }

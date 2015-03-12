@@ -1,4 +1,5 @@
 #include "Interpreter.h"
+#include "Storage.h"
 #include <iostream>
 
 using namespace std; //please avoid using "using namespace std"
@@ -49,6 +50,25 @@ std::string Interpreter::parseStoreCmd(std::string input) {
     // a valid filepath
 
     return cmdDetails;
+}
+
+Task Interpreter::parseDelCmd(std::string input) {
+    std::string taskToDel = input.substr(7);
+    Storage *storage = Storage::getInstance();
+    TaskList tasklist = storage->getTaskList();
+    TaskList::TList list = tasklist.getAll();
+    TaskList::taskIt it;
+    //search for task
+    for (it = list.begin(); it != list.end(); ++it) {
+        Task task = *it;
+        if (Search(taskToDel, task)) {
+            return task;
+        }
+    }
+    //else, throw excpetion
+    Task a;
+    return a;
+
 }
 
 Interpreter::Interpreter(void) {
@@ -173,9 +193,10 @@ void Interpreter::parse(string event, CalEvent *calEventOut)
 
 	string cureve;
 	posEvent = event.find(":", 0);
-	if (posEvent != -1)
-		cureve.assign(cal, 4, posEvent - 4);
-	else
+	if (posEvent != -1) 
+		cureve.assign(cal, 4, posEvent - 4); //start copying from pos 4 
+    //so assuming time is of the form 1234pm?
+	else //input does not have additional details. Just taskname.
 		cureve.assign(cal, 4, strlen(cal) - 4);
 	const char *cheve = cureve.c_str();
 	curEvent.event = cureve;    //´¿ÊÂ¼þ
