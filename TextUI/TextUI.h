@@ -20,7 +20,6 @@ private:
     static std::string getTimeName(const time_t &taskDate);
 	static std::string getQualifierName(const time_t &taskDate);
 	static void printDateBar(const time_t &taskDate);
-	//static void printTasks(const std::vector<DS::TASK> &tasks);
 	static void printTasks(TaskList::TList tasks);
 	static void printPrevious(Task task);
 
