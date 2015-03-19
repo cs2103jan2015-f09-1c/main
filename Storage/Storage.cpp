@@ -26,15 +26,15 @@ TaskList Storage::getTaskList() const {
 }
 
 void Storage::updateStorage(TaskList taskList) {
-    _maxID++; //todo: find a better way to increase maxID / set ID
+    _maxID++; 
     _sessionStore = taskList;
-    writeToTaskList();
+    writeTaskListTxt();
 }
 
 void Storage::setStorageLoc(std::string newLoc) {
     moveTaskList(_taskListLoc, newLoc);
     _taskListLoc = newLoc;
-    writeToSettings();
+    writeSettingsTxt();
 }
 
 std::string Storage::getStorageLoc() const {
@@ -139,7 +139,7 @@ void Storage::moveTaskList(std::string oldLoc, std::string newLoc) {
     rename(oldpath.c_str(), newpath.c_str());
 }
 
-void Storage::writeToSettings() {
+void Storage::writeSettingsTxt() {
     //This overwrites the exisiting file
     //save to settings.txt in the following format:
     //<File Location>
@@ -147,7 +147,7 @@ void Storage::writeToSettings() {
 }
 
 
-void Storage::writeToTaskList() {
+void Storage::writeTaskListTxt() {
     //This overwrites the exisiting file
     //save to tasklist.txt in the following format:
     // <taskid>
