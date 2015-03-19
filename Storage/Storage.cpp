@@ -3,6 +3,7 @@
 #include <sstream>
 #include <stdio.h>
 #include <windows.h>
+#include <assert.h>
 
 const std::string Storage::SETTINGS_FILENAME = "settings.txt";
 const std::string Storage::TASKLIST_FILENAME = "tasklist.txt";
@@ -38,12 +39,15 @@ void Storage::setStorageLoc(std::string newLoc) {
 }
 
 std::string Storage::getStorageLoc() const {
-    if (_taskListLoc == "") {
-        std::string path = getExePath();
-        return path;
-    }
+    std::string path = _taskListLoc;
 
-    return _taskListLoc;
+    if (path == "") {
+        path = getExePath();
+    } 
+
+    assert(path != "");
+
+    return path;
 }
 
 unsigned Storage::getNextID() const {
@@ -71,10 +75,10 @@ std::string Storage::getExePath() const {
 }
 
 void Storage::loadTaskListLoc() {
-    std::ifstream readFile(SETTINGS_FILENAME);
+    std::ifstream settingsFile(SETTINGS_FILENAME);
     std::string line;
-
-    std::getline(readFile, line);
+ 
+    std::getline(settingsFile, line);
     _taskListLoc = line;
 }
 
