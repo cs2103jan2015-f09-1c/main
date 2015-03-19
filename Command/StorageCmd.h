@@ -5,6 +5,8 @@ class StorageCmd : public CommandInterface {
 private:
     std::string _fileLoc;
     bool _isChangeLoc;
+    std::string changeStorageLoc();
+    std::string readStorageLoc();
 
 public:
     StorageCmd(void);
