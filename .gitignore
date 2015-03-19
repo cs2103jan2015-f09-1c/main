@@ -6,8 +6,9 @@ tasklist.txt
 [Tt]humbs.db
 *.DS_Store
 
-#ignore boost lib
+#ignore external lib
 boost/
+easylogging/
 
 #Visual Studio files
 *.[Oo]bj
