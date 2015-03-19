@@ -1,4 +1,5 @@
 #include "Storage.h"
+#include "Logger.h"
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
@@ -27,12 +28,16 @@ TaskList Storage::getTaskList() const {
 }
 
 void Storage::updateStorage(TaskList taskList) {
+    Logger::log("update storage");
     _maxID++; 
     _sessionStore = taskList;
     writeTaskListTxt();
 }
 
 void Storage::setStorageLoc(std::string newLoc) {
+    std::string logInfo = "Set storage location to " + newLoc;
+    Logger::log(logInfo);
+
     moveTaskList(_taskListLoc, newLoc);
     _taskListLoc = newLoc;
     writeSettingsTxt();

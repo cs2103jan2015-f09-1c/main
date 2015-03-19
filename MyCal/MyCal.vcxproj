@@ -46,7 +46,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)/Controller;$(SolutionDir)/easylogging;$(SolutionDir)/Storage;$(SolutionDir)/TextUI;$(SolutionDir)/TaskMaster;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/Controller;$(SolutionDir)/Log;$(SolutionDir)/Storage;$(SolutionDir)/TextUI;$(SolutionDir)/TaskMaster;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
@@ -65,7 +65,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)/Controller;$(SolutionDir)/easylogging;$(SolutionDir)/Storage;$(SolutionDir)/TextUI;$(SolutionDir)/TaskMaster;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/Controller;$(SolutionDir)/Log;$(SolutionDir)/Storage;$(SolutionDir)/TextUI;$(SolutionDir)/TaskMaster;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -87,6 +87,9 @@
     </ProjectReference>
     <ProjectReference Include="..\Interpreter\Interpreter.vcxproj">
       <Project>{7e930f3c-d8d1-4c60-9018-9ebbce7a0a99}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Log\Log.vcxproj">
+      <Project>{9a6eb919-460c-4be1-8825-8d88d4288e72}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Storage\Storage.vcxproj">
       <Project>{8523459c-aa5b-47bb-b367-3de39d0ae156}</Project>

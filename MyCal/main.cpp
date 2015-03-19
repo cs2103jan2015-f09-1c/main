@@ -2,23 +2,10 @@
 #include "UIObject.h"
 #include "TextUI.h"
 #include "Storage.h"
-#include <iostream>
-#include "easylogging++.h"
-
-INITIALIZE_EASYLOGGINGPP
-
-void configureLogging() {
-    el::Configurations defaultConf;
-    defaultConf.setToDefault();
-    defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
-    el::Loggers::reconfigureLogger("default", defaultConf);
-    LOG(INFO) << "LOG SESSION BEGIN <<<<<<<<<<<";
-}
+#include "Logger.h"
 
 int main(int argc, char *argv[]) {
-    START_EASYLOGGINGPP(argc, argv);
-    configureLogging();
-
+    Logger::log("============= start program =============");
 	Controller controllerService;
 
 	TextUI::printWelcomeMsg();

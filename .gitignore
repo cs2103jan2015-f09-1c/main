@@ -1,6 +1,7 @@
 #MyCal 
 settings.txt
 tasklist.txt
+MyCalLog.txt
 
 #OS junk files
 [Tt]humbs.db
@@ -8,7 +9,6 @@ tasklist.txt
 
 #ignore external lib
 boost/
-easylogging/
 
 #Visual Studio files
 *.[Oo]bj
