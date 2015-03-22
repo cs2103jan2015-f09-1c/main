@@ -7,6 +7,10 @@
 // TextUI has no idea whether it is a add, edit or whatever. 
 // It Just prints what is given to it.
 //
+
+// settle the unsheduled task
+// then if no task, must show it.
+
 //////////////////////////////////////////////////////////////////////////
 ///////////////// SAMPLE USER INTERFACE AND ITS COMPONENTS ////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -299,6 +303,8 @@ void TextUI::showOutput(UIObject uiObj) {
 
 	std::cout << uiObj.getHeaderText() << std::endl;
 	printTasks(uiObj.getTaskList());
+
+
 }
 
 TextUI::TextUI(void) {

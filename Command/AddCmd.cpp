@@ -14,14 +14,12 @@ void AddCmd::prepareTask(Task task) {
 }
 
 UIObject AddCmd::execute() {
-    UIObject temp;
-
-    //The storage functions are not completed yet
-    //so just hardcode a tasklist to test AddCmd
-    
     //get current tasks
     Storage* storage = Storage::getInstance();
     TaskList taskList = storage->getTaskList();
+
+    //set the taskid
+    _task.setTaskID(storage->getNextID());
 
     //add the task
     taskList.add(_task);
@@ -29,7 +27,13 @@ UIObject AddCmd::execute() {
     //update storage
     storage->updateStorage(taskList);    
 
-    //return UI Object
+    //returns the day's tasks
+    TaskList::TList tasksThatDay;
+    tasksThatDay = taskList.getDay(_task.getTaskBegin());
 
-    return temp;
+    UIObject addObj;
+    addObj.setHeaderText("Task added.");
+    addObj.setTaskList(tasksThatDay);
+
+    return addObj;
 }

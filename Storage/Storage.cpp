@@ -26,6 +26,7 @@ TaskList Storage::getTaskList() const {
 }
 
 void Storage::updateStorage(TaskList taskList) {
+    _maxID++; //todo: find a better way to increase maxID / set ID
     _sessionStore = taskList;
     writeToTaskList();
 }
@@ -43,6 +44,10 @@ std::string Storage::getStorageLoc() const {
     }
 
     return _taskListLoc;
+}
+
+unsigned Storage::getNextID() const {
+    return _maxID + 1;
 }
 
 Storage::Storage(void) {
@@ -80,6 +85,7 @@ void Storage::initSessionStore() {
     Task *curTask = NULL;
     std::string line;
     int counter = 0;
+    _maxID = 0;
 
     while (std::getline(readFile, line)) {
         counter++;
@@ -91,6 +97,9 @@ void Storage::initSessionStore() {
         case 1:
             curTask = new Task;
             id = std::stoul(line);
+            if (id > _maxID) {
+                _maxID = id;
+            }
             curTask->setTaskID(id);
             break;
         case 2:

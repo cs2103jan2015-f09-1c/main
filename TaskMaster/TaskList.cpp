@@ -1,5 +1,6 @@
 #include "TaskList.h"
 #include <sstream>
+#include <iomanip> //put_time
 
 TaskList::TaskList(void) {
 }
@@ -39,6 +40,26 @@ void TaskList::remove(unsigned id) {
     }
 }
 
+TaskList::TList TaskList::getDay(time_t day) const {
+    TaskList retList;
+    constTaskIt it;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        time_t begin = it->getTaskBegin();
+        if (isSameDay(day, begin)) {
+            retList.add((*it));
+        }
+    }
+    
+    return retList.getAll();
+}
+
+TaskList::TList TaskList::getToday() const {
+    time_t curTime;
+    time(&curTime); 
+
+    return getDay(curTime);    
+}
+
 TaskList::TList TaskList::getAll() const {
     return _taskList;
 }
@@ -63,6 +84,20 @@ std::string TaskList::toString() const {
     }
 
     return oss.str();
+}
+
+bool TaskList::isSameDay(time_t time1, time_t time2) const {
+    tm tmstruct1;
+    localtime_s(&tmstruct1, &time1);
+    std::ostringstream oss;
+    oss << std::put_time(&tmstruct1, "%d/%m/%y");
+
+    tm tmstruct2;
+    localtime_s(&tmstruct2, &time2);
+    std::ostringstream oss2;
+    oss2 << std::put_time(&tmstruct2, "%d/%m/%y");
+
+    return oss.str() == oss2.str();
 }
 
 bool TaskList::isEarlier(Task task1, Task task2) {
