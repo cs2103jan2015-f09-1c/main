@@ -23,20 +23,24 @@ public:
     //
     // action: ADD task x
     // - state to store: newly created task x
-    // - to undo, retrieve taskID of newly created task and
+    // - undo implementation: retrieve taskID of newly created task and
     // call delete using the taskID 
     //
     // action: EDIT task x
     // - state to store: task before edit
-    // - to undo, call edit again and pass in the previous task. 
+    // - undo implementation: call edit again and pass in the previous task. 
     //
     // action: DELETE task x
     // - state to store: task before delete
-    // - to undo, call add and pass in copy of task
+    // - undo implementation: call add and pass in copy of task
     //
     // action: change STORAGE location from x to y
     // - state to store: previous storage location, x.
-    // - to undo, call change storage again, this time changing from y to x.
+    // - undo implementation: call change storage again, this time changing from y to x.
+    //
+    // History should be cleared after undoing. If user types "undo" again, he will not
+    // "undo" the undo - which is a confusing behavior to have.
+
 
     virtual UIObject undo(); 
 };
