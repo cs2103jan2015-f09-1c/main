@@ -25,8 +25,8 @@ private:
     void initSessionStore();
     void overwriteFile(std::string file, std::string contents, std::string loc);
     void moveTaskList(std::string oldLoc, std::string newLoc);
-    void writeToSettings();
-    void writeToTaskList();
+    void writeSettingsTxt();
+    void writeTaskListTxt();
     
     static Storage* _instance;
     unsigned _maxID;

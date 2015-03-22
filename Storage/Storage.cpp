@@ -1,8 +1,10 @@
 #include "Storage.h"
+#include "Logger.h"
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
 #include <windows.h>
+#include <assert.h>
 
 const std::string Storage::SETTINGS_FILENAME = "settings.txt";
 const std::string Storage::TASKLIST_FILENAME = "tasklist.txt";
@@ -26,24 +28,31 @@ TaskList Storage::getTaskList() const {
 }
 
 void Storage::updateStorage(TaskList taskList) {
-    _maxID++; //todo: find a better way to increase maxID / set ID
+    Logger::log("update storage");
+    _maxID++; 
     _sessionStore = taskList;
-    writeToTaskList();
+    writeTaskListTxt();
 }
 
 void Storage::setStorageLoc(std::string newLoc) {
+    std::string logInfo = "Set storage location to " + newLoc;
+    Logger::log(logInfo);
+
     moveTaskList(_taskListLoc, newLoc);
     _taskListLoc = newLoc;
-    writeToSettings();
+    writeSettingsTxt();
 }
 
 std::string Storage::getStorageLoc() const {
-    if (_taskListLoc == "") {
-        std::string path = getExePath();
-        return path;
-    }
+    std::string path = _taskListLoc;
 
-    return _taskListLoc;
+    if (path == "") {
+        path = getExePath();
+    } 
+
+    assert(path != "");
+
+    return path;
 }
 
 unsigned Storage::getNextID() const {
@@ -71,10 +80,10 @@ std::string Storage::getExePath() const {
 }
 
 void Storage::loadTaskListLoc() {
-    std::ifstream readFile(SETTINGS_FILENAME);
+    std::ifstream settingsFile(SETTINGS_FILENAME);
     std::string line;
-
-    std::getline(readFile, line);
+ 
+    std::getline(settingsFile, line);
     _taskListLoc = line;
 }
 
@@ -139,7 +148,7 @@ void Storage::moveTaskList(std::string oldLoc, std::string newLoc) {
     rename(oldpath.c_str(), newpath.c_str());
 }
 
-void Storage::writeToSettings() {
+void Storage::writeSettingsTxt() {
     //This overwrites the exisiting file
     //save to settings.txt in the following format:
     //<File Location>
@@ -147,7 +156,7 @@ void Storage::writeToSettings() {
 }
 
 
-void Storage::writeToTaskList() {
+void Storage::writeTaskListTxt() {
     //This overwrites the exisiting file
     //save to tasklist.txt in the following format:
     // <taskid>

@@ -1,5 +1,37 @@
 #include "StorageCmd.h"
 #include "Storage.h"
+#include "InvalidFilePathException.h"
+#include "Shlwapi.h" // PathFileExists
+
+std::string StorageCmd::changeStorageLoc() {
+    Storage *storage = Storage::getInstance();
+    std::string statusText;
+
+    try {
+        int retVal = PathFileExists(_fileLoc.c_str());
+        if (retVal != 1) {
+            throw InvalidFilePathException("Invalid file path. Please try again.");
+        }
+
+        storage->setStorageLoc(_fileLoc);
+        statusText = "Your todo list data storage location has been changed to:\n"
+        + _fileLoc + "\n" + 
+        "The file at the previous location has been moved to the new location.";
+    } catch(InvalidFilePathException& e) {
+        statusText = e.what();
+    }
+
+    return statusText;
+}
+
+std::string StorageCmd::readStorageLoc() {
+    Storage *storage = Storage::getInstance();
+    std::string storageLoc = storage->getStorageLoc();
+    std::string statusText = "Your todo list data is currently saved at " + 
+    storageLoc + "\n";
+
+    return statusText;
+}
 
 StorageCmd::StorageCmd(void) {
 }
@@ -18,24 +50,17 @@ void StorageCmd::cmdType(std::string detail) {
 }
 
 UIObject StorageCmd::execute() {
-    Storage *storage = Storage::getInstance();
     std::string headerText;
 
     if (_isChangeLoc) {
-        storage->setStorageLoc(_fileLoc);
-        headerText = "Your todo list data storage location has been changed to "
-            + _fileLoc + "\n" + 
-            "The file at the previous location has been moved to the new location.\n";
+        headerText = changeStorageLoc();
     } else {
-        std::string storageLoc = storage->getStorageLoc();
-        headerText = "Your todo list data is currently saved at " + 
-            storageLoc + "\n";
+        headerText = readStorageLoc();        
     }
 
     UIObject uiObj;
     uiObj.setHeaderText(headerText);
 
-    Storage::resetInstance();
     return uiObj;
 }
 

@@ -2,23 +2,34 @@
 #include "UIObject.h"
 #include "TextUI.h"
 #include "Storage.h"
-#include <iostream>
+#include "Logger.h"
 
-int main(int argc, char *argv[]) {
-	Controller controllerService;
-
-	TextUI::printWelcomeMsg();
-
+void printTasksToday() {
     Storage *storage = Storage::getInstance();
     TaskList tasklist = storage->getTaskList();
     TaskList::TList today = tasklist.getToday();
 
     UIObject tasksToday;
-    tasksToday.setHeaderText("Your tasks today:\n");
-    tasksToday.setTaskList(today);
+
+    if (today.empty()) {
+        tasksToday.setHeaderText("No tasks for today.");
+
+    } else {
+        tasksToday.setHeaderText("Your tasks today:");
+        tasksToday.setTaskList(today);
+    }
+
     TextUI::showOutput(tasksToday);
-	
-	while (true) {
+}
+
+int main(int argc, char *argv[]) {
+    Logger::log("============= start program =============");
+
+	TextUI::printWelcomeMsg();
+	printTasksToday();
+
+    Controller controllerService;
+	while (true) {        
 		std::string userInput;
 		userInput = TextUI::getInput();
 

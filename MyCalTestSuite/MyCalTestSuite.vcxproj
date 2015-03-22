@@ -57,12 +57,16 @@
       <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)\Storage;$(SolutionDir)\TaskMaster;$(SolutionDir)\TextUI;$(SolutionDir)\Interpreter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -100,6 +104,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Interpreter\Interpreter.vcxproj">
       <Project>{7e930f3c-d8d1-4c60-9018-9ebbce7a0a99}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Log\Log.vcxproj">
+      <Project>{9a6eb919-460c-4be1-8825-8d88d4288e72}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\MyCal\MyCal.vcxproj">
+      <Project>{cb019c58-d56a-48bc-b2ff-6f4436975fae}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Storage\Storage.vcxproj">
       <Project>{8523459c-aa5b-47bb-b367-3de39d0ae156}</Project>
