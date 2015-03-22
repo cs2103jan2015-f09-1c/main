@@ -1,6 +1,6 @@
 #include <sstream>
+#include <assert.h>
 #include "Controller.h"
-#include "CommandType.h"
 #include "Interpreter.h"
 #include "Storage.h"
 #include "Logger.h"
@@ -9,6 +9,32 @@
 #include "StorageCmd.h"
 #include "DeleteCmd.h"
 #include "SearchCmd.h"
+#include "History.h"
+
+UIObject Controller::undoCommand(CommandType::Command cmdType) {
+    switch (cmdType) { 
+        case CommandType::ADD: {
+            AddCmd addCmd;
+            return addCmd.undo();
+        }
+        case CommandType::DEL: {
+            DeleteCmd delCmd;
+            return delCmd.undo();
+        }
+        case CommandType::EDIT: {
+            StorageCmd editCmd;
+            return editCmd.undo();
+        }
+        case CommandType::STORAGE: {
+            StorageCmd storageCmd;
+            return storageCmd.undo();
+        }
+        default:
+            UIObject noUndo;
+            noUndo.setHeaderText("No more actions to undo.");
+            return noUndo;
+    }
+}
 
 UIObject Controller::handleInput(std::string input) {
     CommandType::Command cmdType = CommandType::determineCmdType(input);  
@@ -39,10 +65,12 @@ UIObject Controller::handleInput(std::string input) {
         }
         case CommandType::UNDO: {
             Logger::log("begin undo command");
-
-            UIObject inProgress;
-            inProgress.setHeaderText("This feature is work in progress");
-            return inProgress;
+            History *hist = History::getInstance();
+            CommandType::Command prevCmd = hist->getPreviousCommand();
+            
+            UIObject feedback;
+            feedback = undoCommand(prevCmd);
+            return feedback;
         }
         case CommandType::SEARCH: {
             Logger::log("begin search command");

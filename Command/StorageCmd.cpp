@@ -1,25 +1,33 @@
+#include <assert.h>
 #include "StorageCmd.h"
 #include "Storage.h"
 #include "InvalidFilePathException.h"
 #include "Shlwapi.h" // PathFileExists
+#include "History.h"
+#include "State.h"
+#include "Logger.h"
+
+void StorageCmd::recordInHistory(std::string prevLoc) {
+    State prevState; 
+    prevState.recordStorageLoc(prevLoc);
+    History *hist = History::getInstance();
+    hist->saveState(prevState);
+    hist->saveCommand(CommandType::STORAGE);
+}
 
 std::string StorageCmd::changeStorageLoc() {
     Storage *storage = Storage::getInstance();
     std::string statusText;
 
-    try {
-        int retVal = PathFileExists(_fileLoc.c_str());
-        if (retVal != 1) {
-            throw InvalidFilePathException("Invalid file path. Please try again.");
-        }
-
-        storage->setStorageLoc(_fileLoc);
-        statusText = "Your todo list data storage location has been changed to:\n"
-        + _fileLoc + "\n" + 
-        "The file at the previous location has been moved to the new location.";
-    } catch(InvalidFilePathException& e) {
-        statusText = e.what();
+    int retVal = PathFileExists(_fileLoc.c_str());
+    if (retVal != 1) {
+        throw InvalidFilePathException("Invalid file path. Please try again.");
     }
+
+    storage->setStorageLoc(_fileLoc);
+    statusText = "Your todo list data storage location has been changed to:\n"
+    + _fileLoc + "\n" + 
+    "The file at the previous location has been moved to the new location.";
 
     return statusText;
 }
@@ -51,9 +59,17 @@ void StorageCmd::cmdType(std::string detail) {
 
 UIObject StorageCmd::execute() {
     std::string headerText;
-
+  
     if (_isChangeLoc) {
-        headerText = changeStorageLoc();
+        try {
+            Storage *storage = Storage::getInstance();
+            std::string prevLoc = storage->getStorageLoc();
+            headerText = changeStorageLoc();
+            recordInHistory(prevLoc);
+        } catch(InvalidFilePathException& e) {
+            headerText = e.what();
+        }
+
     } else {
         headerText = readStorageLoc();        
     }
@@ -65,7 +81,21 @@ UIObject StorageCmd::execute() {
 }
 
 UIObject StorageCmd::undo() {
+    History *hist = History::getInstance();
+    State prevState = hist->getPreviousState();
+    CommandType::Command prevCmd = hist->getPreviousCommand();
+
+    assert(prevCmd == CommandType::STORAGE);
+    
+    std::string prevLoc = prevState.getStorageLoc();
+    _fileLoc = prevLoc;
+    changeStorageLoc();
+    hist->clearHistory();
+
     UIObject undoMessage;
-    //undo stuff
+    std::string headerText = "Storage location changed back to " + 
+        prevLoc;
+    undoMessage.setHeaderText(headerText);
+   
     return undoMessage;
 }
