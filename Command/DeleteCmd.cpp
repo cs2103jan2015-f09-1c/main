@@ -30,3 +30,9 @@ UIObject DeleteCmd::execute() {
     temp.setTaskList(taskList.getToday());
     return temp;
 }
+
+UIObject DeleteCmd::undo() {
+    UIObject undoMessage;
+    //undo stuff
+    return undoMessage;
+}

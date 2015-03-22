@@ -37,3 +37,9 @@ UIObject AddCmd::execute() {
 
     return addObj;
 }
+
+UIObject AddCmd::undo() {
+    UIObject undoMessage;
+    //undo stuff
+    return undoMessage;
+}

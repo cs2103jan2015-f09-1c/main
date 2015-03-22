@@ -85,6 +85,9 @@
     <ProjectReference Include="..\Controller\Controller.vcxproj">
       <Project>{a8e750c9-bd07-433a-a3eb-1a4f6a9d1951}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\History\History.vcxproj">
+      <Project>{00824ba1-7127-47b1-8e83-c4a456013c40}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Interpreter\Interpreter.vcxproj">
       <Project>{7e930f3c-d8d1-4c60-9018-9ebbce7a0a99}</Project>
     </ProjectReference>

@@ -13,5 +13,6 @@ public:
     ~StorageCmd(void);
     void cmdType(std::string detail);
     UIObject execute();
+    UIObject undo();
 };
 
