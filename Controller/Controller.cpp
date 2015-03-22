@@ -37,13 +37,6 @@ UIObject Controller::handleInput(std::string input) {
             editCmdObj.prepareTask(task);
             return editCmdObj.execute();
         }
-        case CommandType::POSTPONE: {
-            Logger::log("begin postpone command");
-
-            UIObject inProgress;
-            inProgress.setHeaderText("This feature is work in progress");
-            return inProgress;
-        }
         case CommandType::UNDO: {
             Logger::log("begin undo command");
 
@@ -60,20 +53,6 @@ UIObject Controller::handleInput(std::string input) {
         }
         case CommandType::VIEW: {
             Logger::log("begin view command");
-
-            UIObject inProgress;
-            inProgress.setHeaderText("This feature is work in progress");
-            return inProgress;
-        }
-        case CommandType::BLOCK: {
-            Logger::log("begin block command");
-
-            UIObject inProgress;
-            inProgress.setHeaderText("This feature is work in progress");
-            return inProgress;
-        }
-        case CommandType::CONFIRM: {
-            Logger::log("begin confirm command");
 
             UIObject inProgress;
             inProgress.setHeaderText("This feature is work in progress");

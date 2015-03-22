@@ -18,9 +18,6 @@ CommandType::Command CommandType::determineCmdType(std::string userCmd) {
 	if (cmdString == "edit") {
 		return CommandType::EDIT;
 	} else
-	if (cmdString == "postpone") {
-		return CommandType::POSTPONE;
-	} else
 	if (cmdString == "undo") {
 		return CommandType::UNDO;
 	} else
@@ -29,12 +26,6 @@ CommandType::Command CommandType::determineCmdType(std::string userCmd) {
 	} else
 	if (cmdString == "view") {
 		return CommandType::VIEW;
-	} else 
-	if (cmdString == "block") {
-		return CommandType::BLOCK;
-	} else 
-    if (cmdString == "confirm") {
-		return CommandType::CONFIRM;
 	} else 
     if (cmdString == "storage") {
 		return CommandType::STORAGE;
