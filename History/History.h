@@ -37,7 +37,8 @@ public:
     void saveCommand(CommandType::Command cmd);
     State getPreviousState() const;
     void saveState(State state);
-    
+    void clearHistory();
+
 private:
     History(void);
     ~History(void);

@@ -30,7 +30,12 @@ void History::saveState(State state) {
     _previousState = state;
 }
 
-History::History(void) {
+void History::clearHistory() {
+    _previousCommand = CommandType::INVALID;
+}
+
+History::History(void): 
+    _previousCommand(CommandType::INVALID) {
 }
 
 
