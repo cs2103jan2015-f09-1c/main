@@ -14,12 +14,12 @@ void History::resetInstance() {
     _instance = NULL;
 }
 
-CommandType History::getPreviousCommand() const {
+CommandType::Command History::getPreviousCommand() const {
     return _previousCommand;
 }
 
-void History::saveCommand(CommandType cmdType) {
-    _previousCommand = cmdType;
+void History::saveCommand(CommandType::Command cmd) {
+    _previousCommand = cmd;
 }
 
 State History::getPreviousState() const {

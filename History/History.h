@@ -33,8 +33,8 @@ public:
     static History* getInstance();
     static void resetInstance(); // work in progress. Do not call reset instance as History will be erased
 
-    CommandType getPreviousCommand() const;
-    void saveCommand(CommandType cmdType);
+    CommandType::Command getPreviousCommand() const;
+    void saveCommand(CommandType::Command cmd);
     State getPreviousState() const;
     void saveState(State state);
     
@@ -42,7 +42,7 @@ private:
     History(void);
     ~History(void);
     static History* _instance;
-    CommandType _previousCommand;
+    CommandType::Command _previousCommand;
     State _previousState;
 
 
