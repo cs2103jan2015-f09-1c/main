@@ -21,6 +21,7 @@ public:
     void setTaskEnd(time_t end);
     
     void markDone();
+    void markUndone();
     bool isDone() const;
 
     unsigned getTaskID() const;
