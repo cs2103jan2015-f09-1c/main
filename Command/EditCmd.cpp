@@ -49,3 +49,9 @@ UIObject EditCmd::execute() {
 
     return temp;
 }
+
+UIObject EditCmd::undo() {
+    UIObject undoMessage;
+    //undo stuff
+    return undoMessage;
+}

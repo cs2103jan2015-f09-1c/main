@@ -6,6 +6,7 @@ public:
     ~EditCmd(void);
     void prepareTask(Task task);
     UIObject execute();
+    UIObject undo();
 
 private:
     Task _task;

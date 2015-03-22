@@ -75,6 +75,10 @@ void Task::markDone() {
     _isDone = true;
 }
 
+void Task::markUndone() {
+    _isDone = false;
+}
+
 bool Task::isDone() const {
     return _isDone;
 }

@@ -11,18 +11,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{CB019C58-D56A-48BC-B2FF-6F4436975FAE}</ProjectGuid>
-    <RootNamespace>MyCal</RootNamespace>
+    <ProjectGuid>{00824BA1-7127-47B1-8E83-C4A456013C40}</ProjectGuid>
+    <RootNamespace>History</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -38,25 +38,17 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\YanYi\Documents\Visual Studio 2012\Projects\MyCal\Storage;$(IncludePath)</IncludePath>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)/Controller;$(SolutionDir)/Log;$(SolutionDir)/Storage;$(SolutionDir)/TextUI;$(SolutionDir)/TaskMaster;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <BrowseInformation>true</BrowseInformation>
+      <AdditionalIncludeDirectories>$(SolutionDir)\TaskMaster;$(SolutionDir)\Command;$(SolutionDir)\Log;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <Bscmake>
-      <PreserveSbr>true</PreserveSbr>
-    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -65,44 +57,21 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)/Controller;$(SolutionDir)/Log;$(SolutionDir)/Storage;$(SolutionDir)/TextUI;$(SolutionDir)/TaskMaster;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\TaskMaster;$(SolutionDir)\Command;$(SolutionDir)\Log;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClInclude Include="History.h" />
+    <ClInclude Include="State.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Command\Command.vcxproj">
-      <Project>{6f3d4173-e831-4527-b82e-113a7c0af81d}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Controller\Controller.vcxproj">
-      <Project>{a8e750c9-bd07-433a-a3eb-1a4f6a9d1951}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\History\History.vcxproj">
-      <Project>{00824ba1-7127-47b1-8e83-c4a456013c40}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Interpreter\Interpreter.vcxproj">
-      <Project>{7e930f3c-d8d1-4c60-9018-9ebbce7a0a99}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Log\Log.vcxproj">
-      <Project>{9a6eb919-460c-4be1-8825-8d88d4288e72}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Storage\Storage.vcxproj">
-      <Project>{8523459c-aa5b-47bb-b367-3de39d0ae156}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\TaskMaster\TaskMaster.vcxproj">
-      <Project>{2c173256-f1a1-418f-ad91-055f8a7bc84c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\TextUI\TextUI.vcxproj">
-      <Project>{d9797dc5-bb94-41ff-b9dc-c9b1d79ab7cf}</Project>
-    </ProjectReference>
+    <ClCompile Include="History.cpp" />
+    <ClCompile Include="State.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

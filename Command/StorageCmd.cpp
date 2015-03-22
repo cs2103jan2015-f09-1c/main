@@ -64,3 +64,8 @@ UIObject StorageCmd::execute() {
     return uiObj;
 }
 
+UIObject StorageCmd::undo() {
+    UIObject undoMessage;
+    //undo stuff
+    return undoMessage;
+}
