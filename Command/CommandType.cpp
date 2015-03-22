@@ -13,7 +13,7 @@ CommandType::Command CommandType::determineCmdType(std::string userCmd) {
 		return CommandType::ADD;
 	} else
 	if (cmdString == "delete") {
-		return CommandType::DELETE;
+		return CommandType::DEL;
 	} else
 	if (cmdString == "edit") {
 		return CommandType::EDIT;

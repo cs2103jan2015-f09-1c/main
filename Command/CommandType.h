@@ -5,12 +5,12 @@
 class CommandType {
 public:
     enum Command {
-	    ADD, DELETE, EDIT, POSTPONE, UNDO, 
+	    ADD, DEL, EDIT, UNDO, 
 	    SEARCH, VIEW, 
-	    BLOCK, CONFIRM, 
 	    STORAGE,
 	    EXIT_PROGRAM, INVALID
     };
+
     CommandType(void);
     ~CommandType(void);
 

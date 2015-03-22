@@ -21,7 +21,7 @@ UIObject Controller::handleInput(std::string input) {
             addCmdObj.prepareTask(task);
             return addCmdObj.execute();
         }
-        case CommandType::DELETE: {
+        case CommandType::DEL: {
             Logger::log("begin delete command");
 
             DeleteCmd delCmdObj;
@@ -67,7 +67,7 @@ UIObject Controller::handleInput(std::string input) {
             return storageCmdObj.execute();
         }
         case CommandType::EXIT_PROGRAM: {
-            Logger::log("============= exit program =============");
+            Logger::log("============= exit program ==============");
 
             Storage::resetInstance();
             exit(EXIT_SUCCESS);
