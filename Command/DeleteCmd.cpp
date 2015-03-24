@@ -1,6 +1,7 @@
 #include "DeleteCmd.h"
 #include "Storage.h"
 #include "TaskList.h"
+#include <iostream>
 
 DeleteCmd::DeleteCmd(void) {
 }

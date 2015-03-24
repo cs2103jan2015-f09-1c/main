@@ -7,6 +7,10 @@
 // TextUI has no idea whether it is a add, edit or whatever. 
 // It Just prints what is given to it.
 //
+
+// settle the unsheduled task
+// then if no task, must show it.
+
 //////////////////////////////////////////////////////////////////////////
 ///////////////// SAMPLE USER INTERFACE AND ITS COMPONENTS ////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -19,7 +23,7 @@
 //
 // [Today Fri Jan 1] ===================================    <--- DATE BAR
 //
-// 2.  ----------------	    Remember to bring pencil	    <--- TASK
+// 2.  ----------------	    Remember to bring pencil	    <--- TASK [done]
 // 3. [8:45am - 11:30am]    Brunch with Jane			    <--- TASK  
 // 4. [12pm]			    Submit CS2103 CE2			    <--- TASK
 //
@@ -32,6 +36,8 @@
 #include <time.h>
 #include "TextUI.h"
 #include "boost/format.hpp"
+#include "MappingNumber.h"
+
 
 using boost::format;
 
@@ -192,7 +198,6 @@ std::string TextUI::getTimeName(const time_t &taskDate) {
 	}
 	timeString = timeString + amPm;
 	return timeString;
-	
 }
 
 void TextUI::printDateBar(const time_t &taskDate) {
@@ -215,7 +220,7 @@ void TextUI::printDateBar(const time_t &taskDate) {
 		{
 			std::cout << format(QUALIFIER_DATE_BAR) % qualifier % wkdayName % monthName % day;
 		}
-	    std::cout << std::endl << std::endl;
+	    std::cout << std::endl;
     }
 }
 
@@ -239,6 +244,7 @@ void TextUI::printTasks(TaskList::TList tasks) {
 		//if different date then print date bar
 		if(lastDate != nowDate)
 		{
+			std::cout << std::endl;
 			printDateBar(it->getTaskBegin());
 		}
 		lastDate = nowDate;
@@ -270,11 +276,32 @@ void TextUI::printTasks(TaskList::TList tasks) {
 		}
 
 
-		std::cout <<  counter << "." << '\t' << timePrint << '\t' << it->getTaskName() << std::endl;
+		std::cout <<  counter << "." << timePrint << '\t' << it->getTaskName();
+		if(it->isDone())
+		{
+			std::cout << " [done]";
+		}
+		std::cout << std::endl;
 	    counter++;
 	}
 	std::cout << std::endl;
 }
+
+void TextUI:: mappingNumber(TaskList::TList tasks){
+	TaskList::taskIt it;
+	MappingNumber* mapping = MappingNumber::getInstance();
+	MappingNumber:: NODE node;
+	
+	int counter = 1;
+    
+	for (it = tasks.begin(); it != tasks.end(); ++it){
+		node.displayNum = counter;
+		node.taskID = it->getTaskID();
+		mapping->addNode(node);
+		counter++;
+	}
+}
+
 
 
 void TextUI::printWelcomeMsg() {
@@ -296,10 +323,14 @@ std::string TextUI::getInput() {
 
 
 void TextUI::showOutput(UIObject uiObj) {
-
+	
+    MappingNumber* mapping = MappingNumber::getInstance();
 	std::cout << uiObj.getHeaderText() << std::endl;
+	mapping->clearMappingNumber();
 	printTasks(uiObj.getTaskList());
+	mappingNumber(uiObj.getTaskList());
 }
+
 
 TextUI::TextUI(void) {
 }

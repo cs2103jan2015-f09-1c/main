@@ -4,7 +4,6 @@
 
 class TextUI
 {
-
 private:
 	static const std::string WELCOME_MSG;
 	static const std::string HELP_MSG;
@@ -21,14 +20,15 @@ private:
 	static std::string getQualifierName(const time_t &taskDate);
 	static void printDateBar(const time_t &taskDate);
 	static void printTasks(TaskList::TList tasks);
-	static void printPrevious(Task task);
+	static void mappingNumber(TaskList::TList tasks);
 
 public:
 	static void printWelcomeMsg();
 	static void printHelp();
-
 	static std::string getInput();
 	static void showOutput(UIObject uiObj);
+
+
 
 	TextUI(void);
 	~TextUI(void);

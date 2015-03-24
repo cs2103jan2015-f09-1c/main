@@ -1,10 +1,14 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
+#include <stdio.h>
+#include <fstream>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace MyCalTestSuite {
-	TEST_CLASS(TextUITest) 	{
+namespace MyCalTestSuite
+{
+	TEST_CLASS(TextUITest)
+	{
 	public: time_t sampleTime() {
             time_t rawTime;
             tm sampleTime;
@@ -40,45 +44,48 @@ namespace MyCalTestSuite {
             task.markDone();
             return task;
         }
-
-        Task sampleTask3() {
-            Task task;
-            task.setTaskID((unsigned) 4);
-            task.setTaskName("Buy gift for John");
-            task.markDone();
-            return task;
-        }
-
-        Task sampleTask4() {
-            Task task;
-            task.setTaskID((unsigned) 5);
-            task.setTaskName("Go to NTU");
-            task.setTaskBegin(sampleTime() - 72000);
-            task.setTaskEnd(sampleTime() - 63000);
-            return task;
-        }
-
-        TaskList sampleTaskList() {
+		
+        TaskList sampleTaskList1() {
             TaskList list;
-            list.add(sampleTask3());
-            list.add(sampleTask1());
-            list.add(sampleTask2());
-            list.add(sampleTask4());
+			list.add(sampleTask1());
+			list.add(sampleTask2());
             return list;
         }
 		
-		TEST_METHOD(TestHeaderText) {
+		
+		TEST_METHOD(TestHeaderText){
 			UIObject uiObj;
 
-			uiObj.setHeaderText("Successfully edited");
-			Assert::AreEqual(std::string("Successfully edited"), uiObj.getHeaderText());
+			uiObj.setHeaderText("Successfully Edited");
+			Assert::AreEqual(std::string("Successfully Edited"), uiObj.getHeaderText());
 		}
 
-		TEST_METHOD(TestPrintTasks)	{
+	
+
+
+		TEST_METHOD(printDateBar){
+			std::ostringstream oss;
 			UIObject uiObj;
+			TaskList::TList tasks;		
+			uiObj.setTaskList(tasks);
 
-			uiObj.setHeaderText("Test Print Tasks");
+			oss << "cs2103 tutorial" << std::endl;
+            oss << "Mon Mar 09" << std::endl;
+            oss << "07:23 AM - 08:53 AM" << std::endl;
+            oss << "0" << std::endl << std::endl;
+
+            oss << "Performance @ UCC" << std::endl;
+            oss << "Sat Mar 07" << std::endl;
+            oss << "05:23 AM - 07:23 AM" << std::endl;
+            oss << "1" << std::endl << std::endl; 
+
+			TaskList:: TList listSample = uiObj.getTaskList();
+		//	TextUI::printTasks(listSample);
+
+          //  Assert::AreEqual(oss.str(), listSample);
+		
 		}
+
 
 	};
 }

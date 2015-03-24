@@ -9,11 +9,14 @@ public:
     
     typedef std::list<Task> TList;
     typedef std::list<Task>::iterator taskIt;
-    typedef std::list<Task>::const_iterator constTaskIt;
+	typedef std::list<Task>::const_iterator constTaskIt;
 
     void add(Task task);
     void update(Task task);
     void remove(unsigned id);
+	void markDone(unsigned id);
+	TList getTomorrow() const;
+
     TList getDay(time_t day) const; //get tasks of a certain day
     TList getToday() const;
     TList getAll() const;

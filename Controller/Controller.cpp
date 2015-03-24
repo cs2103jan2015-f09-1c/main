@@ -9,6 +9,8 @@
 #include "StorageCmd.h"
 #include "DeleteCmd.h"
 #include "SearchCmd.h"
+#include "DoneCmd.h"
+#include "ViewCmd.h"
 #include "History.h"
 
 UIObject Controller::undoCommand(CommandType::Command cmdType) {
@@ -81,10 +83,10 @@ UIObject Controller::handleInput(std::string input) {
         }
         case CommandType::VIEW: {
             Logger::log("begin view command");
-
-            UIObject inProgress;
-            inProgress.setHeaderText("This feature is work in progress");
-            return inProgress;
+			ViewCmd ViewObj;
+			std::string detail = Interpreter::parseViewCmd(input);
+			ViewObj.prepareDetail(detail);
+			return ViewObj.execute();
         }
         case CommandType::STORAGE: {
             Logger::log("begin storage command");
