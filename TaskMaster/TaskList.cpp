@@ -55,8 +55,14 @@ TaskList::TList TaskList::getDay(time_t day) const {
 
 TaskList::TList TaskList::getToday() const {
     time_t curTime;
-    time(&curTime); 
+    time(&curTime); //get today
 
+    return getDay(curTime);    
+}
+
+TaskList::TList TaskList::getTomorrow() const {
+    time_t curTime = time(NULL);	//get today
+	curTime += 86400; // add number of seconds in a day
     return getDay(curTime);    
 }
 
@@ -109,6 +115,18 @@ bool TaskList::isEarlier(Task task1, Task task2) {
     }
 
     return false;
+}
+
+void TaskList::markDone(unsigned id){
+    taskIt it;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        unsigned curId = it->getTaskID();
+
+        if (foundTask(id, curId)) {
+            it->markDone();
+            break;
+        }
+    }
 }
 
 //Sorts tasks by date, in ascending order (earliest first)
