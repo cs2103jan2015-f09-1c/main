@@ -47,7 +47,7 @@ std::string Storage::getStorageLoc() const {
     std::string path = _taskListLoc;
 
     if (path == "") {
-        path = getExePath();
+        path = getExePath() + "\\";
     } 
 
     assert(path != "");
