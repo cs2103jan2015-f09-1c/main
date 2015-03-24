@@ -1,9 +1,11 @@
 #include "Interpreter.h"
 #include "Storage.h"
 #include <iostream>
+#include <sstream>
 
 using namespace std; //please avoid using "using namespace std"
 const size_t Interpreter::NUM_CHARS_STORAGE = 7;
+const size_t Interpreter::NUM_CHARS_VIEW = 4;
 
 Task Interpreter::parseAddCmd(std::string input) {
 
@@ -70,6 +72,22 @@ Task Interpreter::parseDelCmd(std::string input) {
     return a;
 
 }
+
+int Interpreter::parseDoneCmd(std::string input){
+	int index;
+	std::string command;
+	std::istringstream in(input);
+	in >> command;
+	in>> index;
+    return index;
+}
+
+std::string Interpreter::parseViewCmd(std::string input){
+	std:: string detail;
+	detail = input.substr(NUM_CHARS_VIEW + 1);
+	return detail;
+}
+
 
 Interpreter::Interpreter(void) {
 }

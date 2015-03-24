@@ -1,7 +1,7 @@
 #include "DoneCmd.h"
 #include "Storage.h"
 #include "TaskList.h"
-#include "RetrieveTaskID.h"
+#include "MappingNumber.h"
 #include <iostream>
 
 DoneCmd::DoneCmd(void) {
@@ -15,22 +15,24 @@ void DoneCmd::prepareIndex(int index) {
 }
 
 UIObject DoneCmd:: execute(){
-	UIObject temp;
-	RetrieveTaskID retrieve;
+	UIObject doneObj;
+	MappingNumber *mapping = MappingNumber::getInstance();
     
     //get current tasks
     Storage* storage = Storage::getInstance();
     TaskList taskList = storage->getTaskList();
-	
-	
-	retrieve.findTaskID(_index, temp.getTaskList());
-	// retrieve.getSelectedTaskID();
-	
-	//std:: cout << "r : " << retrieve.getSelectedTaskID() << std::endl;
 
+	//before execution, we generate mapping number first
+	unsigned taskId =  mapping->getTaskID(_index);
+	
+	//mark done
+	taskList.markDone(taskId);
 
-    //return UI Object 
-	temp.setHeaderText("in progress");
-   // temp.setTaskList();
-    return temp;
+    //update storage
+    storage->updateStorage(taskList);    
+
+    
+	//doneObj.setHeaderText();
+	doneObj.setTaskList(taskList.getAll()); // currently it will show all after marking the task is done
+    return doneObj;
 }

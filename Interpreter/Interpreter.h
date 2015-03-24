@@ -17,6 +17,7 @@ class Interpreter
 {
 private:
     static const size_t NUM_CHARS_STORAGE;
+	static const size_t NUM_CHARS_VIEW;
 	static void parse(std::string event, CalEvent *calEventOut);//event:  input string£»calEventOut: output result
 
 	static bool Search(std::string keyword, Task task){
@@ -39,6 +40,8 @@ public:
     static Task parseEditCmd(std::string input);
     static std::string parseStoreCmd(std::string input);
     static Task parseDelCmd(std::string input);
+	static int parseDoneCmd(std::string input);
+	static std:: string parseViewCmd(std::string input);
 
 	Interpreter(void);
 	~Interpreter(void);
