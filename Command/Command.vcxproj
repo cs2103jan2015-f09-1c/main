@@ -75,8 +75,10 @@
     <ClInclude Include="CommandType.h" />
     <ClInclude Include="DeleteCmd.h" />
     <ClInclude Include="EditCmd.h" />
+    <ClInclude Include="DoneCmd.h" />
     <ClInclude Include="SearchCmd.h" />
     <ClInclude Include="StorageCmd.h" />
+    <ClInclude Include="ViewCmd.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AddCmd.cpp" />
@@ -84,8 +86,10 @@
     <ClCompile Include="CommandType.cpp" />
     <ClCompile Include="DeleteCmd.cpp" />
     <ClCompile Include="EditCmd.cpp" />
+    <ClCompile Include="DoneCmd.cpp" />
     <ClCompile Include="SearchCmd.cpp" />
     <ClCompile Include="StorageCmd.cpp" />
+    <ClCompile Include="ViewCmd.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

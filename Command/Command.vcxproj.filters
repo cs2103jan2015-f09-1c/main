@@ -36,6 +36,12 @@
     <ClInclude Include="SearchCmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DoneCmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewCmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandInterface.cpp">
@@ -57,6 +63,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SearchCmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DoneCmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewCmd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

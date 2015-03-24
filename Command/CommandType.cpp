@@ -24,6 +24,9 @@ CommandType::Command CommandType::determineCmdType(std::string userCmd) {
 	if (cmdString == "search") {
 		return CommandType::SEARCH;
 	} else
+	if (cmdString == "done") {
+		return CommandType::DONE;
+	} else 
 	if (cmdString == "view") {
 		return CommandType::VIEW;
 	} else 

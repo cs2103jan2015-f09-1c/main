@@ -9,6 +9,8 @@
 #include "StorageCmd.h"
 #include "DeleteCmd.h"
 #include "SearchCmd.h"
+#include "DoneCmd.h"
+#include "ViewCmd.h"
 
 UIObject Controller::handleInput(std::string input) {
     CommandType::Command cmdType = CommandType::determineCmdType(input);  
@@ -51,12 +53,20 @@ UIObject Controller::handleInput(std::string input) {
             inProgress.setHeaderText("This feature is work in progress");
             return inProgress;
         }
+		case CommandType::DONE: {
+            Logger::log("begin mark command");
+			DoneCmd  DoneObj;
+			int index = Interpreter::parseDoneCmd(input);
+			DoneObj.prepareIndex(index);
+            return DoneObj.execute();
+
+        }
         case CommandType::VIEW: {
             Logger::log("begin view command");
-
-            UIObject inProgress;
-            inProgress.setHeaderText("This feature is work in progress");
-            return inProgress;
+			ViewCmd ViewObj;
+			std::string detail = Interpreter::parseViewCmd(input);
+			ViewObj.prepareDetail(detail);
+			return ViewObj.execute();
         }
         case CommandType::STORAGE: {
             Logger::log("begin storage command");
