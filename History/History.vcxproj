@@ -66,10 +66,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="MappingNumber.h" />
     <ClInclude Include="History.h" />
     <ClInclude Include="State.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="MappingNumber.cpp" />
     <ClCompile Include="History.cpp" />
     <ClCompile Include="State.cpp" />
   </ItemGroup>
