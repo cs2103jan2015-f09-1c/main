@@ -7,6 +7,29 @@
 #include "State.h"
 #include "Logger.h"
 
+void StorageCmd::verifyFilePath() {
+  int retVal = PathFileExists(_fileLoc.c_str());
+    if (retVal != 1) {
+        throw InvalidFilePathException("Invalid file path. Please try again.");
+    }
+}
+void StorageCmd::saveFilePath() {
+    Storage *storage = Storage::getInstance();
+    storage->setStorageLoc(_fileLoc);
+}
+
+bool StorageCmd::missingSlash() {
+    if (_fileLoc.back() != '\\' && _fileLoc.back() != '/') {
+        return true;
+    }
+
+    return false;
+}
+
+void StorageCmd::appendSlash() {
+    _fileLoc = _fileLoc + '\\';
+}
+
 void StorageCmd::recordInHistory(std::string prevLoc) {
     State prevState; 
     prevState.recordStorageLoc(prevLoc);
@@ -16,15 +39,14 @@ void StorageCmd::recordInHistory(std::string prevLoc) {
 }
 
 std::string StorageCmd::changeStorageLoc() {
-    Storage *storage = Storage::getInstance();
-    std::string statusText;
-
-    int retVal = PathFileExists(_fileLoc.c_str());
-    if (retVal != 1) {
-        throw InvalidFilePathException("Invalid file path. Please try again.");
+    if (missingSlash()) {
+        appendSlash();
     }
 
-    storage->setStorageLoc(_fileLoc);
+    verifyFilePath();  
+    saveFilePath();
+
+    std::string statusText;
     statusText = "Your todo list data storage location has been changed to:\n"
     + _fileLoc + "\n" + 
     "The file at the previous location has been moved to the new location.";
@@ -61,9 +83,10 @@ UIObject StorageCmd::execute() {
     std::string headerText;
   
     if (_isChangeLoc) {
-        try {
+        try {            
             Storage *storage = Storage::getInstance();
             std::string prevLoc = storage->getStorageLoc();
+
             headerText = changeStorageLoc();
             recordInHistory(prevLoc);
         } catch(InvalidFilePathException& e) {
