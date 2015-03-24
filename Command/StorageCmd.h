@@ -5,6 +5,9 @@ class StorageCmd : public CommandInterface {
 private:
     std::string _fileLoc;
     bool _isChangeLoc;
+
+    void restorePreviousLoc(std::string prevLoc);
+
     // checks whether file path entered is a valid windows location
     void verifyFilePath();
 
@@ -21,6 +24,7 @@ private:
     void recordInHistory(std::string prevLoc);
 
     std::string changeStorageLoc();
+    std::string updateStorage();
     std::string readStorageLoc();
 
 public:

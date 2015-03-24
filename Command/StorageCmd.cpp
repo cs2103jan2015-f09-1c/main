@@ -7,6 +7,11 @@
 #include "State.h"
 #include "Logger.h"
 
+void StorageCmd::restorePreviousLoc(std::string prevLoc) {
+    _fileLoc = prevLoc;
+    changeStorageLoc();
+}
+
 void StorageCmd::verifyFilePath() {
   int retVal = PathFileExists(_fileLoc.c_str());
     if (retVal != 1) {
@@ -39,11 +44,19 @@ void StorageCmd::recordInHistory(std::string prevLoc) {
 }
 
 std::string StorageCmd::changeStorageLoc() {
-    if (missingSlash()) {
-        appendSlash();
+    std::string retText;
+
+    try { 
+        verifyFilePath();  
+        retText = updateStorage();
+    } catch(InvalidFilePathException& e) {
+        retText = e.what();
     }
 
-    verifyFilePath();  
+    return retText;
+}
+
+std::string StorageCmd::updateStorage() {
     saveFilePath();
 
     std::string statusText;
@@ -83,16 +96,16 @@ UIObject StorageCmd::execute() {
     std::string headerText;
   
     if (_isChangeLoc) {
-        try {            
-            Storage *storage = Storage::getInstance();
-            std::string prevLoc = storage->getStorageLoc();
-
-            headerText = changeStorageLoc();
-            recordInHistory(prevLoc);
-        } catch(InvalidFilePathException& e) {
-            headerText = e.what();
+        if (missingSlash()) {
+            appendSlash();
         }
 
+        Storage *storage = Storage::getInstance();
+        std::string prevLoc = storage->getStorageLoc();
+
+        headerText = changeStorageLoc();    
+
+        recordInHistory(prevLoc); // only record after location successfully changed
     } else {
         headerText = readStorageLoc();        
     }
@@ -105,14 +118,14 @@ UIObject StorageCmd::execute() {
 
 UIObject StorageCmd::undo() {
     History *hist = History::getInstance();
-    State prevState = hist->getPreviousState();
-    CommandType::Command prevCmd = hist->getPreviousCommand();
 
+    CommandType::Command prevCmd = hist->getPreviousCommand();
     assert(prevCmd == CommandType::STORAGE);
     
+    State prevState = hist->getPreviousState();
     std::string prevLoc = prevState.getStorageLoc();
-    _fileLoc = prevLoc;
-    changeStorageLoc();
+    restorePreviousLoc(prevLoc);
+
     hist->clearHistory();
 
     UIObject undoMessage;
