@@ -108,6 +108,13 @@ UIObject Controller::handleInput(std::string input) {
             invalidCmd.setHeaderText("The command entered is invalid.");
             return invalidCmd;
         }
+        default: {
+            assert(false);
+            Logger::log("invalid command");
+            UIObject invalidCmd;
+            invalidCmd.setHeaderText("The command entered is invalid.");
+            return invalidCmd;
+        }
     }
 }
 
