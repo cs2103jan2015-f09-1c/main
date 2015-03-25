@@ -38,7 +38,106 @@ Task Interpreter::parseAddCmd(std::string input) {
 
 Task Interpreter::parseEditCmd(std::string input) {
 	Task a;
+	CalEvent EventOut;
 
+	a.setTaskBegin(0);
+	a.setTaskEnd(0);
+	a.setTaskName("");
+
+	cout << endl;
+	cout << input << endl;
+
+	const char *cal = input.c_str();
+
+	int i = 5;
+	int k = 0;
+	char recch[4];
+	while (i < strlen(cal)) {
+		if (cal[i] >= '0' && cal[i] <= '9') {
+			recch[k] = cal[i];
+			k++;
+		}
+		i++;
+	}
+
+	int recID = atoi(recch);
+	if (recID <= 0) {
+		cout << "edit record error, please check" << endl;
+		return a;
+	}
+
+	//search for task
+	int findF = 0;
+	Storage *storage = Storage::getInstance();
+	TaskList tasklist = storage->getTaskList();
+	TaskList::TList list = tasklist.getAll();
+	TaskList::taskIt it;
+	for (it = list.begin(); it != list.end(); ++it) {
+		if (it->getTaskID() == recID){
+			findF = 1;
+			break;
+		}
+	}
+	if (findF == 0)	{
+		cout << "can't find the record" << endl;
+		return a;
+	}
+	char tempEvent[LENGTH];
+	string curStr;
+	int  posTime, posName;
+	posTime = input.find("time", 0);
+	posName = input.find("name", 0);
+	if (posTime != -1){
+		cout << "privor  date:" << it->getDateStr() << endl;
+		cout << "       begin:" << it->getBeginStr() << endl;
+		cout << "         end:" << it->getEndStr() << endl << endl;
+		cout << "please input new  time:" << endl;
+
+		cin.getline(tempEvent, LENGTH, '\n');
+		curStr.assign(tempEvent, 0, strlen(tempEvent));
+		parse(curStr, &EventOut);
+		time_t startt, endt;
+		tmConvert(EventOut, &startt, &endt);
+		it->setTaskBegin(startt);
+		it->setTaskEnd(endt);
+		cout << "new     date:" << it->getDateStr() << endl;
+		cout << "       begin:" << it->getBeginStr() << endl;
+		cout << "         end:" << it->getEndStr() << endl << endl;
+		a = *it;
+	}
+	else if (posName != -1) {
+		cout << "previor name:" << it->getTaskName() << endl;
+		cout << "please input new name:" << endl;
+
+		cin.getline(tempEvent, LENGTH, '\n');
+		curStr.assign(tempEvent, 0, strlen(tempEvent));
+		cout << "    new name: " << curStr << endl;
+		it->setTaskName(curStr);
+		a = *it;
+	}
+	else{
+		cout << "privor event:" << it->getTaskName() << endl;
+		cout << "        date:" << it->getDateStr() << endl;
+		cout << "       begin:" << it->getBeginStr() << endl;
+		cout << "         end:" << it->getEndStr() << endl << endl;
+
+		cout << "please input new event:" << endl;
+		cin.getline(tempEvent, LENGTH, '\n');
+		curStr.assign(tempEvent, 0, strlen(tempEvent));
+		parse(curStr, &EventOut);
+		time_t startt, endt;
+		tmConvert(EventOut, &startt, &endt);
+		it->setTaskBegin(startt);
+		it->setTaskEnd(endt);
+		it->setTaskName(EventOut.event);
+		cout << "new    event:" << it->getTaskName() << endl;
+		cout << "        date:" << it->getDateStr() << endl;
+		cout << "       begin:" << it->getBeginStr() << endl;
+		cout << "         end:" << it->getEndStr() << endl << endl;
+		a = *it;
+	}
+
+	storage->updateStorage(tasklist);
 	return a;
 }
 
@@ -198,8 +297,8 @@ void Interpreter::parse(string event, CalEvent *calEventOut)
 	curEvent.month = -1;
 	curEvent.day = -1;
 	curEvent.wday = -1;
-	curEvent.time = -1;
-	curEvent.endtime = -1;
+	curEvent.time = 800;
+	curEvent.endtime = 1800;
 	curEvent.event = "\0";
 
 	//get time of "today"
