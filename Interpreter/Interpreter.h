@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "Task.h"
-
+#define LENGTH  200
 typedef struct Cal
 {
 	int year;
