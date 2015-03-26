@@ -11,6 +11,7 @@ private:
 	static std::string QUALIFIER_DATE_BAR;
 	static std::string DEFAULT_DATE_BAR;
 	static std:: string NO_SCHEDULE;
+	static std:: string TIME_PRINT_BOTH;
 
     static struct tm convertToLocalTime(const time_t &taskDate); 
 	static bool isUnscheduled(const time_t &taskDate);
