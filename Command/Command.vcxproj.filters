@@ -42,6 +42,9 @@
     <ClInclude Include="ViewCmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ViewType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandInterface.cpp">
@@ -69,6 +72,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ViewCmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewType.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

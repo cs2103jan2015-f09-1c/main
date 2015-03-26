@@ -9,4 +9,5 @@ public:
 
 private:
 	int _index;
+	TaskList::TList selectedTasks;
 };

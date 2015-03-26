@@ -79,6 +79,7 @@
     <ClInclude Include="SearchCmd.h" />
     <ClInclude Include="StorageCmd.h" />
     <ClInclude Include="ViewCmd.h" />
+    <ClInclude Include="ViewType.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AddCmd.cpp" />
@@ -90,6 +91,7 @@
     <ClCompile Include="SearchCmd.cpp" />
     <ClCompile Include="StorageCmd.cpp" />
     <ClCompile Include="ViewCmd.cpp" />
+    <ClCompile Include="ViewType.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
