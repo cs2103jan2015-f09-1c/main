@@ -11,4 +11,5 @@ public:
 private:
 	std::string _detail;
 	TaskList::TList selectedTasks;
+	time_t getDayPosition(int index);
 };
