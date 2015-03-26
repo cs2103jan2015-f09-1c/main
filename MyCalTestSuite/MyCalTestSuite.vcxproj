@@ -54,7 +54,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)\Storage;$(SolutionDir)\TaskMaster;$(SolutionDir)\TextUI;$(SolutionDir)\Interpreter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)\Storage;$(SolutionDir)\TaskMaster;$(SolutionDir)\TextUI;$(SolutionDir)\Interpreter;$(SolutionDir)\History;$(SolutionDir)\Controller;$(SolutionDir)\Command;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <BrowseInformation>true</BrowseInformation>
@@ -75,7 +75,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)\Storage;$(SolutionDir)\TaskMaster;$(SolutionDir)\TextUI;$(SolutionDir)\Interpreter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)\Storage;$(SolutionDir)\TaskMaster;$(SolutionDir)\TextUI;$(SolutionDir)\Interpreter;$(SolutionDir)\History;$(SolutionDir)\Controller;$(SolutionDir)\Command;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -102,6 +102,15 @@
     <ClCompile Include="TextUITest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Command\Command.vcxproj">
+      <Project>{6f3d4173-e831-4527-b82e-113a7c0af81d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Controller\Controller.vcxproj">
+      <Project>{a8e750c9-bd07-433a-a3eb-1a4f6a9d1951}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\History\History.vcxproj">
+      <Project>{00824ba1-7127-47b1-8e83-c4a456013c40}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Interpreter\Interpreter.vcxproj">
       <Project>{7e930f3c-d8d1-4c60-9018-9ebbce7a0a99}</Project>
     </ProjectReference>
