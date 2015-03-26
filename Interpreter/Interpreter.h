@@ -24,10 +24,10 @@ private:
 		std::string line = task.getTaskName();
 		if (line.find(keyword) != std::string::npos){
 			return true;
-	}
-	else{
-		return false;
-	}
+		}
+		else{
+			return false;
+		}
 	}
 	static int IsLeapYear(int year); //return = 1 means leap year
 	static int month_days(int year, int month); //return number of days in a particular month

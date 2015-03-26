@@ -38,7 +38,7 @@ Task Interpreter::parseAddCmd(std::string input) {
 
 Task Interpreter::parseEditCmd(std::string input) {
 	Task a;
-	/*CalEvent EventOut;
+	CalEvent EventOut;
 
 	a.setTaskBegin(0);
 	a.setTaskEnd(0);
@@ -137,7 +137,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 		a = *it;
 	}
 
-	storage->updateStorage(tasklist);*/
+	storage->updateStorage(tasklist);
 	return a;
 } 
 
@@ -207,94 +207,6 @@ Interpreter::~Interpreter(void) {
 }
 
 
-int Interpreter::IsLeapYear(int year)
-{
-	if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
-		return 1;
-	else
-		return 0;
-}
-//return the number of days in a particular month of year
-int Interpreter::month_days(int y, int m)
-{
-	int mon_day[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
-	if (IsLeapYear(y) && m == 2)
-		return 29;
-	else
-		return(mon_day[m - 1]);
-}
-
-void Interpreter::wDaySearch(int year, int month, int day, int *wday)
-{
-	int c = 0;
-	float s;
-	int m;
-	for (m = 1; m<month; m++)
-		c = c + month_days(year, m);
-	c = c + day;
-	s = year - 1 + (float)(year - 1) / 4 + (float)(year - 1) / 100 + (float)(year - 1) / 400 - 40 + c;
-	*wday = (int)s % 7;
-}
-
-
-void Interpreter::Monthday(int year, int yearDay, int *pMonth, int *pDay)
-//input: year,yearDay: year & nth day in a year
-//output: pMonth,pDay: month day
-{
-	int dec;
-	if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))  dec = 0;
-	else dec = 1;
-	if (yearDay >= 1 && yearDay <= 31) 	{
-		*pMonth = 1;
-		*pDay = yearDay;
-	}
-	else if (yearDay >= 32 && yearDay <= 60 - dec) {
-		*pMonth = 2;
-		*pDay = yearDay - 31;
-	}
-	else if (yearDay >= 61 - dec && yearDay <= 91 - dec){
-		*pMonth = 3;
-		*pDay = yearDay - (60 - dec);
-	}
-	else if (yearDay >= 92 - dec && yearDay <= 121 - dec){
-		*pMonth = 4;
-		*pDay = yearDay - (91 - dec);
-	}
-	else if (yearDay >= 122 - dec && yearDay <= 152 - dec){
-		*pMonth = 5;
-		*pDay = yearDay - (121 - dec);
-	}
-	else if (yearDay >= 153 - dec && yearDay <= 182 - dec){
-		*pMonth = 6;
-		*pDay = yearDay - (152 - dec);
-	}
-	else if (yearDay >= 183 - dec && yearDay <= 212 - dec){
-		*pMonth = 7;
-		*pDay = yearDay - (182 - dec);
-	}
-	else if (yearDay >= 214 - dec && yearDay <= 244 - dec){
-		*pMonth = 8;
-		*pDay = yearDay - (213 - dec);
-	}
-	else if (yearDay >= 245 - dec && yearDay <= 274 - dec){
-		*pMonth = 9;
-		*pDay = yearDay - (244 - dec);
-	}
-	else if (yearDay >= 275 - dec && yearDay <= 305 - dec){
-		*pMonth = 10;
-		*pDay = yearDay - (274 - dec);
-	}
-	else if (yearDay >= 306 - dec && yearDay <= 335 - dec){
-		*pMonth = 11;
-		*pDay = yearDay - (305 - dec);
-	}
-	else if (yearDay >= 336 - dec && yearDay <= 366 - dec) {
-		*pMonth = 12;
-		*pDay = yearDay - (335 - dec);
-	}
-
-}
 
 
 void Interpreter::parse(string event, CalEvent *calEventOut)
@@ -524,3 +436,110 @@ void Interpreter::parse(string event, CalEvent *calEventOut)
 	*calEventOut = curEvent;
 }
 
+void Interpreter::tmConvert(CalEvent Event, time_t *starttime, time_t *endtime)
+{
+
+	int year, mon, day, yday, tim1, tim2;
+
+	year = Event.year;
+	mon = Event.month;
+	day = Event.day;
+	tim1 = Event.time;
+	tim2 = Event.endtime;
+	yday = 0;
+	for (int i = 1; i < Event.month; i++)
+		yday = yday + month_days(year, i);
+	yday = yday + day;
+	*starttime = (year - 1970) * 365 * 24 * 3600 + yday * 24 * 3600 + (tim1 / 100) * 3600 + (tim1 % 100) * 60 + 232 * 3600;
+	if (tim2 == -1) *endtime = *starttime;
+	else *endtime = (year - 1970) * 365 * 24 * 3600 + yday * 24 * 3600 + (tim2 / 100) * 3600 + (tim2 % 100) * 60 + 232 * 3600;
+}
+
+int Interpreter::IsLeapYear(int year)
+{
+	if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
+		return 1;
+	else
+		return 0;
+}
+//return the number of days in a particular month of year
+int Interpreter::month_days(int y, int m)
+{
+	int mon_day[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+	if (IsLeapYear(y) && m == 2)
+		return 29;
+	else
+		return(mon_day[m - 1]);
+}
+
+void Interpreter::wDaySearch(int year, int month, int day, int *wday)
+{
+	int c = 0;
+	float s;
+	int m;
+	for (m = 1; m<month; m++)
+		c = c + month_days(year, m);
+	c = c + day;
+	s = year - 1 + (float)(year - 1) / 4 + (float)(year - 1) / 100 + (float)(year - 1) / 400 - 40 + c;
+	*wday = (int)s % 7;
+}
+
+
+void Interpreter::Monthday(int year, int yearDay, int *pMonth, int *pDay)
+//input: year,yearDay: year & nth day in a year
+//output: pMonth,pDay: month day
+{
+	int dec;
+	if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))  dec = 0;
+	else dec = 1;
+	if (yearDay >= 1 && yearDay <= 31) 	{
+		*pMonth = 1;
+		*pDay = yearDay;
+	}
+	else if (yearDay >= 32 && yearDay <= 60 - dec) {
+		*pMonth = 2;
+		*pDay = yearDay - 31;
+	}
+	else if (yearDay >= 61 - dec && yearDay <= 91 - dec){
+		*pMonth = 3;
+		*pDay = yearDay - (60 - dec);
+	}
+	else if (yearDay >= 92 - dec && yearDay <= 121 - dec){
+		*pMonth = 4;
+		*pDay = yearDay - (91 - dec);
+	}
+	else if (yearDay >= 122 - dec && yearDay <= 152 - dec){
+		*pMonth = 5;
+		*pDay = yearDay - (121 - dec);
+	}
+	else if (yearDay >= 153 - dec && yearDay <= 182 - dec){
+		*pMonth = 6;
+		*pDay = yearDay - (152 - dec);
+	}
+	else if (yearDay >= 183 - dec && yearDay <= 212 - dec){
+		*pMonth = 7;
+		*pDay = yearDay - (182 - dec);
+	}
+	else if (yearDay >= 214 - dec && yearDay <= 244 - dec){
+		*pMonth = 8;
+		*pDay = yearDay - (213 - dec);
+	}
+	else if (yearDay >= 245 - dec && yearDay <= 274 - dec){
+		*pMonth = 9;
+		*pDay = yearDay - (244 - dec);
+	}
+	else if (yearDay >= 275 - dec && yearDay <= 305 - dec){
+		*pMonth = 10;
+		*pDay = yearDay - (274 - dec);
+	}
+	else if (yearDay >= 306 - dec && yearDay <= 335 - dec){
+		*pMonth = 11;
+		*pDay = yearDay - (305 - dec);
+	}
+	else if (yearDay >= 336 - dec && yearDay <= 366 - dec) {
+		*pMonth = 12;
+		*pDay = yearDay - (335 - dec);
+	}
+
+}
