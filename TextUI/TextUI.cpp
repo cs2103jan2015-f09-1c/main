@@ -51,8 +51,9 @@ std::string TextUI::QUALIFIER_DATE_BAR =
 
 std::string TextUI::DEFAULT_DATE_BAR = 
 	"[%1% %2% %3%] %|25t| Description";
-std:: string TextUI:: TIME_PRINT_BOTH =
+std:: string TextUI:: TIME_PRINT=
 	"%1%%2% [%3%] %|25t| ";
+std:: string TextUI:: DONE_PRINT= " (done)";
 
 struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
     struct tm tmStruct;
@@ -230,7 +231,8 @@ void TextUI::printDateBar(const time_t &taskDate) {
 void TextUI::printTasks(TaskList::TList tasks) {
     TaskList::taskIt it;
 	 int counter = 1;
-    
+	 char x = '.';
+
 	std::string lastDate = "";
 	for (it = tasks.begin(); it != tasks.end(); ++it){
 	
@@ -278,13 +280,11 @@ void TextUI::printTasks(TaskList::TList tasks) {
 			timePrint = timeStart+" - "+timeEnd;
 		}
 		
-		char x = '.';
-
-		std::cout << format(TIME_PRINT_BOTH) %counter %x %timePrint;
+		std::cout << format(TIME_PRINT) %counter %x %timePrint;
 		std::cout << it->getTaskName();
 
 		if(it->isDone()){
-			std::cout << " ***";
+			std::cout << DONE_PRINT;
 		}
 
 		std::cout << std::endl;
