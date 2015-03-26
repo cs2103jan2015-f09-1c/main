@@ -166,6 +166,7 @@ Task Interpreter::parseDelCmd(std::string input) {
 				Task _task;
 				_task.setTaskName(taskToDel);
 				_task.setTaskID(0);
+				return _task;
 		}
 		else{
     for (it = list.begin(); it != list.end(); ++it) {
