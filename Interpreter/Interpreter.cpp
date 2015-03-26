@@ -38,7 +38,7 @@ Task Interpreter::parseAddCmd(std::string input) {
 
 Task Interpreter::parseEditCmd(std::string input) {
 	Task a;
-	CalEvent EventOut;
+	/*CalEvent EventOut;
 
 	a.setTaskBegin(0);
 	a.setTaskEnd(0);
@@ -137,7 +137,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 		a = *it;
 	}
 
-	storage->updateStorage(tasklist);
+	storage->updateStorage(tasklist);*/
 	return a;
 } 
 

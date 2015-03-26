@@ -95,6 +95,14 @@ UIObject Controller::handleInput(std::string input) {
             std::string cmdDetails = Interpreter::parseStoreCmd(input);
             storageCmdObj.cmdType(cmdDetails);
             return storageCmdObj.execute();
+        }    
+		case CommandType::DONE: {
+            Logger::log("done storage command");
+
+            DoneCmd doneCmdObj;
+            int index = Interpreter::parseDoneCmd(input);
+			doneCmdObj.prepareIndex(index);
+            return doneCmdObj.execute();
         }
         case CommandType::EXIT_PROGRAM: {
             Logger::log("============= exit program ==============");

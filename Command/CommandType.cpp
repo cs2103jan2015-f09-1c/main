@@ -27,6 +27,9 @@ CommandType::Command CommandType::determineCmdType(std::string userCmd) {
 	if (cmdString == "view") {
 		return CommandType::VIEW;
 	} else 
+	if(cmdString == "done"){
+		return CommandType::DONE;
+	}else
     if (cmdString == "storage") {
 		return CommandType::STORAGE;
 	} else 

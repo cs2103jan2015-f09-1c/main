@@ -34,6 +34,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <time.h>
+#include <iomanip>
 #include "TextUI.h"
 #include "boost/format.hpp"
 #include "MappingNumber.h"
@@ -44,12 +45,15 @@ using boost::format;
 const std::string TextUI::WELCOME_MSG = "Welcome to MyCal!"; 
 const std::string TextUI::HELP_MSG = "Helpppp";
 const std::string TextUI::UNSCHEDULED_DATE_BAR = 
-	"[Unscheduled Tasks] =================================";
+	"[Unscheduled Tasks] %|25t| Description";
 std::string TextUI::QUALIFIER_DATE_BAR = 
-	"[%1% %2% %3% %4%] ===================================";
+	"[%1% %2% %3% %4%] %|25t| Description";
 
 std::string TextUI::DEFAULT_DATE_BAR = 
-	"[%1% %2% %3%] =======================================";
+	"[%1% %2% %3%] %|25t| Description";
+std:: string TextUI:: TIME_PRINT=
+	"%1%%2% [%3%] %|25t| ";
+std:: string TextUI:: DONE_PRINT= " (done)";
 
 struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
     struct tm tmStruct;
@@ -162,6 +166,7 @@ std::string TextUI::getQualifierName(const time_t &taskDate) {
 	return "";
 }
 
+/*
 std::string TextUI::getTimeName(const time_t &taskDate) {
     struct tm localTime = convertToLocalTime(taskDate);
 	std::string timeString = "";
@@ -199,6 +204,7 @@ std::string TextUI::getTimeName(const time_t &taskDate) {
 	timeString = timeString + amPm;
 	return timeString;
 }
+*/
 
 void TextUI::printDateBar(const time_t &taskDate) {
   
@@ -212,14 +218,12 @@ void TextUI::printDateBar(const time_t &taskDate) {
 	    std::string monthName = getMonthName(taskDate);
         struct tm localTime = convertToLocalTime(taskDate);
 	    std::string day = std::to_string(localTime.tm_mday);
-		if(qualifier == "")
-		{
+		if(qualifier == ""){
 			std::cout << format(DEFAULT_DATE_BAR) % wkdayName % monthName % day;
-		}
-		else
-		{
+		}else{
 			std::cout << format(QUALIFIER_DATE_BAR) % qualifier % wkdayName % monthName % day;
 		}
+
 	    std::cout << std::endl;
     }
 }
@@ -227,7 +231,8 @@ void TextUI::printDateBar(const time_t &taskDate) {
 void TextUI::printTasks(TaskList::TList tasks) {
     TaskList::taskIt it;
 	 int counter = 1;
-    
+	 char x = '.';
+
 	std::string lastDate = "";
 	for (it = tasks.begin(); it != tasks.end(); ++it){
 	
@@ -268,22 +273,24 @@ void TextUI::printTasks(TaskList::TList tasks) {
 		}
 		else if(timeEnd == "")
 		{
-			timePrint = "["+timeStart+"]";
+			timePrint = timeStart;
 		}
 		else
 		{
-			timePrint = "["+timeStart+" - "+timeEnd+"]";
+			timePrint = timeStart+" - "+timeEnd;
+		}
+		
+		std::cout << format(TIME_PRINT) %counter %x %timePrint;
+		std::cout << it->getTaskName();
+
+		if(it->isDone()){
+			std::cout << DONE_PRINT;
 		}
 
-
-		std::cout <<  counter << "." << timePrint << '\t' << it->getTaskName();
-		if(it->isDone())
-		{
-			std::cout << " [done]";
-		}
 		std::cout << std::endl;
 	    counter++;
 	}
+
 	std::cout << std::endl;
 }
 
