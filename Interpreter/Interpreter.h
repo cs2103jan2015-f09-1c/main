@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 #include <string>
 #include "Task.h"
 #define LENGTH  200
@@ -42,6 +42,7 @@ public:
     static Task parseDelCmd(std::string input);
 	static int parseDoneCmd(std::string input);
 	static std:: string parseViewCmd(std::string input);
+	static void tmConvert(CalEvent Event, time_t *starttime, time_t *endtime);
 
 	Interpreter(void);
 	~Interpreter(void);
