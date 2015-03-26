@@ -42,7 +42,7 @@ UIObject AddCmd::undo() {
     UIObject undoMessage;
     //undo stuff
 
-	//get current tasks
+    //get current tasks
     Storage* storage = Storage::getInstance();
     TaskList taskList = storage->getTaskList();
 
