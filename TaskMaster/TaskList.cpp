@@ -1,10 +1,6 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include "TaskList.h"
 #include <sstream>
 #include <iomanip> //put_time
-#include <time.h>
-#include <iostream>
-
 
 TaskList::TaskList(void) {
 }
@@ -68,37 +64,6 @@ TaskList::TList TaskList::getTomorrow() const {
     time_t curTime = time(NULL);	//get today
 	curTime += 86400; // add number of seconds in a day
     return getDay(curTime);    
-}
-
-TaskList::TList TaskList::getWeekly() const {	
-	TaskList retList;
-    constTaskIt it;
-
-	time_t curTime;
-	time_t day;
-	struct tm * timeinfo;
-	int diff = 0;
-
-	time (&curTime);
-	timeinfo = localtime(&curTime);
-
-	if(timeinfo->tm_wday != 1){
-		diff = timeinfo->tm_wday - 1;
-		day = curTime - (diff+1)*86400;
-	}else{
-		day = time(&curTime);
-	}
-	
-	for (int i = 0; i<=6; i++){
-		day = day + 86400;
-    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
-        time_t begin = it->getTaskBegin();
-        if (isSameDay(day, begin)) {
-            retList.add((*it));
-        }
-	}
-    }
-    return retList.getAll();
 }
 
 TaskList::TList TaskList::getAll() const {
@@ -167,34 +132,6 @@ void TaskList::markDone(unsigned id){
 //Sorts tasks by date, in ascending order (earliest first)
 void TaskList::sortByDate() {
     _taskList.sort(isEarlier);
-}
-
-//finding taskName from taskID
-std::string TaskList::findTaskName(unsigned idActual) const{
-	constTaskIt it;
-	std::string taskName;
-    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
-        unsigned curId = it->getTaskID();
-        if (foundTask(idActual, curId)) {
-			taskName = it->getTaskName();
-            break;
-        }
-    }
-	return taskName;
-}
-
-//finding taskDate from taskID
-time_t TaskList:: findTaskDate(unsigned idActual) const{
-	constTaskIt it;
-	time_t taskTime;
-    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
-        unsigned curId = it->getTaskID();
-        if (foundTask(idActual, curId)) {
-			taskTime = it->getTaskBegin();
-            break;
-        }
-    }
-	return taskTime;
 }
 
 bool TaskList::foundTask(unsigned idExpected, unsigned idActual) const {
