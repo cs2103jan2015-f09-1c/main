@@ -30,6 +30,9 @@ CommandType::Command CommandType::determineCmdType(std::string userCmd) {
     if (cmdString == "storage") {
 		return CommandType::STORAGE;
 	} else 
+		if(cmdString == "done"){
+		return CommandType::DONE;
+	}else
 	if (cmdString == "exit") {
 		return CommandType::EXIT_PROGRAM;
 	} else {

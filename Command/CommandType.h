@@ -6,7 +6,7 @@ class CommandType {
 public:
     enum Command {
 	    ADD, DEL, EDIT, UNDO, 
-	    SEARCH, VIEW, 
+	    SEARCH, VIEW, DONE,
 	    STORAGE,
 	    EXIT_PROGRAM, INVALID
     };
