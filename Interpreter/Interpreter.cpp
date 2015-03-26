@@ -139,7 +139,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 
 	storage->updateStorage(tasklist);
 	return a;
-}
+} 
 
 std::string Interpreter::parseStoreCmd(std::string input) {    
     std::string cmdDetails;
@@ -159,13 +159,24 @@ Task Interpreter::parseDelCmd(std::string input) {
     TaskList tasklist = storage->getTaskList();
     TaskList::TList list = tasklist.getAll();
     TaskList::taskIt it;
-    //search for task
+
+	int _size = taskToDel.size();
+	for (int i=0; i<_size; i++){
+		if (isdigit(taskToDel[i])){
+				Task _task;
+				_task.setTaskName(taskToDel);
+				_task.setTaskID(0);
+				return _task;
+		}
+		else{
     for (it = list.begin(); it != list.end(); ++it) {
         Task task = *it;
         if (Search(taskToDel, task)) {
             return task;
-        }
-    }
+		}
+	}
+		}
+	}
     //else, throw excpetion
     Task a;
     return a;
