@@ -41,5 +41,20 @@ UIObject AddCmd::execute() {
 UIObject AddCmd::undo() {
     UIObject undoMessage;
     //undo stuff
+
+	//get current tasks
+    Storage* storage = Storage::getInstance();
+    TaskList taskList = storage->getTaskList();
+
+	//Removed the newly added task
+	taskList.remove(_task.getTaskID());
+
+	//Update the storage
+	storage->updateStorage(taskList);
+
+	//return UI Object 
+	undoMessage.setHeaderText("Undo successfully");
+	undoMessage.setTaskList(taskList.getToday());
+
     return undoMessage;
 }
