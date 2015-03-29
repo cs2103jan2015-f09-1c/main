@@ -41,7 +41,6 @@ namespace MyCalTestSuite {
             Assert::AreEqual(originalContents, newContents);
 
             MockStorage::cleanMockStorage(newTaskListLoc);
-            Storage::resetInstance();
 		}
         
         TEST_METHOD(TestUpdateStorage) {
@@ -80,7 +79,6 @@ namespace MyCalTestSuite {
             Assert::AreEqual(oss.str(), listAfterInit.toString());
 
             MockStorage::cleanMockStorage();
-            Storage::resetInstance();    
         }
 	};
 }

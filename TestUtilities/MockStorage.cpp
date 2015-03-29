@@ -20,4 +20,5 @@ void MockStorage::cleanMockStorage(std::string taskListLoc) {
     StorageUtils::removeTaskListFile(taskListLoc);
     StorageUtils::removeSettingsFile();
     StorageUtils::restoreExistingFiles();
+    Storage::resetInstance();
 }
