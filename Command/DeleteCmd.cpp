@@ -29,61 +29,83 @@ void DeleteCmd::recordInHistory(Task task) {
     hist->saveCommand(CommandType::DEL);
 }
 
-bool DeleteCmd::Delete (Task _task){
+int DeleteCmd::ConvertStrtoNum (std::string str){
+	int integer;
+	std::stringstream convert (str);
+	convert >> integer;
+
+	if (convert.fail()){
+		integer = 0;
+	}
+	else{
+		convert >> integer;
+	}
+	return integer;
+}
+
+bool DeleteCmd::CheckTask (Task _task){
 	MappingNumber *mapping = MappingNumber::getInstance();
-	unsigned taskId;
 	std::string taskToDel = _task.getTaskName();
+	int DelNum;
 	if (_task.getTaskID() == 0){
-		int DelNum;
-		std::stringstream convert(taskToDel);
-		if(! (convert >> DelNum))
-		{
+		int integer = ConvertStrtoNum (taskToDel);
+		if (integer == 0){
 			return false;
 		}
 		else{
-		convert >> DelNum;
-		int count = mapping->countNode ();
-		if (DelNum > count ){
-			return false;
-		}
-		else{
-		taskId = mapping->getTaskID(DelNum);
-		return true;
-		}
+			int count = mapping->countNode ();
+			if(integer > count){
+				return false;
+			}
+			else{
+				return true;
+			}
 		}
 	}
-		else{
-			return true;
-		}
+	else{
+		return true;
+	}
+
+}
+
+unsigned DeleteCmd::GetTaskId (){
+  MappingNumber *mapping = MappingNumber::getInstance();
+  std::string taskToDel = _task.getTaskName();
+  unsigned TaskId;
+  int DelNum = ConvertStrtoNum (taskToDel);
+	  TaskId = mapping->getTaskID(DelNum);
+	  return TaskId;
 }
 
 UIObject DeleteCmd::execute() {
   UIObject temp;
+  unsigned TaskId;
+  Storage* storage = Storage::getInstance();
+  TaskList taskList = storage->getTaskList();
 
-    //get current tasks
-    Storage* storage = Storage::getInstance();
-    TaskList taskList = storage->getTaskList();
-	unsigned taskId;
-	if (!(Delete(_task))){
-		temp.setHeaderText("There is no matching task to be deleted. \n");
-	}
-	else{
-	taskList.remove(_task.getTaskID());
-	storage->updateStorage(taskList);
+  if (!CheckTask(_task)){
+	  temp.setHeaderText("There is no matching task to be deleted. \n");
+  }
+  else{
+	  TaskId = GetTaskId();
+	  Task ActualTask = taskList.findTask(TaskId);
 
-	recordInHistory (_task);
+	  recordInHistory (ActualTask);
 
-	TaskList::TList tasksThatDay;
-    tasksThatDay = taskList.getDay(_task.getTaskBegin());
-    temp.setTaskList(tasksThatDay);
+	  taskList.remove(TaskId);
+	  storage->updateStorage(taskList);
 
-	if (tasksThatDay.empty()){
-		temp.setHeaderText("No more tasks for that day! \n");
-	}
-	else{
-		temp.setHeaderText("Remaining tasks for that day: \n");
-	}
-	}
+	  TaskList::TList tasksThatDay;
+      tasksThatDay = taskList.getDay(ActualTask.getTaskBegin());
+      temp.setTaskList(tasksThatDay);
+	  
+	  if (tasksThatDay.empty()){
+		  temp.setHeaderText("No more tasks for that day! \n");
+	  }
+	  else{
+		  temp.setHeaderText("Remaining tasks for that day: \n");
+	  }
+  }
 	 //return UI Object 
 	 return temp;
 }
@@ -102,9 +124,7 @@ UIObject DeleteCmd::undo() {
 	Storage* storage = Storage::getInstance();
     TaskList taskList = storage->getTaskList();
 
-	task.setTaskID(storage->getNextID());
-	taskList.add(_task);
-
+	taskList.add(task);
 	storage->updateStorage(taskList);    
 
 	hist->clearHistory();
