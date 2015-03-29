@@ -1,42 +1,12 @@
 TIMELINE
 ========
 
-Week 10 (V0.2)
-===============
-
-- complete all must-have features (including undo)
-- **write at least one test case**
-- fix urgent bugs
-
-Pham: 
-------
-- Command: Add, Edit, Delete, Search
-- Interpreter: Delete, Search
-
-DD: 
------
-- Interpreter: Add, Edit
-- Fix bugs, complete edit, ensure component fails gracefully
-
-Ratna: 
------
-- TextUI: fix floating tasks, how to differentiate between done and not done tasks, mapping display number to taskID
-- Command: View, Mark Done, 
-- Interpreter: View, Mark Done
-
-YY:
------
-- Storage: More assertions, exceptions. 
-- Project Manual: Make updates to user guide
-- History: for undoing
-- Integration
-
 Week 11 (V0.3)
 ===============
 
-- Focus on Quality Assurance and extensive testing
-- Make sure we meet criteria for automated testing
-- Project Manual
+- fix bugs
+- test cases
+- Code coverage framework
 
 Week 12 (V0.4)
 ===============
