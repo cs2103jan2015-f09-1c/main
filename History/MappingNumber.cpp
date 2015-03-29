@@ -20,7 +20,14 @@ void MappingNumber:: addNode(NODE node){
 void MappingNumber:: clearMappingNumber(){
 	_displayMapping.clear();
 }
-
+int MappingNumber:: countNode (){
+	const_node_iterator iter;
+	int count = 1;
+	for(iter=_displayMapping.begin();  iter != _displayMapping.end(); ++iter){
+		count++;
+	}
+	return count;
+}
 unsigned MappingNumber:: getTaskID(unsigned num) const{
 	const_node_iterator iter;
 	for(iter=_displayMapping.begin();  iter != _displayMapping.end(); ++iter){
