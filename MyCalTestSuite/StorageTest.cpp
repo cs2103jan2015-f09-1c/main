@@ -17,11 +17,7 @@ namespace MyCalTestSuite {
             std::string initialFile = initialTaskListLoc + "tasklist.txt";
             std::string movedFile = newTaskListLoc + "tasklist.txt";
 
-            StorageUtils::backupExistingFiles();
-            StorageUtils::createSettingsFile(initialTaskListLoc);
-
-            Storage *storage = Storage::getInstance();
-            storage->updateStorage(TaskStub::getSampleTaskList());
+            MockStorage::initMockStorage(TaskStub::getSampleTaskList(), initialTaskListLoc);
 
             //File not moved yet and should exist
             Assert::IsTrue(StorageUtils::isFileExist(initialFile.c_str()));
@@ -31,6 +27,7 @@ namespace MyCalTestSuite {
             std::string originalContents = StorageUtils::readFile(initialFile);
             
             //Modify storage location
+            Storage *storage = Storage::getInstance();
             storage->setStorageLoc(newTaskListLoc);
             std::string storageLocExpected = storage->getStorageLoc();
             Assert::AreEqual(storageLocExpected, newTaskListLoc);
@@ -43,20 +40,17 @@ namespace MyCalTestSuite {
             std::string newContents = StorageUtils::readFile(movedFile);
             Assert::AreEqual(originalContents, newContents);
 
+            MockStorage::cleanMockStorage(newTaskListLoc);
             Storage::resetInstance();
-            StorageUtils::removeTaskListFile(newTaskListLoc);
-            StorageUtils::removeSettingsFile();
-            StorageUtils::restoreExistingFiles();
 		}
         
         TEST_METHOD(TestUpdateStorage) {
             std::string taskListLoc = "";
-            StorageUtils::backupExistingFiles();
-            StorageUtils::createSettingsFile(taskListLoc);
 
+            MockStorage::initMockStorage(TaskStub::getSampleTaskList());
             Storage *storage = Storage::getInstance();
-            storage->updateStorage(TaskStub::getSampleTaskList());
             TaskList listAfterUpdate = storage->getTaskList();
+
             std::ostringstream oss;
             oss << "Buy gift for John" << std::endl;
             oss << "Thu Jan 01" << std::endl;
@@ -77,17 +71,16 @@ namespace MyCalTestSuite {
             oss << "Mon Mar 09" << std::endl;
             oss << "07:23 AM - 08:53 AM" << std::endl;
             oss << "0" << std::endl << std::endl;  
-            Assert::AreEqual(oss.str(), listAfterUpdate.toString());
-            Storage::resetInstance();        
 
+            Assert::AreEqual(oss.str(), listAfterUpdate.toString());
+
+            Storage::resetInstance();        
             Storage *storage2 = Storage::getInstance();
             TaskList listAfterInit = storage2->getTaskList();
             Assert::AreEqual(oss.str(), listAfterInit.toString());
-            Storage::resetInstance();    
 
-            StorageUtils::removeSettingsFile();
-            StorageUtils::removeTaskListFile(taskListLoc);
-            StorageUtils::restoreExistingFiles();
+            MockStorage::cleanMockStorage();
+            Storage::resetInstance();    
         }
 	};
 }
