@@ -66,6 +66,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="TaskStub.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TaskStub.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

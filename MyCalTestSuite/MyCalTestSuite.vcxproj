@@ -54,7 +54,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)\Storage;$(SolutionDir)\TaskMaster;$(SolutionDir)\TextUI;$(SolutionDir)\Interpreter;$(SolutionDir)\History;$(SolutionDir)\Controller;$(SolutionDir)\Command;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)\Storage;$(SolutionDir)\TaskMaster;$(SolutionDir)\TextUI;$(SolutionDir)\Interpreter;$(SolutionDir)\History;$(SolutionDir)\Controller;$(SolutionDir)\Command;$(SolutionDir)\TestUtilities;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <BrowseInformation>true</BrowseInformation>
@@ -75,7 +75,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)\Storage;$(SolutionDir)\TaskMaster;$(SolutionDir)\TextUI;$(SolutionDir)\Interpreter;$(SolutionDir)\History;$(SolutionDir)\Controller;$(SolutionDir)\Command;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)\Storage;$(SolutionDir)\TaskMaster;$(SolutionDir)\TextUI;$(SolutionDir)\Interpreter;$(SolutionDir)\History;$(SolutionDir)\Controller;$(SolutionDir)\Command;$(SolutionDir)\TestUtilities;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -92,6 +92,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DeleteCmdTest.cpp" />
     <ClCompile Include="InterpreterTest.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -125,6 +126,9 @@
     </ProjectReference>
     <ProjectReference Include="..\TaskMaster\TaskMaster.vcxproj">
       <Project>{2c173256-f1a1-418f-ad91-055f8a7bc84c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\TestUtilities\TestUtilities.vcxproj">
+      <Project>{9e13eaa1-88e0-4493-9236-8a940ffff241}</Project>
     </ProjectReference>
     <ProjectReference Include="..\TextUI\TextUI.vcxproj">
       <Project>{d9797dc5-bb94-41ff-b9dc-c9b1d79ab7cf}</Project>

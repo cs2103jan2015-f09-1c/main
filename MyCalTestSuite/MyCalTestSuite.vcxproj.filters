@@ -6,6 +6,7 @@
     <ClCompile Include="StorageTest.cpp" />
     <ClCompile Include="TaskMasterTest.cpp" />
     <ClCompile Include="TextUITest.cpp" />
+    <ClCompile Include="DeleteCmdTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
