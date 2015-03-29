@@ -5,6 +5,7 @@ public:
     AddCmd(void);
     ~AddCmd(void);
     void prepareTask(Task task);
+	void recordInHistory (Task task);
     UIObject execute();
     UIObject undo();
 
