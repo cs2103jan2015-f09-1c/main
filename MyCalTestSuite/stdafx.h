@@ -18,3 +18,4 @@
 #include "TaskStub.h"
 #include "StorageUtils.h"
 #include "MockStorage.h"
+#include "DeleteCmd.h"

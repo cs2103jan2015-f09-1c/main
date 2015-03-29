@@ -44,7 +44,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Log;$(SolutionDir)\TaskMaster;$(SolutionDir)\History;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Log;$(SolutionDir)\TaskMaster;$(SolutionDir)\History;$(SolutionDir)\Storage;$(SolutionDir)\Controller;$(SolutionDir)\Interpreter;$(SolutionDir)\TextUI;$(SolutionDir)\Command;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -57,7 +57,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Log;$(SolutionDir)\TaskMaster;$(SolutionDir)\History;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Log;$(SolutionDir)\TaskMaster;$(SolutionDir)\History;$(SolutionDir)\Storage;$(SolutionDir)\Controller;$(SolutionDir)\Interpreter;$(SolutionDir)\TextUI;$(SolutionDir)\Command;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
