@@ -15,8 +15,10 @@ public:
     void update(Task task);
     void remove(unsigned id);
 	void markDone(unsigned id);
+	void markUndone(unsigned id);
 	std::string findTaskName(unsigned idActual) const;
 	time_t findTaskDate(unsigned idActual) const;
+	Task findTask(unsigned idActual) const;
 
 	TList getTomorrow() const;
     TList getDay(time_t day) const; //get tasks of a certain day

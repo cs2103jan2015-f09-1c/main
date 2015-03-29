@@ -164,6 +164,19 @@ void TaskList::markDone(unsigned id){
     }
 }
 
+void TaskList::markUndone(unsigned id){
+    taskIt it;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        unsigned curId = it->getTaskID();
+
+        if (foundTask(id, curId)) {
+            it->markUndone();
+            break;
+        }
+    }
+}
+
+
 //Sorts tasks by date, in ascending order (earliest first)
 void TaskList::sortByDate() {
     _taskList.sort(isEarlier);
@@ -195,6 +208,16 @@ time_t TaskList:: findTaskDate(unsigned idActual) const{
         }
     }
 	return taskTime;
+}
+
+Task TaskList::findTask(unsigned idActual) const{
+	constTaskIt it;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        unsigned curId = it->getTaskID();
+        if (foundTask(idActual, curId)) {
+			return(*it);
+        }
+    }
 }
 
 bool TaskList::foundTask(unsigned idExpected, unsigned idActual) const {
