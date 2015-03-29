@@ -25,7 +25,6 @@ public:
 	TList getWeekly() const;
     void loadTaskList(TList list);
     int totalTasks() const;
-
     std::string toString() const;
 
 private:
@@ -36,4 +35,3 @@ private:
     bool foundTask(unsigned idExpected, unsigned idActual) const;
     void replaceTask(taskIt pos, Task newTask);
 };
-

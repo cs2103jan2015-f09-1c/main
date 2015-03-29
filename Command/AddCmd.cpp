@@ -1,6 +1,12 @@
 #include "AddCmd.h"
 #include "Storage.h"
 #include "TaskList.h"
+#include <assert.h>
+#include "InvalidFilePathException.h"
+#include "Shlwapi.h" // PathFileExists
+#include "History.h"
+#include "State.h"
+#include "Logger.h"
 
 AddCmd::AddCmd(void) {
 }
@@ -12,6 +18,15 @@ AddCmd::~AddCmd(void) {
 void AddCmd::prepareTask(Task task) {
     _task = task;
 }
+
+void AddCmd::recordInHistory(Task task) {
+    State prevState; 
+    prevState.recordTask (task);
+    History *hist = History::getInstance();
+    hist->saveState(prevState);
+    hist->saveCommand(CommandType::ADD);
+}
+
 
 UIObject AddCmd::execute() {
     //get current tasks
@@ -27,6 +42,8 @@ UIObject AddCmd::execute() {
     //update storage
     storage->updateStorage(taskList);    
 
+	recordInHistory (_task);
+
     //returns the day's tasks
     TaskList::TList tasksThatDay;
     tasksThatDay = taskList.getDay(_task.getTaskBegin());
@@ -39,22 +56,29 @@ UIObject AddCmd::execute() {
 }
 
 UIObject AddCmd::undo() {
-    UIObject undoMessage;
-    //undo stuff
+	History *hist = History::getInstance();
 
-    //get current tasks
-    Storage* storage = Storage::getInstance();
+	CommandType::Command prevCmd = hist->getPreviousCommand();
+    assert(prevCmd == CommandType::ADD);
+
+	State prevState = hist->getPreviousState();
+	Task task = prevState.getTask();
+
+	Storage* storage = Storage::getInstance();
     TaskList taskList = storage->getTaskList();
 
 	//Removed the newly added task
-	taskList.remove(_task.getTaskID());
-
-	//Update the storage
+	taskList.remove(task.getTaskID());
 	storage->updateStorage(taskList);
 
-	//return UI Object 
+	hist->clearHistory();
+
+    UIObject undoMessage;
+
+	TaskList::TList tasksThatDay;
+    tasksThatDay = taskList.getDay(_task.getTaskBegin());
 	undoMessage.setHeaderText("Undo successfully");
-	undoMessage.setTaskList(taskList.getToday());
+	undoMessage.setTaskList(tasksThatDay);
 
     return undoMessage;
 }

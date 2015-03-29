@@ -10,7 +10,6 @@ Task::Task(void): _taskID(0), _isDone(false), _isFloating(true),
 
 Task::~Task(void) {
 }
-
 void Task::setTaskName(std::string name) {
     _taskName = name;
 }

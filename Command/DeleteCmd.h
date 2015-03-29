@@ -5,6 +5,8 @@ public:
     DeleteCmd(void);
     ~DeleteCmd(void);
     void prepareTask(Task task);
+	bool Delete (Task _task);
+	void recordInHistory(Task task);
     UIObject execute();
     UIObject undo();
 
