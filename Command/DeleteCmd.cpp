@@ -42,8 +42,15 @@ bool DeleteCmd::Delete (Task _task){
 			return false;
 		}
 		else{
-		taskId =  mapping->getTaskID(DelNum);
+		convert >> DelNum;
+		int count = mapping->countNode ();
+		if (DelNum > count ){
+			return false;
+		}
+		else{
+		taskId = mapping->getTaskID(DelNum);
 		return true;
+		}
 		}
 	}
 		else{
