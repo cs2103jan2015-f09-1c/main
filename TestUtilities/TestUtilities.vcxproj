@@ -66,9 +66,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="MockStorage.h" />
+    <ClInclude Include="StorageUtils.h" />
     <ClInclude Include="TaskStub.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="MockStorage.cpp" />
+    <ClCompile Include="StorageUtils.cpp" />
     <ClCompile Include="TaskStub.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
