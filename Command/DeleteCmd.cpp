@@ -17,8 +17,8 @@ DeleteCmd::DeleteCmd(void) {
 DeleteCmd::~DeleteCmd(void) {
 }
 
-void DeleteCmd::prepareTask(Task task) {
-    _task = task;
+void DeleteCmd::prepareTaskId(int _TaskId) {
+    TaskId = _TaskId;
 }
 
 void DeleteCmd::recordInHistory(Task task) {
@@ -29,67 +29,16 @@ void DeleteCmd::recordInHistory(Task task) {
     hist->saveCommand(CommandType::DEL);
 }
 
-int DeleteCmd::ConvertStrtoNum (std::string str){
-	int integer;
-	std::stringstream convert (str);
-	convert >> integer;
-
-	if (convert.fail()){
-		integer = 0;
-	}
-	else{
-		convert >> integer;
-	}
-	return integer;
-}
-
-bool DeleteCmd::CheckTask (Task _task){
-	MappingNumber *mapping = MappingNumber::getInstance();
-	std::string taskToDel = _task.getTaskName();
-	int DelNum;
-	if (_task.getTaskID() == 0){
-		int integer = ConvertStrtoNum (taskToDel);
-		if (integer == 0){
-			return false;
-		}
-		else{
-			int count = mapping->countNode ();
-			if(integer > count){
-				return false;
-			}
-			else{
-				return true;
-			}
-		}
-	}
-	else{
-		return true;
-	}
-
-}
-
-unsigned DeleteCmd::GetTaskId (){
-  MappingNumber *mapping = MappingNumber::getInstance();
-  std::string taskToDel = _task.getTaskName();
-  unsigned TaskId;
-  int DelNum = ConvertStrtoNum (taskToDel);
-	  TaskId = mapping->getTaskID(DelNum);
-	  return TaskId;
-}
-
 UIObject DeleteCmd::execute() {
   UIObject temp;
-  unsigned TaskId;
   Storage* storage = Storage::getInstance();
   TaskList taskList = storage->getTaskList();
 
-  if (!CheckTask(_task)){
+  if (TaskId == 0){
 	  temp.setHeaderText("There is no matching task to be deleted. \n");
   }
   else{
-	  TaskId = GetTaskId();
 	  Task ActualTask = taskList.findTask(TaskId);
-
 	  recordInHistory (ActualTask);
 
 	  taskList.remove(TaskId);
@@ -132,7 +81,7 @@ UIObject DeleteCmd::undo() {
     UIObject undoMessage;
   
     TaskList::TList tasksThatDay;
-    tasksThatDay = taskList.getDay(_task.getTaskBegin());
+    tasksThatDay = taskList.getDay(task.getTaskBegin());
 
 	//return UIObject
 	undoMessage.setHeaderText("Undo successfully");
