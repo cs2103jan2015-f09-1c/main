@@ -18,9 +18,21 @@
     <ClInclude Include="TaskStub.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MockStorage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StorageUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TaskStub.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MockStorage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StorageUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
