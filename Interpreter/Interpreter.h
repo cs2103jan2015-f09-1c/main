@@ -32,6 +32,7 @@ private:
 			return false;
 		}
 	}
+	static int parse(std::string event, CalEvent *calEventOut);
 	static int IsLeapYear(int year); //return = 1 means leap year
 	static int month_days(int year, int month); //return number of days in a particular month
 	static void wDaySearch(int year, int month, int day, int *wday); //output: wday:(0-6: Sun,Mon,....,Sat)

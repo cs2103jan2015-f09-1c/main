@@ -11,26 +11,29 @@ const size_t Interpreter::NUM_CHARS_VIEW = 4;
 Task Interpreter::parseAddCmd(std::string input) {
 
 	Task a;
+	int flag;
 
 	CalEvent EventOut;
+
+	string event;
+	const char *cal = input.c_str();
+	event.assign(cal, 4, strlen(cal) - 4);
+	flag = parse(event, &EventOut);
+	if (flag <= -1){
+		cout << "input error,please check the input" << endl;
+		a.setTaskBegin(0);
+		a.setTaskEnd(0);
+		a.setTaskName("");
+		return a;
+	}
+
 	time_t starttime, endtime;
-	int year, mon, day, yday, tim1, tim2;
-
-	parse(input, &EventOut);
-
-	year = EventOut.year;
-	mon = EventOut.month;
-	day = EventOut.day;
-	tim1 = EventOut.time;
-	tim2 = EventOut.endtime;
-	yday = 0;
-	for (int i = 1; i < EventOut.month; i++)
-		yday = yday + month_days(year, i);
-	yday = yday + day;
-	starttime = (year - 1970) * 365 * 24 * 3600 + yday * 24 * 3600 + (tim1 / 100) * 3600 + (tim1 % 100) * 60 + 232 * 3600;
-	if (tim2 == -1) endtime = starttime;
-	else endtime = (year - 1970) * 365 * 24 * 3600 + yday * 24 * 3600 + (tim2 / 100) * 3600 + (tim2 % 100) * 60 + 232 * 3600;
-
+	if (EventOut.year != -1)
+		tmConvert(EventOut, &starttime, &endtime);
+	else{
+		starttime = 0;
+		endtime = 0;
+	}
 	a.setTaskBegin(starttime);
 	a.setTaskEnd(endtime);
 	a.setTaskName(EventOut.event);
@@ -73,8 +76,11 @@ Task Interpreter::parseEditCmd(std::string input) {
 	TaskList tasklist = storage->getTaskList();
 	TaskList::TList list = tasklist.getAll();
 	TaskList::taskIt it;
+	
+	int num = 0;
 	for (it = list.begin(); it != list.end(); ++it) {
-		if (it->getTaskID() == recID){
+		num++;
+		if (/*it->getTaskID()*/num == recID){
 			findF = 1;
 			break;
 		}
@@ -127,7 +133,12 @@ Task Interpreter::parseEditCmd(std::string input) {
 		curStr.assign(tempEvent, 0, strlen(tempEvent));
 		parse(curStr, &EventOut);
 		time_t startt, endt;
-		tmConvert(EventOut, &startt, &endt);
+		if (EventOut.year != -1)
+			tmConvert(EventOut, &startt, &endt);
+		else{
+			startt = 0;
+			endt = 0;
+		}
 		it->setTaskBegin(startt);
 		it->setTaskEnd(endt);
 		it->setTaskName(EventOut.event);
@@ -222,7 +233,7 @@ Interpreter::~Interpreter(void) {
 
 
 
-void Interpreter::parse(string event, CalEvent *calEventOut)
+int Interpreter::parse(string event, CalEvent *calEventOut)
 {
 	char week[7][10] = { "Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat" };
 	int posOn, posAt, posTmr1, posTmr2, posNext, posFrom, posEvent;
@@ -246,11 +257,10 @@ void Interpreter::parse(string event, CalEvent *calEventOut)
 
 	string cureve;
 	posEvent = event.find(":", 0);
-	if (posEvent != -1) 
-		cureve.assign(cal, 4, posEvent - 4); //start copying from pos 4 
-    //so assuming time is of the form 1234pm?
-	else //input does not have additional details. Just taskname.
-		cureve.assign(cal, 4, strlen(cal) - 4);
+	if (posEvent != -1)
+		cureve.assign(cal, 0, posEvent);
+	else
+		cureve.assign(cal, 0, strlen(cal));
 	const char *cheve = cureve.c_str();
 	curEvent.event = cureve;    //´¿ÊÂ¼þ
 
@@ -279,9 +289,9 @@ void Interpreter::parse(string event, CalEvent *calEventOut)
 		for (i = 0; i<7; i++){
 			if (strweek.find(week[i], 0) != -1) break;
 		}
-		if (i == 7){
-			return;
-		}
+		if (i == 7)
+			return -1;
+
 		int yday, year, wday, nextwday;
 		year = timeinfo.tm_year + 1900;
 		yday = timeinfo.tm_yday + 1;
@@ -309,14 +319,14 @@ void Interpreter::parse(string event, CalEvent *calEventOut)
 		i = posFrom + 6;
 		k = 0;
 		j = 0;
-		char tmch[10], apm[2][5];
+		char tmch[2][10], apm[2][5];
 		int  tim[2];
 		int num = 0;
 		strcpy_s(apm[0], "am");
 		strcpy_s(apm[1], "am");
 		while (i<strlen(cal)) {
 			if (cal[i] >= '0' && cal[i] <= '9') {
-				tmch[k] = cal[i];
+				tmch[num][k] = cal[i];
 				k++;
 			}
 			else if (cal[i] == 'a' || cal[i] == 'p' || cal[i] == 'm') {
@@ -326,13 +336,13 @@ void Interpreter::parse(string event, CalEvent *calEventOut)
 			else if (cal[i] == 't' || cal[i] == '-') {
 				k = 0;
 				j = 0;
-				tim[num] = atoi(tmch);
+				tim[num] = atoi(tmch[num]);
 				num++;
 			}
 			else;
 			i++;
 		}
-		tim[num] = atoi(tmch);
+		tim[num] = atoi(tmch[num]);
 		for (int ii = 0; ii<2; ii++) {
 			if (strcmp(apm[ii], "pm") == 0){
 				if (tim[ii]>100)
@@ -383,6 +393,9 @@ void Interpreter::parse(string event, CalEvent *calEventOut)
 		curEvent.year = dmy[2];
 		curEvent.month = dmy[1];
 		curEvent.day = dmy[0];
+
+		if (curEvent.month>12 || curEvent.month <= 0 || curEvent.day>31 || curEvent.day <= 0)
+			return -1;
 	}
 
 	//deal with "at" in a command
@@ -417,11 +430,14 @@ void Interpreter::parse(string event, CalEvent *calEventOut)
 		}
 		if (tmm<100) tmm = tmm * 100;
 		curEvent.time = tmm;
+		curEvent.endtime = curEvent.time + 200;
 		if (posOn == -1){
 			curEvent.year = timeinfo.tm_year + 1900;
 			curEvent.month = timeinfo.tm_mon + 1;
 			curEvent.day = timeinfo.tm_mday;
 		}
+		if (tmm>2400)  
+			return -1;
 	}
 
 	//deal with "tomorrow" in a command
@@ -447,6 +463,8 @@ void Interpreter::parse(string event, CalEvent *calEventOut)
 
 	wDaySearch(curEvent.year, curEvent.month, curEvent.day, &curEvent.wday);
 	*calEventOut = curEvent;
+	return 1;
+		
 }
 
 void Interpreter::tmConvert(CalEvent Event, time_t *starttime, time_t *endtime)
