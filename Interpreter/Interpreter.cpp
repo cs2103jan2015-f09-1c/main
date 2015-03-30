@@ -2,6 +2,7 @@
 #include "Storage.h"
 #include <iostream>
 #include <sstream>
+#include "MappingNumber.h"
 
 using namespace std; //please avoid using "using namespace std"
 const size_t Interpreter::NUM_CHARS_STORAGE = 7;
@@ -153,34 +154,32 @@ std::string Interpreter::parseStoreCmd(std::string input) {
     return cmdDetails;
 }
 
-Task Interpreter::parseDelCmd(std::string input) {
-    std::string taskToDel = input.substr(7);
-    Storage *storage = Storage::getInstance();
-    TaskList tasklist = storage->getTaskList();
-    TaskList::TList list = tasklist.getAll();
-    TaskList::taskIt it;
-
-	int _size = taskToDel.size();
-	for (int i=0; i<_size; i++){
-		if (isdigit(taskToDel[i])){
-				Task _task;
-				_task.setTaskName(taskToDel);
-				_task.setTaskID(0);
-				return _task;
+int Interpreter::parseDelCmd(std::string input){
+	  MappingNumber *mapping = MappingNumber::getInstance();
+	  Task _task = prepareDelCmd (input);
+  std::string taskToDel = _task.getTaskName();
+  int TaskId;
+  int integer;
+  int ID = _task.getTaskID();
+  if (ID == 0){
+	  integer = ConvertStrtoNum (taskToDel);
+		if (integer == 0){
+			TaskId = 0;
 		}
 		else{
-    for (it = list.begin(); it != list.end(); ++it) {
-        Task task = *it;
-        if (Search(taskToDel, task)) {
-            return task;
+			int count = mapping->countNode ();
+			if(integer > count){
+				TaskId = 0;
+			}
+			else{
+				TaskId = mapping->getTaskID(integer);
+			}
 		}
-	}
-		}
-	}
-    //else, throw excpetion
-    Task a;
-    return a;
-
+  }
+  else if (ID !=0){
+	  TaskId = ID;
+  }
+	  return TaskId;
 }
 
 int Interpreter::parseDoneCmd(std::string input){
@@ -542,4 +541,47 @@ void Interpreter::Monthday(int year, int yearDay, int *pMonth, int *pDay)
 		*pDay = yearDay - (335 - dec);
 	}
 
+}
+Task Interpreter::prepareDelCmd(std::string input) {
+    std::string taskToDel = input.substr(7);
+    Storage *storage = Storage::getInstance();
+    TaskList tasklist = storage->getTaskList();
+    TaskList::TList list = tasklist.getAll();
+    TaskList::taskIt it;
+
+	int _size = taskToDel.size();
+	for (int i=0; i<_size; i++){
+		if (isdigit(taskToDel[i])){
+				Task _task;
+				_task.setTaskName(taskToDel);
+				_task.setTaskID(0);
+				return _task;
+		}
+		else{
+    for (it = list.begin(); it != list.end(); ++it) {
+        Task task = *it;
+        if (Search(taskToDel, task)) {
+            return task;
+		}
+	}
+		}
+	}
+    //else, throw excpetion
+    Task a;
+    return a;
+
+}
+
+int Interpreter::ConvertStrtoNum(std::string str){
+	int integer;
+	std::stringstream convert (str);
+	convert >> integer;
+
+	if (convert.fail()){
+		integer = 0;
+	}
+	else{
+		convert >> integer;
+	}
+	return integer;
 }
