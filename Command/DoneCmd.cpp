@@ -4,6 +4,10 @@
 #include "MappingNumber.h"
 #include <iostream>
 #include <time.h>
+#include <assert.h>
+#include "History.h"
+#include "State.h"
+#include "Logger.h"
 
 DoneCmd::DoneCmd(void) {
 }
@@ -39,9 +43,48 @@ UIObject DoneCmd:: execute(){
     //update storage
     storage->updateStorage(taskList);    
 
+	Task _task;
+	_task = taskList.findTask(taskId);
+	recordInHistory(_task);
+
 	selectedTasks = taskList.getDay(taskTime);
     
 	doneObj.setHeaderText("done: " + taskName);
 	doneObj.setTaskList(selectedTasks); // currently it will show all after marking the task is done
     return doneObj;
+}
+
+void DoneCmd::recordInHistory(Task task) {
+    State prevState; 
+    prevState.recordTask (task);
+    History *hist = History::getInstance();
+    hist->saveState(prevState);
+    hist->saveCommand(CommandType::DONE);
+}
+
+UIObject DoneCmd:: undo(){
+	History *hist = History::getInstance();
+
+	CommandType::Command prevCmd = hist->getPreviousCommand();
+    assert(prevCmd == CommandType::DONE);
+
+	State prevState = hist->getPreviousState();
+	Task task = prevState.getTask();
+
+	Storage* storage = Storage::getInstance();
+    TaskList taskList = storage->getTaskList();
+
+	//Removed the newly added task
+	taskList.markUndone(task.getTaskID());
+	storage->updateStorage(taskList);
+
+	hist->clearHistory();
+
+    UIObject undoMessage;
+
+	undoMessage.setHeaderText("Undo successfully");
+	undoMessage.setTaskList(selectedTasks);
+
+    return undoMessage;
+
 }
