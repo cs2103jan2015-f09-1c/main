@@ -117,11 +117,7 @@ std::string TaskList::toString() const {
     std::ostringstream oss;
     constTaskIt it;
     for (it = _taskList.begin(); it != _taskList.end(); ++it) {
-        oss << it->getTaskName() << std::endl;
-        oss << it->getDateStr() << std::endl ;
-        oss << it->getBeginStr() << " - ";
-        oss << it->getEndStr() << std::endl;
-        oss << it->isDone() << std::endl << std::endl;
+        oss << it->toString() << std::endl;
     }
 
     return oss.str();

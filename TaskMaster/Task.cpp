@@ -89,3 +89,15 @@ unsigned Task::getTaskID() const {
 void Task::setTaskID(unsigned id) {
     _taskID = id;
 }
+
+std::string Task::toString() const {
+    std::ostringstream oss;
+    oss << getTaskID() << std::endl;
+    oss << getTaskName() << std::endl;
+    oss << getDateStr() << std::endl ;
+    oss << getBeginStr() << " - ";
+    oss << getEndStr() << std::endl;
+    oss << isDone() << std::endl;
+
+    return oss.str();
+}

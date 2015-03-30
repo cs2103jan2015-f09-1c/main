@@ -27,6 +27,8 @@ public:
     unsigned getTaskID() const;
     void setTaskID(unsigned id);
 
+    std::string toString() const;
+
 private:
     unsigned _taskID;
     std::string _taskName;
