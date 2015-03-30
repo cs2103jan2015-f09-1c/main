@@ -5,11 +5,11 @@ public:
     ViewCmd(void);
 	~ViewCmd(void);
 	void prepareDetail (std::string detail);
-	void getSelectedTasks();
+	TaskList::TList getSelectedTasks();
     UIObject execute();
+	static const std::string NO_TASK_MESSAGE;
 
 private:
 	std::string _detail;
-	TaskList::TList selectedTasks;
 	time_t getDayPosition(int index);
 };

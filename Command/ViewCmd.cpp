@@ -7,6 +7,8 @@
 #include "ViewType.h"
 #include <time.h>
 
+const std::string ViewCmd:: NO_TASK_MESSAGE = "There is no task. Start writing one now!"; 
+
 ViewCmd::ViewCmd(void) {
 }
 
@@ -30,8 +32,12 @@ time_t ViewCmd:: getDayPosition(int index){
 		diff = index - timeinfo->tm_wday;
 		day = curTime + diff*86400;
 	}else 
-	if(timeinfo->tm_wday > index){
-		diff = index - timeinfo->tm_wday;
+	if(timeinfo->tm_wday > index && index == 0){
+		diff = 7 - timeinfo->tm_wday;
+		day = curTime + diff*86400;
+	}else
+	if(timeinfo->tm_wday > index && index != 0){
+		diff = 7 - timeinfo->tm_wday + index;
 		day = curTime + diff*86400;
 	}else{
 		day = curTime;
@@ -40,67 +46,65 @@ time_t ViewCmd:: getDayPosition(int index){
 	return day;
 }
 
-void ViewCmd:: getSelectedTasks(){
+TaskList::TList ViewCmd:: getSelectedTasks(){
 	
+	TaskList::TList selectedTasks;
 	//get current tasks
     Storage* storage = Storage::getInstance();
     TaskList taskList = storage->getTaskList();
-
-	//returns the day's tasks
-	if(_detail == "all"){
-		selectedTasks = taskList.getAll();
-	} else
-	if(_detail == "today"){
-		selectedTasks = taskList.getToday();
-	}else
-	if(_detail == "tomorrow"){
-		selectedTasks = taskList.getTomorrow();
-	}else
-	if(_detail == "weekly"){
-		selectedTasks = taskList.getWeekly();
-	}
-	/*
+	
 	ViewType::View ViewType = ViewType::determineViewType(_detail);  
 	 switch (ViewType) {
         case ViewType::SUNDAY: {
 			time_t day = getDayPosition(0);
 			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
 		}
 		case ViewType::MONDAY: {
 			time_t day = getDayPosition(1);
 			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
         }
 		case ViewType::TUESDAY: {
 			time_t day = getDayPosition(2);
 			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
         }
 		case ViewType::WEDNESDAY: {
 			time_t day = getDayPosition(3);
 			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
         }
 		case ViewType::THURSDAY: {
 			time_t day = getDayPosition(4);
 			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
         }
 		case ViewType::FRIDAY: {
 			time_t day = getDayPosition(5);
 			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
         }
 		case ViewType::SATURDAY: {
 			time_t day = getDayPosition(6);
 			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
         }
 		case ViewType::ALL: {
 			selectedTasks = taskList.getAll();
+			return selectedTasks;
         }
 		case ViewType::TODAY: {
 			selectedTasks = taskList.getToday();
+			return selectedTasks;
         }
 		case ViewType::TOMORROW: {
 			selectedTasks = taskList.getTomorrow();
+			return selectedTasks;
         }
 		case ViewType::WEEKLY: {
 			selectedTasks = taskList.getWeekly();
+			return selectedTasks;
         }
 		case ViewType::INVALID: {
 		//	selectedTasks = NULL;
@@ -109,20 +113,19 @@ void ViewCmd:: getSelectedTasks(){
 		//	selectedTasks = NULL;
 		 }
 	 }
-	 */
 }
 
 
 UIObject ViewCmd::execute() {
 	std:: string header;
-	
-	getSelectedTasks();
+	TaskList::TList selectedTasks;
+	selectedTasks = getSelectedTasks();
    
     UIObject viewObj;
 	if(!selectedTasks.empty()){
 		viewObj.setTaskList(selectedTasks);
 	} else{
-		viewObj.setHeaderText("There is no task!");
+		viewObj.setHeaderText(NO_TASK_MESSAGE);
 	}
 	return viewObj;
 }

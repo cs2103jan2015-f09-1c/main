@@ -31,6 +31,10 @@ UIObject Controller::undoCommand(CommandType::Command cmdType) {
             StorageCmd storageCmd;
             return storageCmd.undo();
         }
+		case CommandType::DONE:{
+            DoneCmd doneCmd;
+            return doneCmd.undo();
+        }
         default:
             UIObject noUndo;
             noUndo.setHeaderText("No more actions to undo.");
