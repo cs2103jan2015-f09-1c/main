@@ -17,6 +17,7 @@ public:
 	static MappingNumber* getInstance();
     static void resetInstance(); 
 	void addNode(NODE node);
+	int countNode();
 	void clearMappingNumber(); // everytime a fresh set of tasks is displayed on textUI, and we want to add a fresh set of nodes, we should clear everything in the vector. If not will have duplicates
 	unsigned getTaskID(unsigned num) const;// pass in a number on screen,
 	//should return corresponding taskID

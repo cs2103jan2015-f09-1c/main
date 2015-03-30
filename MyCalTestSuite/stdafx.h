@@ -15,3 +15,7 @@
 #include "TaskList.h"
 #include "TextUI.h"
 #include "Interpreter.h"
+#include "TaskStub.h"
+#include "StorageUtils.h"
+#include "MockStorage.h"
+#include "DeleteCmd.h"

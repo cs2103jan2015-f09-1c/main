@@ -4,10 +4,11 @@ class DeleteCmd : public CommandInterface {
 public:
     DeleteCmd(void);
     ~DeleteCmd(void);
-    void prepareTask(Task task);
+    void prepareTaskId(int _TaskId);
+	void recordInHistory(Task task);
     UIObject execute();
     UIObject undo();
 
 private:
-    Task _task;
+    int TaskId;
 };
