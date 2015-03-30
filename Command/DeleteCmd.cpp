@@ -35,7 +35,7 @@ UIObject DeleteCmd::execute() {
   TaskList taskList = storage->getTaskList();
 
   if (TaskId == 0){
-	  temp.setHeaderText("There is no matching task to be deleted. \n");
+	  temp.setHeaderText("There is no matching task to be deleted.");
   }
   else{
 	  Task ActualTask = taskList.findTask(TaskId);
@@ -49,10 +49,10 @@ UIObject DeleteCmd::execute() {
       temp.setTaskList(tasksThatDay);
 	  
 	  if (tasksThatDay.empty()){
-		  temp.setHeaderText("No more tasks for that day! \n");
+		  temp.setHeaderText("No more tasks for that day!");
 	  }
 	  else{
-		  temp.setHeaderText("Remaining tasks for that day: \n");
+		  temp.setHeaderText("Remaining tasks for that day:");
 	  }
   }
 	 //return UI Object 
@@ -84,7 +84,7 @@ UIObject DeleteCmd::undo() {
     tasksThatDay = taskList.getDay(task.getTaskBegin());
 
 	//return UIObject
-	undoMessage.setHeaderText("Undo successfully");
+	undoMessage.setHeaderText("Undo successfully.");
 	undoMessage.setTaskList(tasksThatDay);
 
     return undoMessage;
