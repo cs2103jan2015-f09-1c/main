@@ -2,6 +2,7 @@
 #include "Storage.h"
 #include "TaskList.h"
 #include "MappingNumber.h"
+#include "InvalidIndex.h"
 #include <iostream>
 #include <time.h>
 #include <assert.h>
@@ -19,17 +20,45 @@ void DoneCmd::prepareIndex(int index) {
     _index = index;
 }
 
-UIObject DoneCmd:: execute(){
-	UIObject doneObj;
+void DoneCmd::verifyIndex(){
+	MappingNumber *mapping = MappingNumber::getInstance();
+	if (_index > mapping->countNode() && mapping->countNode() <= 0 ) {
+        throw InvalidIndex("Invalid index. Please try again");
+    }
+}
+
+std::string DoneCmd::markDone() {
+    std::string retText;
 	MappingNumber *mapping = MappingNumber::getInstance();
     
     //get current tasks
     Storage* storage = Storage::getInstance();
     TaskList taskList = storage->getTaskList();
 
+    try { 
+        verifyIndex();
+    } catch(InvalidIndex& e) {
+        retText = e.what();
+    }
+
+    return retText;
+}
+
+UIObject DoneCmd:: execute(){
+	UIObject doneObj;
+	MappingNumber *mapping = MappingNumber::getInstance();
+	std:: string headerText;
+
+	if (_index > mapping->countNode() && mapping->countNode() <= 0 ){	
+		headerText = markDone();
+	}else{
+    //get current tasks
+    Storage* storage = Storage::getInstance();
+    TaskList taskList = storage->getTaskList();
+
 	//before execution, we generate mapping number first
 	unsigned taskId =  mapping->getTaskID(_index);
-	
+
 	//mark done
 	taskList.markDone(taskId);
 
@@ -46,11 +75,13 @@ UIObject DoneCmd:: execute(){
 	Task _task;
 	_task = taskList.findTask(taskId);
 	recordInHistory(_task);
-
 	selectedTasks = taskList.getDay(taskTime);
-    
-	doneObj.setHeaderText("done: " + taskName);
-	doneObj.setTaskList(selectedTasks); // currently it will show all after marking the task is done
+
+	headerText = "Done: " + taskName;
+	}
+
+	doneObj.setHeaderText(headerText);
+	doneObj.setTaskList(selectedTasks);
     return doneObj;
 }
 
@@ -86,5 +117,4 @@ UIObject DoneCmd:: undo(){
 	undoMessage.setTaskList(selectedTasks);
 
     return undoMessage;
-
 }

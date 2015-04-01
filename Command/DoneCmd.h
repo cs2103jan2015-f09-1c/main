@@ -6,6 +6,8 @@ public:
 	~DoneCmd(void);
 	void prepareIndex (int index);
 	void recordInHistory(Task task);
+	void verifyIndex();
+	std:: string markDone();
     UIObject execute();
 	UIObject undo();
 
