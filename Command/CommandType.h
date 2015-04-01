@@ -15,6 +15,7 @@ public:
     ~CommandType(void);
 
     static Command determineCmdType(std::string userCmd);
+	static std::string cmdToString(Command cmdType);
 
 private:
     static std::string getFirstWord(std::string userCmd);

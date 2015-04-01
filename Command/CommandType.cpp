@@ -40,6 +40,38 @@ CommandType::Command CommandType::determineCmdType(std::string userCmd) {
 	}
 }
 
+std::string CommandType::cmdToString(Command cmdType) {
+	if (cmdType == ADD) {
+		return "CommandType::ADD";
+	} else
+	if (cmdType == DEL) {
+		return "CommandType::DEL";
+	} else
+	if (cmdType == EDIT) {
+		return "CommandType::EDIT";
+	} else
+	if (cmdType == UNDO) {
+		return "CommandType::UNDO";
+	} else
+	if (cmdType == SEARCH) {
+		return "CommandType::SEARCH";
+	} else
+	if (cmdType == VIEW) {
+		return "CommandType::VIEW";
+	} else 
+	if(cmdType == DONE){
+		return "CommandType::DONE";
+	}else
+    if (cmdType == STORAGE) {
+		return "CommandType::STORAGE";
+	} else 
+	if (cmdType == EXIT_PROGRAM) {
+		return "CommandType::EXIT_PROGRAM";
+	} else {
+		return "CommandType::INVALID";
+	}
+}
+
 std::string CommandType::getFirstWord(std::string userCmd) {
 	std::istringstream iss(userCmd);
 	std::string firstWord;
