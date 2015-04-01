@@ -31,10 +31,6 @@ UIObject Controller::undoCommand(CommandType::Command cmdType) {
             StorageCmd storageCmd;
             return storageCmd.undo();
         }
-		case CommandType::DONE:{
-            DoneCmd doneCmd;
-            return doneCmd.undo();
-        }
         default:
             UIObject noUndo;
             noUndo.setHeaderText("No more actions to undo.");
@@ -57,8 +53,8 @@ UIObject Controller::handleInput(std::string input) {
             Logger::log("begin delete command");
 
             DeleteCmd delCmdObj;
-            Task task = Interpreter::parseDelCmd(input);
-//            delCmdObj.prepareTask(task);
+            int TaskId = Interpreter::parseDelCmd(input);
+            delCmdObj.prepareTaskId(TaskId);
             return delCmdObj.execute();
         }
         case CommandType::EDIT: {
