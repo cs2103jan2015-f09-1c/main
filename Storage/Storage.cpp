@@ -1,5 +1,5 @@
 #include "Storage.h"
-#include "Logger.h"
+#include "MCLogger.h"
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
@@ -28,15 +28,15 @@ TaskList Storage::getTaskList() const {
 }
 
 void Storage::updateStorage(TaskList taskList) {
-    Logger::log("update storage");
+    MCLogger::log("Storage.cpp: update storage");
     _maxID++; 
     _sessionStore = taskList;
     writeTaskListTxt();
 }
 
 void Storage::setStorageLoc(std::string newLoc) {
-    std::string logInfo = "Set storage location to " + newLoc;
-    Logger::log(logInfo);
+    std::string logInfo = "Storage.cpp: Set storage location to " + newLoc;
+    MCLogger::log(logInfo);
 
     moveTaskList(_taskListLoc, newLoc);
     _taskListLoc = newLoc;
@@ -49,6 +49,8 @@ std::string Storage::getStorageLoc() const {
     if (path == "") {
         path = getExePath() + "\\";
     } 
+
+	MCLogger::log("Storage.cpp: Getting storage location of " + path);
 
     assert(path != "");
 

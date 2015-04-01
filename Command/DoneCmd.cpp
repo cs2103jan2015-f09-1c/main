@@ -7,7 +7,7 @@
 #include <assert.h>
 #include "History.h"
 #include "State.h"
-#include "Logger.h"
+#include "MCLogger.h"
 
 DoneCmd::DoneCmd(void) {
 }

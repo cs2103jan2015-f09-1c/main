@@ -5,7 +5,8 @@
 #include "Shlwapi.h" // PathFileExists
 #include "History.h"
 #include "State.h"
-#include "Logger.h"
+#include "MCLogger.h"
+#include "TextUI.h"
 
 void StorageCmd::restorePreviousLoc(std::string prevLoc) {
     _fileLoc = prevLoc;

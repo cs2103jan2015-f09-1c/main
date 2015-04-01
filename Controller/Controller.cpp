@@ -3,7 +3,7 @@
 #include "Controller.h"
 #include "Interpreter.h"
 #include "Storage.h"
-#include "Logger.h"
+#include "MCLogger.h"
 #include "AddCmd.h"
 #include "EditCmd.h"
 #include "StorageCmd.h"
@@ -46,7 +46,7 @@ UIObject Controller::handleInput(std::string input) {
     CommandType::Command cmdType = CommandType::determineCmdType(input);  
     switch (cmdType) {
         case CommandType::ADD: {
-            Logger::log("begin add command");
+            MCLogger::log("Controller.cpp: begin add command");
 
             AddCmd addCmdObj;
             Task task = Interpreter::parseAddCmd(input);
@@ -54,7 +54,7 @@ UIObject Controller::handleInput(std::string input) {
             return addCmdObj.execute();
         }
         case CommandType::DEL: {
-            Logger::log("begin delete command");
+            MCLogger::log("Controller.cpp: begin delete command");
 
             DeleteCmd delCmdObj;
             int TaskId = Interpreter::parseDelCmd(input);
@@ -62,7 +62,7 @@ UIObject Controller::handleInput(std::string input) {
             return delCmdObj.execute();
         }
         case CommandType::EDIT: {
-            Logger::log("begin edit command");
+            MCLogger::log("Controller.cpp: begin edit command");
 
             EditCmd editCmdObj;
             Task task = Interpreter::parseEditCmd(input);
@@ -70,7 +70,7 @@ UIObject Controller::handleInput(std::string input) {
             return editCmdObj.execute();
         }
         case CommandType::UNDO: {
-            Logger::log("begin undo command");
+            MCLogger::log("Controller.cpp: begin undo command");
             History *hist = History::getInstance();
             CommandType::Command prevCmd = hist->getPreviousCommand();
             
@@ -79,7 +79,7 @@ UIObject Controller::handleInput(std::string input) {
             return feedback;
         }
         case CommandType::SEARCH: {
-            Logger::log("begin search command");
+            MCLogger::log("Controller.cpp: begin search command");
 
 			SearchCmd SearchCmdObj;
 			TaskList::TList List = Interpreter::parseSearchCmd(input);
@@ -87,14 +87,14 @@ UIObject Controller::handleInput(std::string input) {
 			return SearchCmdObj.execute();
         }
         case CommandType::VIEW: {
-            Logger::log("begin view command");
+            MCLogger::log("Controller.cpp: begin view command");
 			ViewCmd ViewObj;
 			std::string detail = Interpreter::parseViewCmd(input);
 			ViewObj.prepareDetail(detail);
 			return ViewObj.execute();
         }
         case CommandType::STORAGE: {
-            Logger::log("begin storage command");
+            MCLogger::log("Controller.cpp: begin storage command");
 
             StorageCmd storageCmdObj;
             std::string cmdDetails = Interpreter::parseStoreCmd(input);
@@ -102,7 +102,7 @@ UIObject Controller::handleInput(std::string input) {
             return storageCmdObj.execute();
         }    
 		case CommandType::DONE: {
-            Logger::log("done storage command");
+            MCLogger::log("Controller.cpp: begin done command");
 
             DoneCmd doneCmdObj;
             int index = Interpreter::parseDoneCmd(input);
@@ -110,20 +110,20 @@ UIObject Controller::handleInput(std::string input) {
             return doneCmdObj.execute();
         }
         case CommandType::EXIT_PROGRAM: {
-            Logger::log("============= exit program ==============");
+            MCLogger::log("============= exit program ==============");
 
             Storage::resetInstance();
             exit(EXIT_SUCCESS);
         }
         case CommandType::INVALID: {
-            Logger::log("invalid command");
+            MCLogger::log("Controller.cpp: invalid command");
             UIObject invalidCmd;
             invalidCmd.setHeaderText("The command entered is invalid.");
             return invalidCmd;
         }
         default: {
+			MCLogger::log("ERROR: UNRECOGNIZED COMMAND TYPE");
             assert(false);
-            Logger::log("invalid command");
             UIObject invalidCmd;
             invalidCmd.setHeaderText("The command entered is invalid.");
             return invalidCmd;
