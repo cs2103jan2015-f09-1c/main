@@ -21,7 +21,6 @@ class Interpreter
 private:
     static const size_t NUM_CHARS_STORAGE;
 	static const size_t NUM_CHARS_VIEW;
-	static void parse(std::string event, CalEvent *calEventOut);//event:  input string£»calEventOut: output result
 
 	static bool Search(std::string keyword, Task task){
 		std::string line = task.getTaskName();
