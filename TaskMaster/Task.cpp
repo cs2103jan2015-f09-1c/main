@@ -27,7 +27,7 @@ std::string Task::getDateStr() const {
     tm beginStruct;
     localtime_s(&beginStruct, &_taskBegin);
     std::ostringstream beginOss;
-    beginOss << std::put_time(&beginStruct, "%a %b %d");
+    beginOss << std::put_time(&beginStruct, "%a %b %d %Y");
     return beginOss.str();
 }
 

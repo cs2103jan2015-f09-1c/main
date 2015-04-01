@@ -15,7 +15,7 @@ namespace MyCalTestSuite {
             Assert::IsFalse(task.isDone());
             Assert::IsTrue(task.isFloating());
             Assert::AreEqual((unsigned)0, task.getTaskID());
-            Assert::AreEqual(std::string("Thu Jan 01"), task.getDateStr());
+            Assert::AreEqual(std::string("Thu Jan 01 1970"), task.getDateStr());
             Assert::AreEqual(std::string("08:00 AM"), task.getBeginStr());
             Assert::AreEqual(std::string("08:00 AM"), task.getEndStr());
 		}
@@ -33,7 +33,7 @@ namespace MyCalTestSuite {
             Assert::AreEqual((unsigned)123, task.getTaskID());
 
             task.setTaskBegin(TaskStub::getSampleTime());
-            Assert::AreEqual(std::string("Mon Mar 09"), task.getDateStr());
+            Assert::AreEqual(std::string("Mon Mar 09 2015"), task.getDateStr());
             Assert::AreEqual(std::string("07:23 AM"), task.getBeginStr());
         }
 
