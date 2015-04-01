@@ -4,7 +4,7 @@
 #include <sstream>
 #include "MappingNumber.h"
 
-using namespace std; //please avoid using "using namespace std"
+using namespace std; 
 const size_t Interpreter::NUM_CHARS_STORAGE = 7;
 const size_t Interpreter::NUM_CHARS_VIEW = 4;
 

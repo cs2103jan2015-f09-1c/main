@@ -11,6 +11,10 @@ namespace MyCalTestSuite {
     
 	TEST_CLASS(StorageTest) {
 	public:
+		TEST_METHOD_INITIALIZE(InitStorageTest) {
+			MCLogger::log("---------------Begin storage test------------------");
+		}
+
    		TEST_METHOD(TestSetStorageLoc) {
             std::string initialTaskListLoc = "";
             std::string newTaskListLoc = "../";       
@@ -61,5 +65,9 @@ namespace MyCalTestSuite {
 
             MockStorage::cleanMockStorage();
         }
+
+		TEST_METHOD_CLEANUP(CleanupStorageTest) {
+			MCLogger::log("---------------End storage test------------------");
+		}
 	};
 }

@@ -1,7 +1,8 @@
 #include "InvalidFilePathException.h"
-
+#include "MCLogger.h"
 
 InvalidFilePathException::InvalidFilePathException(std::string msg) {
+	MCLogger::log("EXCEPTION: invalid file path");
     _message = msg;
 }
 

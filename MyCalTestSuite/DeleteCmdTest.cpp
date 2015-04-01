@@ -7,6 +7,9 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace MyCalTestSuite {
 	TEST_CLASS(DeleteCmdTest) {
 	public:
+		TEST_METHOD_INITIALIZE(InitDeleteCmdTest) {
+			MCLogger::log("---------------Begin Delete Cmd test------------------");
+		}
         /*TEST_METHOD(TestDeleteByNum) {
             unsigned idToDel = 3;
             MockStorage::initMockStorage(TaskStub::getSampleTaskList());
@@ -78,6 +81,10 @@ namespace MyCalTestSuite {
 
             MockStorage::cleanMockStorage();
         }*/
+
+		TEST_METHOD_CLEANUP(CleanupDeleteCmdTest) {
+			MCLogger::log("---------------End Delete Cmd test------------------");
+		}
 
 	};
 
