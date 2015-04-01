@@ -113,6 +113,9 @@ UIObject Controller::handleInput(std::string input) {
             MCLogger::log("============= exit program ==============");
 
             Storage::resetInstance();
+			MappingNumber::resetInstance();
+			History::resetInstance();
+
             exit(EXIT_SUCCESS);
         }
         case CommandType::INVALID: {
