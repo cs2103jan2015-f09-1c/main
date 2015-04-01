@@ -27,5 +27,5 @@ std::string State::toString() const {
 		return _storageLoc;
 	}
 
-	return _task.toString();
+	return "\n" + _task.toString();
 }
