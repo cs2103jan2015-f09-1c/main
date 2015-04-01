@@ -35,9 +35,11 @@
 #include <stdio.h>
 #include <time.h>
 #include <iomanip>
+#include <stdlib.h>
 #include "TextUI.h"
 #include "boost/format.hpp"
 #include "MappingNumber.h"
+
 
 
 using boost::format;
@@ -52,8 +54,8 @@ std::string TextUI::QUALIFIER_DATE_BAR =
 std::string TextUI::DEFAULT_DATE_BAR = 
 	"[%1% %2% %3%] %|25t| Description";
 std:: string TextUI:: TIME_PRINT=
-	"%1%%2% [%3%] %|25t| ";
-std:: string TextUI:: DONE_PRINT= " (done)";
+	"%1%. [%2%] %|26t|";
+std:: string TextUI:: DONE_PRINT= "\t \t \t \t (done)";
 
 struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
     struct tm tmStruct;
@@ -279,8 +281,8 @@ void TextUI::printTasks(TaskList::TList tasks) {
 		{
 			timePrint = timeStart+" - "+timeEnd;
 		}
-		
-		std::cout << format(TIME_PRINT) %counter %x %timePrint;
+
+		std::cout << format(TIME_PRINT) %counter %timePrint;
 		std::cout << it->getTaskName();
 
 		if(it->isDone()){
@@ -337,7 +339,6 @@ void TextUI::showOutput(UIObject uiObj) {
 	printTasks(uiObj.getTaskList());
 	mappingNumber(uiObj.getTaskList());
 }
-
 
 TextUI::TextUI(void) {
 }

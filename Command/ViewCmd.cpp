@@ -107,10 +107,10 @@ TaskList::TList ViewCmd:: getSelectedTasks(){
 			return selectedTasks;
         }
 		case ViewType::INVALID: {
-		//	selectedTasks = NULL;
+			return selectedTasks;
         }
 		default :{
-		//	selectedTasks = NULL;
+			return selectedTasks;
 		 }
 	 }
 }

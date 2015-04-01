@@ -30,8 +30,6 @@ public:
 	static std::string getInput();
 	static void showOutput(UIObject uiObj);
 
-
-
 	TextUI(void);
 	~TextUI(void);
 };

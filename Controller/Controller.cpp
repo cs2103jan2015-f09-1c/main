@@ -58,7 +58,7 @@ UIObject Controller::handleInput(std::string input) {
 
             DeleteCmd delCmdObj;
             Task task = Interpreter::parseDelCmd(input);
-            delCmdObj.prepareTask(task);
+//            delCmdObj.prepareTask(task);
             return delCmdObj.execute();
         }
         case CommandType::EDIT: {
