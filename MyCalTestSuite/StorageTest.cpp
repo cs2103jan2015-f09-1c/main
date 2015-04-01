@@ -17,7 +17,7 @@ namespace MyCalTestSuite {
             std::string initialFile = initialTaskListLoc + "tasklist.txt";
             std::string movedFile = newTaskListLoc + "tasklist.txt";
 
-            MockStorage::initMockStorage(TaskStub::getSampleTaskList(), initialTaskListLoc);
+            MockStorage::initMockStorage(TaskStub::getSmallTaskList(), initialTaskListLoc);
 
             //File not moved yet and should exist
             Assert::IsTrue(StorageUtils::isFileExist(initialFile.c_str()));
@@ -44,39 +44,20 @@ namespace MyCalTestSuite {
 		}
         
         TEST_METHOD(TestUpdateStorage) {
-            std::string taskListLoc = "";
+            MockStorage::initMockStorage(TaskStub::getLargeTaskList());
 
-            MockStorage::initMockStorage(TaskStub::getSampleTaskList());
             Storage *storage = Storage::getInstance();
+            storage->updateStorage(TaskStub::getSmallTaskList());
             TaskList listAfterUpdate = storage->getTaskList();
 
-            std::ostringstream oss;
-            oss << "Buy gift for John" << std::endl;
-            oss << "Thu Jan 01" << std::endl;
-            oss << "08:00 AM - 08:00 AM" << std::endl;
-            oss << "1" << std::endl << std::endl;
+            std::string expectedList = TaskStub::getSmallTaskList().toString();
 
-            oss << "Performance @ UCC" << std::endl;
-            oss << "Sat Mar 07" << std::endl;
-            oss << "05:23 AM - 07:23 AM" << std::endl;
-            oss << "1" << std::endl << std::endl;
-
-            oss << "Go to NTU" << std::endl;
-            oss << "Sun Mar 08" << std::endl;
-            oss << "11:23 AM - 01:53 PM" << std::endl;
-            oss << "0" << std::endl << std::endl;
-
-            oss << "cs2103 tutorial" << std::endl;
-            oss << "Mon Mar 09" << std::endl;
-            oss << "07:23 AM - 08:53 AM" << std::endl;
-            oss << "0" << std::endl << std::endl;  
-
-            Assert::AreEqual(oss.str(), listAfterUpdate.toString());
+            Assert::AreEqual(expectedList, listAfterUpdate.toString());
 
             Storage::resetInstance();        
             Storage *storage2 = Storage::getInstance();
             TaskList listAfterInit = storage2->getTaskList();
-            Assert::AreEqual(oss.str(), listAfterInit.toString());
+            Assert::AreEqual(expectedList, listAfterInit.toString());
 
             MockStorage::cleanMockStorage();
         }

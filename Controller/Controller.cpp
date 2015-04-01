@@ -77,9 +77,10 @@ UIObject Controller::handleInput(std::string input) {
         case CommandType::SEARCH: {
             Logger::log("begin search command");
 
-            UIObject inProgress;
-            inProgress.setHeaderText("This feature is work in progress");
-            return inProgress;
+			SearchCmd SearchCmdObj;
+			TaskList::TList List = Interpreter::parseSearchCmd(input);
+			SearchCmdObj.prepareList(List);
+			return SearchCmdObj.execute();
         }
         case CommandType::VIEW: {
             Logger::log("begin view command");

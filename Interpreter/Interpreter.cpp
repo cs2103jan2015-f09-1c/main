@@ -197,10 +197,24 @@ std::string Interpreter::parseViewCmd(std::string input){
 	return detail;
 }
 
+TaskList::TList Interpreter::parseSearchCmd (std::string input){
+	std::string taskToDel = input.substr(7);
+    Storage *storage = Storage::getInstance();
+    TaskList tasklist = storage->getTaskList();
+    TaskList::TList list = tasklist.getAll();
+	TaskList::TList foundTaskList;
+    TaskList::taskIt it;
 
+	for (it = list.begin(); it != list.end(); ++it) {
+        Task task = *it;
+        if (Search(taskToDel, task)) {
+			foundTaskList.push_back(task);
+		}
+	}
+	return foundTaskList;
+}
 Interpreter::Interpreter(void) {
 }
-
 
 Interpreter::~Interpreter(void) {
 }
@@ -542,6 +556,7 @@ void Interpreter::Monthday(int year, int yearDay, int *pMonth, int *pDay)
 	}
 
 }
+
 Task Interpreter::prepareDelCmd(std::string input) {
     std::string taskToDel = input.substr(7);
     Storage *storage = Storage::getInstance();

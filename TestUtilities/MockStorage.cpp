@@ -13,7 +13,7 @@ void MockStorage::initMockStorage(TaskList taskList, std::string taskListLoc) {
     StorageUtils::backupExistingFiles();
     StorageUtils::createSettingsFile(taskListLoc);
     Storage *storage = Storage::getInstance();
-    storage->updateStorage(TaskStub::getSampleTaskList());
+    storage->updateStorage(taskList);
 }
 
 void MockStorage::cleanMockStorage(std::string taskListLoc) {
