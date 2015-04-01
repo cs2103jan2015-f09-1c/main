@@ -21,3 +21,11 @@ void State::recordStorageLoc(std::string loc) {
 std::string State::getStorageLoc() const {
     return _storageLoc;
 }
+
+std::string State::toString() const {
+	if (_storageLoc != "") {
+		return _storageLoc;
+	}
+
+	return _task.toString();
+}
