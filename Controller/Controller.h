@@ -5,10 +5,10 @@
 
 class Controller {
 private:
-    UIObject undoCommand(CommandType::Command cmdType);
+    static UIObject undoCommand(CommandType::Command cmdType);
 
 public:
-    UIObject handleInput(std::string input);
+    static UIObject handleInput(std::string input);
     
     Controller(void);
     ~Controller(void);

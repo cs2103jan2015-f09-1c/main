@@ -28,14 +28,13 @@ int main(int argc, char *argv[]) {
 	TextUI::printWelcomeMsg();
 	printTasksToday();
 
-    Controller controllerService;
 	while (true) {        
 		std::string userInput;
 		userInput = TextUI::getInput();
 		
 		MCLogger::log("User input: " + userInput);
 		UIObject controllerOutput;
-		controllerOutput = controllerService.handleInput(userInput);
+		controllerOutput = Controller::handleInput(userInput);
 		TextUI::showOutput(controllerOutput);
 	}
 
