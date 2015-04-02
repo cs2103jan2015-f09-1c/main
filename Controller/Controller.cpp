@@ -13,6 +13,9 @@
 #include "ViewCmd.h"
 #include "History.h"
 
+const size_t Controller::NUM_CHARS_DONE = 4;
+const size_t Controller::NUM_CHARS_DELETE = 6;
+
 UIObject Controller::undoCommand(CommandType::Command cmdType) {
     switch (cmdType) { 
         case CommandType::ADD: {
@@ -53,7 +56,7 @@ UIObject Controller::handleInput(std::string input) {
             Logger::log("begin delete command");
 
             DeleteCmd delCmdObj;
-            int TaskId = Interpreter::parseDelCmd(input);
+            int TaskId = Interpreter::parseDelOrDoneCmd(input, NUM_CHARS_DELETE + 1);
             delCmdObj.prepareTaskId(TaskId);
             return delCmdObj.execute();
         }
@@ -91,23 +94,20 @@ UIObject Controller::handleInput(std::string input) {
         }
         case CommandType::STORAGE: {
             Logger::log("begin storage command");
-
             StorageCmd storageCmdObj;
             std::string cmdDetails = Interpreter::parseStoreCmd(input);
             storageCmdObj.cmdType(cmdDetails);
             return storageCmdObj.execute();
         }    
 		case CommandType::DONE: {
-            Logger::log("done storage command");
-
+            Logger::log("begin done command");
             DoneCmd doneCmdObj;
-            int index = Interpreter::parseDoneCmd(input);
-			doneCmdObj.prepareIndex(index);
+            int taskId = Interpreter::parseDelOrDoneCmd(input, NUM_CHARS_DONE + 1);
+			doneCmdObj.prepareTaskId(taskId);
             return doneCmdObj.execute();
         }
         case CommandType::EXIT_PROGRAM: {
             Logger::log("============= exit program ==============");
-
             Storage::resetInstance();
             exit(EXIT_SUCCESS);
         }
