@@ -92,12 +92,13 @@ void Task::setTaskID(unsigned id) {
 
 std::string Task::toString() const {
     std::ostringstream oss;
-    oss << getTaskID() << std::endl;
+    oss << getTaskID() << " ";
     oss << getTaskName() << std::endl;
-    oss << getDateStr() << std::endl ;
+    oss << getDateStr() << " ";
     oss << getBeginStr() << " - ";
     oss << getEndStr() << std::endl;
-    oss << isDone() << std::endl;
+    oss << "done: " << isDone() << " ";
+	oss << "float: " << isFloating();
 
     return oss.str();
 }
