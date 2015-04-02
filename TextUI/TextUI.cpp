@@ -17,11 +17,11 @@
 //
 // Tasks due this week:      <---- THIS IS THE "HEADER TEXT"
 //
-// [Unscheduled Tasks] =================================    <--- DATE BAR
+// [Unscheduled Tasks]		Description						<--- DATE BAR
 //
 // 1.  ----------------	    comp club meeting			    <--- TASK
 //
-// [Today Fri Jan 1] ===================================    <--- DATE BAR
+// [Today Fri Jan 1]		Description						<--- DATE BAR
 //
 // 2.  ----------------	    Remember to bring pencil	    <--- TASK [done]
 // 3. [8:45am - 11:30am]    Brunch with Jane			    <--- TASK  
@@ -38,12 +38,18 @@
 #include <stdlib.h>
 #include <windows.h>
 #include "TextUI.h"
+#include "Color.h"
 #include "boost/format.hpp"
 #include "MappingNumber.h"
 
-
-
 using boost::format;
+
+HANDLE hStdOut;
+CONSOLE_SCREEN_BUFFER_INFO csbi;
+DWORD count;
+DWORD cellCount;
+DWORD coord;
+COORD homeCoords = { 0, 0 };
 
 const std::string TextUI::WELCOME_MSG = "Welcome to MyCal!"; 
 const std::string TextUI::HELP_MSG = "Helpppp";
@@ -221,6 +227,10 @@ void TextUI::printDateBar(const time_t &taskDate) {
 	    std::string monthName = getMonthName(taskDate);
         struct tm localTime = convertToLocalTime(taskDate);
 	    std::string day = std::to_string(localTime.tm_mday);
+
+		hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+		Color:: TextColor (4, 15 ,hStdOut);
+
 		if(qualifier == ""){
 			std::cout << format(DEFAULT_DATE_BAR) % wkdayName % monthName % day;
 		}else{
@@ -283,11 +293,17 @@ void TextUI::printTasks(TaskList::TList tasks) {
 			timePrint = timeStart+" - "+timeEnd;
 		}
 
-		std::cout << format(TIME_PRINT) %counter %timePrint;
-		std::cout << it->getTaskName();
-
 		if(it->isDone()){
+			hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+			Color:: TextColor (8, 15 ,hStdOut);
+			std::cout << format(TIME_PRINT) %counter %timePrint;
+			std::cout << it->getTaskName();
 			std::cout << DONE_PRINT;
+		} else {
+			hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+			Color:: TextColor (0, 15 ,hStdOut);
+			std::cout << format(TIME_PRINT) %counter %timePrint;
+			std::cout << it->getTaskName();
 		}
 
 		std::cout << std::endl;
@@ -313,10 +329,13 @@ void TextUI:: mappingNumber(TaskList::TList tasks){
 }
 
 void TextUI::printWelcomeMsg() {
-	std::cout << WELCOME_MSG << std::endl;
+	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+	Color:: TextColor (4, 15 ,hStdOut);
+	FillConsoleOutputAttribute(hStdOut, _rotl(15,4) , 80 * 50,homeCoords , &count);
+	std::cout << WELCOME_MSG << std::endl << std:: endl;
 	time_t curTime;
     time(&curTime);
-//	printDateBar(curTime);
+	//printDateBar(curTime);
 }
 
 void TextUI::printHelp() {
@@ -333,19 +352,17 @@ std::string TextUI::getInput() {
 void TextUI::showOutput(UIObject uiObj) {
 	
     MappingNumber* mapping = MappingNumber::getInstance();
-	clearScreen();
+
+	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+	Color:: TextColor (1, 15 ,hStdOut);
 	std::cout << uiObj.getHeaderText() << std::endl;
+	
 	mapping->clearMappingNumber();
 	printTasks(uiObj.getTaskList());
 	mappingNumber(uiObj.getTaskList());
 }
 
 void TextUI:: clearScreen(){
-  HANDLE hStdOut;
-  CONSOLE_SCREEN_BUFFER_INFO csbi;
-  DWORD count;
-  DWORD cellCount;
-  COORD homeCoords = { 0, 0 };
 
   hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
   if (hStdOut == INVALID_HANDLE_VALUE){
@@ -369,7 +386,7 @@ void TextUI:: clearScreen(){
     )){
 		return;
   }
-  /* Fill the entire buffer with the current colors and attributes */
+  // Fill the entire buffer with the current colors and attributes
   if (!FillConsoleOutputAttribute(
     hStdOut,
     csbi.wAttributes,
@@ -380,10 +397,11 @@ void TextUI:: clearScreen(){
 		return;
   }
 
-  /* Move the cursor home */
+  // Move the cursor home
   SetConsoleCursorPosition( hStdOut, homeCoords );
   
 }
+
 
 TextUI::TextUI(void) {
 }
