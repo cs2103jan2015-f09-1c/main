@@ -154,9 +154,9 @@ std::string Interpreter::parseStoreCmd(std::string input) {
     return cmdDetails;
 }
 
-int Interpreter::parseDelCmd(std::string input){
+int Interpreter::parseDelOrDoneCmd(std::string input, int lengthCommand){
 	  MappingNumber *mapping = MappingNumber::getInstance();
-	  Task _task = prepareDelCmd (input);
+	  Task _task = prepareDelOrDoneCmd (input, lengthCommand);
   std::string taskToDel = _task.getTaskName();
   int TaskId;
   int integer;
@@ -182,14 +182,6 @@ int Interpreter::parseDelCmd(std::string input){
 	  return TaskId;
 }
 
-int Interpreter::parseDoneCmd(std::string input){
-	int index;
-	std::string command;
-	std::istringstream in(input);
-	in >> command;
-	in>> index;
-    return index;
-}
 
 std::string Interpreter::parseViewCmd(std::string input){
 	std:: string detail;
@@ -557,8 +549,10 @@ void Interpreter::Monthday(int year, int yearDay, int *pMonth, int *pDay)
 
 }
 
-Task Interpreter::prepareDelCmd(std::string input) {
-    std::string taskToDel = input.substr(7);
+
+
+Task Interpreter::prepareDelOrDoneCmd(std::string input, int lengthCommand) {
+    std::string taskToDel = input.substr(lengthCommand);
     Storage *storage = Storage::getInstance();
     TaskList tasklist = storage->getTaskList();
     TaskList::TList list = tasklist.getAll();
