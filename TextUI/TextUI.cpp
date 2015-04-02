@@ -344,6 +344,7 @@ void TextUI::printHelp() {
 
 std::string TextUI::getInput() {
 	std::string userInput;
+	Color:: TextColor (1, 15 ,hStdOut);
 	std::getline(std::cin, userInput);
 	return userInput;
 }
