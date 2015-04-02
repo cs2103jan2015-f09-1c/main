@@ -2,9 +2,8 @@
 #include "Storage.h"
 #include <iostream>
 #include <sstream>
-#include "MappingNumber.h"
 
-using namespace std; 
+using namespace std; //please avoid using "using namespace std"
 const size_t Interpreter::NUM_CHARS_STORAGE = 7;
 const size_t Interpreter::NUM_CHARS_VIEW = 4;
 
@@ -39,6 +38,7 @@ Task Interpreter::parseAddCmd(std::string input) {
 	a.setTaskName(EventOut.event);
 	return a;
 }
+
 
 Task Interpreter::parseEditCmd(std::string input) {
 	Task a;
@@ -76,7 +76,6 @@ Task Interpreter::parseEditCmd(std::string input) {
 	TaskList tasklist = storage->getTaskList();
 	TaskList::TList list = tasklist.getAll();
 	TaskList::taskIt it;
-	
 	int num = 0;
 	for (it = list.begin(); it != list.end(); ++it) {
 		num++;
@@ -150,47 +149,51 @@ Task Interpreter::parseEditCmd(std::string input) {
 	}
 
 	storage->updateStorage(tasklist);
+
 	return a;
-} 
-
-std::string Interpreter::parseStoreCmd(std::string input) {    
-    std::string cmdDetails;
-    if (input == "storage") { 
-        return "location";
-    }
-    cmdDetails = input.substr(NUM_CHARS_STORAGE + 1); //+1 due to space
-    //todo: check whether substr is either "location" or
-    // a valid filepath
-
-    return cmdDetails;
 }
 
-int Interpreter::parseDelCmd(std::string input){
-	  MappingNumber *mapping = MappingNumber::getInstance();
-	  Task _task = prepareDelCmd (input);
-  std::string taskToDel = _task.getTaskName();
-  int TaskId;
-  int integer;
-  int ID = _task.getTaskID();
-  if (ID == 0){
-	  integer = ConvertStrtoNum (taskToDel);
-		if (integer == 0){
-			TaskId = 0;
+
+std::string Interpreter::parseStoreCmd(std::string input) {
+	std::string cmdDetails;
+	if (input == "storage") {
+		return "location";
+	}
+	cmdDetails = input.substr(NUM_CHARS_STORAGE + 1); //+1 due to space
+	//todo: check whether substr is either "location" or
+	// a valid filepath
+
+	return cmdDetails;
+}
+
+Task Interpreter::parseDelCmd(std::string input) {
+	std::string taskToDel = input.substr(7);
+	Storage *storage = Storage::getInstance();
+	TaskList tasklist = storage->getTaskList();
+	TaskList::TList list = tasklist.getAll();
+	TaskList::taskIt it;
+
+	int _size = taskToDel.size();
+	for (int i = 0; i<_size; i++){
+		if (isdigit(taskToDel[i])){
+			Task _task;
+			_task.setTaskName(taskToDel);
+			_task.setTaskID(0);
+			return _task;
 		}
 		else{
-			int count = mapping->countNode ();
-			if(integer > count){
-				TaskId = 0;
-			}
-			else{
-				TaskId = mapping->getTaskID(integer);
+			for (it = list.begin(); it != list.end(); ++it) {
+				Task task = *it;
+				if (Search(taskToDel, task)) {
+					return task;
+				}
 			}
 		}
-  }
-  else if (ID !=0){
-	  TaskId = ID;
-  }
-	  return TaskId;
+	}
+	//else, throw excpetion
+	Task a;
+	return a;
+
 }
 
 int Interpreter::parseDoneCmd(std::string input){
@@ -198,40 +201,23 @@ int Interpreter::parseDoneCmd(std::string input){
 	std::string command;
 	std::istringstream in(input);
 	in >> command;
-	in>> index;
-    return index;
+	in >> index;
+	return index;
 }
 
 std::string Interpreter::parseViewCmd(std::string input){
-	std:: string detail;
+	std::string detail;
 	detail = input.substr(NUM_CHARS_VIEW + 1);
 	return detail;
 }
 
-TaskList::TList Interpreter::parseSearchCmd (std::string input){
-	std::string taskToDel = input.substr(7);
-    Storage *storage = Storage::getInstance();
-    TaskList tasklist = storage->getTaskList();
-    TaskList::TList list = tasklist.getAll();
-	TaskList::TList foundTaskList;
-    TaskList::taskIt it;
 
-	for (it = list.begin(); it != list.end(); ++it) {
-        Task task = *it;
-        if (Search(taskToDel, task)) {
-			foundTaskList.push_back(task);
-		}
-	}
-	return foundTaskList;
-}
 Interpreter::Interpreter(void) {
 }
 
+
 Interpreter::~Interpreter(void) {
 }
-
-
-
 
 int Interpreter::parse(string event, CalEvent *calEventOut)
 {
@@ -436,8 +422,8 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 			curEvent.month = timeinfo.tm_mon + 1;
 			curEvent.day = timeinfo.tm_mday;
 		}
-		if (tmm>2400)  
-			return -1;
+		if (tmm>2400)  return -1;
+
 	}
 
 	//deal with "tomorrow" in a command
@@ -464,7 +450,6 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 	wDaySearch(curEvent.year, curEvent.month, curEvent.day, &curEvent.wday);
 	*calEventOut = curEvent;
 	return 1;
-		
 }
 
 void Interpreter::tmConvert(CalEvent Event, time_t *starttime, time_t *endtime)
@@ -573,48 +558,4 @@ void Interpreter::Monthday(int year, int yearDay, int *pMonth, int *pDay)
 		*pDay = yearDay - (335 - dec);
 	}
 
-}
-
-Task Interpreter::prepareDelCmd(std::string input) {
-    std::string taskToDel = input.substr(7);
-    Storage *storage = Storage::getInstance();
-    TaskList tasklist = storage->getTaskList();
-    TaskList::TList list = tasklist.getAll();
-    TaskList::taskIt it;
-
-	int _size = taskToDel.size();
-	for (int i=0; i<_size; i++){
-		if (isdigit(taskToDel[i])){
-				Task _task;
-				_task.setTaskName(taskToDel);
-				_task.setTaskID(0);
-				return _task;
-		}
-		else{
-    for (it = list.begin(); it != list.end(); ++it) {
-        Task task = *it;
-        if (Search(taskToDel, task)) {
-            return task;
-		}
-	}
-		}
-	}
-    //else, throw excpetion
-    Task a;
-    return a;
-
-}
-
-int Interpreter::ConvertStrtoNum(std::string str){
-	int integer;
-	std::stringstream convert (str);
-	convert >> integer;
-
-	if (convert.fail()){
-		integer = 0;
-	}
-	else{
-		convert >> integer;
-	}
-	return integer;
 }
