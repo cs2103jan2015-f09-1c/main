@@ -28,7 +28,10 @@ TaskList Storage::getTaskList() const {
 }
 
 void Storage::updateStorage(TaskList taskList) {
-    MCLogger::log("Storage.cpp: update storage");
+	std::string log = "Storage.cpp: updating storage with " 
+		+ std::to_string(taskList.totalTasks()) + std::string(" tasks.");
+    MCLogger::log(log);
+
     _maxID++; 
     _sessionStore = taskList;
     writeTaskListTxt();
