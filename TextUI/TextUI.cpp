@@ -36,6 +36,7 @@
 #include <time.h>
 #include <iomanip>
 #include <stdlib.h>
+#include <windows.h>
 #include "TextUI.h"
 #include "boost/format.hpp"
 #include "MappingNumber.h"
@@ -311,8 +312,6 @@ void TextUI:: mappingNumber(TaskList::TList tasks){
 	}
 }
 
-
-
 void TextUI::printWelcomeMsg() {
 	std::cout << WELCOME_MSG << std::endl;
 	time_t curTime;
@@ -334,10 +333,56 @@ std::string TextUI::getInput() {
 void TextUI::showOutput(UIObject uiObj) {
 	
     MappingNumber* mapping = MappingNumber::getInstance();
+	clearScreen();
 	std::cout << uiObj.getHeaderText() << std::endl;
 	mapping->clearMappingNumber();
 	printTasks(uiObj.getTaskList());
 	mappingNumber(uiObj.getTaskList());
+}
+
+void TextUI:: clearScreen(){
+  HANDLE hStdOut;
+  CONSOLE_SCREEN_BUFFER_INFO csbi;
+  DWORD count;
+  DWORD cellCount;
+  COORD homeCoords = { 0, 0 };
+
+  hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+  if (hStdOut == INVALID_HANDLE_VALUE){
+	  return;
+  }
+
+  // Get the number of cells in the current buffer 
+  if (!GetConsoleScreenBufferInfo( hStdOut, &csbi )){
+	  return;
+  }
+  
+  cellCount = csbi.dwSize.X *csbi.dwSize.Y;
+
+  // Fill the entire buffer with spaces
+  if (!FillConsoleOutputCharacter(
+    hStdOut,
+    (TCHAR) ' ',
+    cellCount,
+    homeCoords,
+    &count
+    )){
+		return;
+  }
+  /* Fill the entire buffer with the current colors and attributes */
+  if (!FillConsoleOutputAttribute(
+    hStdOut,
+    csbi.wAttributes,
+    cellCount,
+    homeCoords,
+    &count
+    )){
+		return;
+  }
+
+  /* Move the cursor home */
+  SetConsoleCursorPosition( hStdOut, homeCoords );
+  
 }
 
 TextUI::TextUI(void) {
