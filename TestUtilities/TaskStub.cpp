@@ -60,8 +60,9 @@ Task TaskStub::getSampleTask2() {
     Task task;
     task.setTaskID((unsigned) 2);
     task.setTaskName("dummy T2");
-    task.setTaskBegin(_9Mar723PM);
-    task.setTaskEnd(_9Mar723PM + _secsInAnHour);
+    task.setTaskBegin(_9Mar723AM);
+    task.setTaskEnd(_9Mar723PM);
+    task.markDone();
     return task;
 }
 
@@ -69,9 +70,8 @@ Task TaskStub::getSampleTask3() {
     Task task;
     task.setTaskID((unsigned) 3);
     task.setTaskName("dummy T3");
-    task.setTaskBegin(_9Mar723AM);
-    task.setTaskEnd(_9Mar723PM);
-    task.markDone();
+    task.setTaskBegin(_9Mar723PM);
+    task.setTaskEnd(_9Mar723PM + _secsInAnHour);
     return task;
 }
 

@@ -25,9 +25,9 @@ public:
 
     // 9 March 15, undone, 07:23 AM
     static Task getSampleTask1();
-    // 9 March 15, undone, 07:23 PM
+	// 9 March 15, done
     static Task getSampleTask2();
-    // 9 March 15, done
+    // 9 March 15, undone, 07:23 PM
     static Task getSampleTask3();
     // 10 March 15, undone, 07:23 AM
     static Task getSampleTask4();
@@ -41,6 +41,7 @@ public:
     static Task getSampleTask8();
 
     // returns a tasklist containing eight sample tasks with ids 1 to 8.
+	// order after internal TaskList sorting: 1, 3, 2, 4, 5, 6, 7, 8
     // do not use this if you require tasks to adhere to
     // specific ranges of dates, for reasons such as equivalence 
     // partioning and boundary value analysis.
