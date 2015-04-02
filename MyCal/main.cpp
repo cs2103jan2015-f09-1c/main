@@ -28,8 +28,6 @@ int main(int argc, char *argv[]) {
 	TextUI::printWelcomeMsg();
 	printTasksToday();
 
-
-
     Controller controllerService;
 	while (true) {        
 		std::string userInput;
@@ -37,6 +35,7 @@ int main(int argc, char *argv[]) {
 
 		UIObject controllerOutput;
 		controllerOutput = controllerService.handleInput(userInput);
+		TextUI:: clearScreen();
 		TextUI::showOutput(controllerOutput);
 	}
 
