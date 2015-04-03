@@ -37,15 +37,18 @@ private:
 	static void wDaySearch(int year, int month, int day, int *wday); //output: wday:(0-6: Sun,Mon,....,Sat)
 	static void Monthday(int year, int yearDay, int *pMonth, int *pDay); //input: year,yearDay
 	//output: the date of a particular day in a year
-	static Task prepareDelCmd(std::string input);
+	static Task prepareDelOrDoneCmd(std::string input, int);
+	static int parseNumber(std::string input, int numCmdChars);
+
 	static int ConvertStrtoNum (std::string str);
 
 public:    
     static Task parseAddCmd(std::string input);
     static Task parseEditCmd(std::string input);
     static std::string parseStoreCmd(std::string input);
-    static int parseDelCmd(std::string input);
-	static int parseDoneCmd(std::string input);
+
+    static int parseDelOrDoneCmd(std::string input, int);
+
 	static std:: string parseViewCmd(std::string input);
 	static TaskList::TList parseSearchCmd(std::string input);
 	static void tmConvert(CalEvent Event, time_t *starttime, time_t *endtime);

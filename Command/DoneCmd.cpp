@@ -9,48 +9,43 @@
 #include "State.h"
 #include "MCLogger.h"
 
+const std::string DoneCmd:: NO_MATCHING_TASK = "There is no matching task to be marked done.";
+const std::string DoneCmd:: DONE_MESSAGE = "Done: "; 
+const std::string DoneCmd:: UNDO_DONE_MESSAGE = " has been marked undone!";
+
 DoneCmd::DoneCmd(void) {
 }
 
 DoneCmd::~DoneCmd(void) {
 }
 
-void DoneCmd::prepareIndex(int index) {
-    _index = index;
+void DoneCmd::prepareTaskId(int _taskId) {
+    taskId = _taskId;
 }
+
 
 UIObject DoneCmd:: execute(){
 	UIObject doneObj;
-	MappingNumber *mapping = MappingNumber::getInstance();
-    
-    //get current tasks
+	
+	if (taskId == 0){
+		doneObj.setHeaderText(NO_MATCHING_TASK);
+	 } else {
+	//get current tasks
     Storage* storage = Storage::getInstance();
     TaskList taskList = storage->getTaskList();
 
-	//before execution, we generate mapping number first
-	unsigned taskId =  mapping->getTaskID(_index);
-	
-	//mark done
+	Task ActualTask = taskList.findTask(taskId);
+	recordInHistory (ActualTask);
+
 	taskList.markDone(taskId);
+	storage->updateStorage(taskList);
 
-	// finding task from the ID
-	std :: string taskName;
-	taskName = taskList.findTaskName(taskId);
-
-	//finding the date of the task from the id
-	time_t taskTime;
-	taskTime = taskList.findTaskDate(taskId);
-    //update storage
-    storage->updateStorage(taskList);    
-
-	Task _task;
-	_task = taskList.findTask(taskId);
-	recordInHistory(_task);
-
-	selectedTasks = taskList.getDay(taskTime);
-    
-	doneObj.setHeaderText("done: " + taskName);
-	doneObj.setTaskList(selectedTasks); // currently it will show all after marking the task is done
+	TaskList::TList tasksThatDay;
+    tasksThatDay = taskList.getDay(ActualTask.getTaskBegin());
+	
+	doneObj.setHeaderText(DONE_MESSAGE + ActualTask.getTaskName());
+	doneObj.setTaskList(tasksThatDay);
+	}
     return doneObj;
 }
 
@@ -82,9 +77,8 @@ UIObject DoneCmd:: undo(){
 
     UIObject undoMessage;
 
-	undoMessage.setHeaderText("Undo successfully");
+	undoMessage.setHeaderText(task.getTaskName() + UNDO_DONE_MESSAGE );
 	undoMessage.setTaskList(selectedTasks);
 
     return undoMessage;
-
 }

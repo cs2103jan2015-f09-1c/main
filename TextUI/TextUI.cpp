@@ -17,11 +17,11 @@
 //
 // Tasks due this week:      <---- THIS IS THE "HEADER TEXT"
 //
-// [Unscheduled Tasks] =================================    <--- DATE BAR
+// [Unscheduled Tasks]		Description						<--- DATE BAR
 //
 // 1.  ----------------	    comp club meeting			    <--- TASK
 //
-// [Today Fri Jan 1] ===================================    <--- DATE BAR
+// [Today Fri Jan 1]		Description						<--- DATE BAR
 //
 // 2.  ----------------	    Remember to bring pencil	    <--- TASK [done]
 // 3. [8:45am - 11:30am]    Brunch with Jane			    <--- TASK  
@@ -35,12 +35,21 @@
 #include <stdio.h>
 #include <time.h>
 #include <iomanip>
+#include <stdlib.h>
+#include <windows.h>
 #include "TextUI.h"
+#include "Color.h"
 #include "boost/format.hpp"
 #include "MappingNumber.h"
 
-
 using boost::format;
+
+HANDLE hStdOut;
+CONSOLE_SCREEN_BUFFER_INFO csbi;
+DWORD count;
+DWORD cellCount;
+DWORD coord;
+COORD homeCoords = { 0, 0 };
 
 const std::string TextUI::WELCOME_MSG = "Welcome to MyCal!"; 
 const std::string TextUI::HELP_MSG = "Helpppp";
@@ -52,8 +61,8 @@ std::string TextUI::QUALIFIER_DATE_BAR =
 std::string TextUI::DEFAULT_DATE_BAR = 
 	"[%1% %2% %3%] %|25t| Description";
 std:: string TextUI:: TIME_PRINT=
-	"%1%%2% [%3%] %|25t| ";
-std:: string TextUI:: DONE_PRINT= " (done)";
+	"%1%. [%2%] %|26t|";
+std:: string TextUI:: DONE_PRINT= "\t \t \t \t (done)";
 
 struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
     struct tm tmStruct;
@@ -218,6 +227,10 @@ void TextUI::printDateBar(const time_t &taskDate) {
 	    std::string monthName = getMonthName(taskDate);
         struct tm localTime = convertToLocalTime(taskDate);
 	    std::string day = std::to_string(localTime.tm_mday);
+
+		hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+		Color:: TextColor (4, 15 ,hStdOut);
+
 		if(qualifier == ""){
 			std::cout << format(DEFAULT_DATE_BAR) % wkdayName % monthName % day;
 		}else{
@@ -279,12 +292,18 @@ void TextUI::printTasks(TaskList::TList tasks) {
 		{
 			timePrint = timeStart+" - "+timeEnd;
 		}
-		
-		std::cout << format(TIME_PRINT) %counter %x %timePrint;
-		std::cout << it->getTaskName();
 
 		if(it->isDone()){
+			hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+			Color:: TextColor (8, 15 ,hStdOut);
+			std::cout << format(TIME_PRINT) %counter %timePrint;
+			std::cout << it->getTaskName();
 			std::cout << DONE_PRINT;
+		} else {
+			hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+			Color:: TextColor (0, 15 ,hStdOut);
+			std::cout << format(TIME_PRINT) %counter %timePrint;
+			std::cout << it->getTaskName();
 		}
 
 		std::cout << std::endl;
@@ -309,13 +328,14 @@ void TextUI:: mappingNumber(TaskList::TList tasks){
 	}
 }
 
-
-
 void TextUI::printWelcomeMsg() {
-	std::cout << WELCOME_MSG << std::endl;
+	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+	Color:: TextColor (4, 15 ,hStdOut);
+	FillConsoleOutputAttribute(hStdOut, _rotl(15,4) , 80 * 50,homeCoords , &count);
+	std::cout << WELCOME_MSG << std::endl << std:: endl;
 	time_t curTime;
     time(&curTime);
-//	printDateBar(curTime);
+	//printDateBar(curTime);
 }
 
 void TextUI::printHelp() {
@@ -324,6 +344,7 @@ void TextUI::printHelp() {
 
 std::string TextUI::getInput() {
 	std::string userInput;
+	Color:: TextColor (1, 15 ,hStdOut);
 	std::getline(std::cin, userInput);
 	return userInput;
 }
@@ -332,10 +353,54 @@ std::string TextUI::getInput() {
 void TextUI::showOutput(UIObject uiObj) {
 	
     MappingNumber* mapping = MappingNumber::getInstance();
+
+	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+	Color:: TextColor (1, 15 ,hStdOut);
 	std::cout << uiObj.getHeaderText() << std::endl;
+	
 	mapping->clearMappingNumber();
 	printTasks(uiObj.getTaskList());
 	mappingNumber(uiObj.getTaskList());
+}
+
+void TextUI:: clearScreen(){
+
+  hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+  if (hStdOut == INVALID_HANDLE_VALUE){
+	  return;
+  }
+
+  // Get the number of cells in the current buffer 
+  if (!GetConsoleScreenBufferInfo( hStdOut, &csbi )){
+	  return;
+  }
+  
+  cellCount = csbi.dwSize.X *csbi.dwSize.Y;
+
+  // Fill the entire buffer with spaces
+  if (!FillConsoleOutputCharacter(
+    hStdOut,
+    (TCHAR) ' ',
+    cellCount,
+    homeCoords,
+    &count
+    )){
+		return;
+  }
+  // Fill the entire buffer with the current colors and attributes
+  if (!FillConsoleOutputAttribute(
+    hStdOut,
+    csbi.wAttributes,
+    cellCount,
+    homeCoords,
+    &count
+    )){
+		return;
+  }
+
+  // Move the cursor home
+  SetConsoleCursorPosition( hStdOut, homeCoords );
+  
 }
 
 

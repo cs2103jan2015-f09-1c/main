@@ -29,8 +29,7 @@ public:
 	static void printHelp();
 	static std::string getInput();
 	static void showOutput(UIObject uiObj);
-
-
+	static void clearScreen();
 
 	TextUI(void);
 	~TextUI(void);

@@ -13,6 +13,9 @@
 #include "ViewCmd.h"
 #include "History.h"
 
+const size_t Controller::NUM_CHARS_DONE = 4;
+const size_t Controller::NUM_CHARS_DELETE = 6;
+
 UIObject Controller::undoCommand(CommandType::Command cmdType) {
     switch (cmdType) { 
         case CommandType::ADD: {
@@ -30,10 +33,6 @@ UIObject Controller::undoCommand(CommandType::Command cmdType) {
         case CommandType::STORAGE: {
             StorageCmd storageCmd;
             return storageCmd.undo();
-        }
-		case CommandType::DONE:{
-            DoneCmd doneCmd;
-            return doneCmd.undo();
         }
         default:
             UIObject noUndo;
@@ -57,7 +56,7 @@ UIObject Controller::handleInput(std::string input) {
             MCLogger::log("Controller.cpp: begin delete command");
 
             DeleteCmd delCmdObj;
-            int TaskId = Interpreter::parseDelCmd(input);
+            int TaskId = Interpreter::parseDelOrDoneCmd(input, NUM_CHARS_DELETE + 1);
             delCmdObj.prepareTaskId(TaskId);
             return delCmdObj.execute();
         }
@@ -95,7 +94,6 @@ UIObject Controller::handleInput(std::string input) {
         }
         case CommandType::STORAGE: {
             MCLogger::log("Controller.cpp: begin storage command");
-
             StorageCmd storageCmdObj;
             std::string cmdDetails = Interpreter::parseStoreCmd(input);
             storageCmdObj.cmdType(cmdDetails);
@@ -103,15 +101,13 @@ UIObject Controller::handleInput(std::string input) {
         }    
 		case CommandType::DONE: {
             MCLogger::log("Controller.cpp: begin done command");
-
             DoneCmd doneCmdObj;
-            int index = Interpreter::parseDoneCmd(input);
-			doneCmdObj.prepareIndex(index);
+            int taskId = Interpreter::parseDelOrDoneCmd(input, NUM_CHARS_DONE + 1);
+			doneCmdObj.prepareTaskId(taskId);
             return doneCmdObj.execute();
         }
         case CommandType::EXIT_PROGRAM: {
             MCLogger::log("============= exit program ==============");
-
             Storage::resetInstance();
 			MappingNumber::resetInstance();
 			History::resetInstance();
