@@ -5,9 +5,11 @@
 #include <iostream>
 #include <sstream>
 #include "ViewType.h"
+#include "MCLogger.h"
 #include <time.h>
 
 const std::string ViewCmd:: NO_TASK_MESSAGE = "There is no task. Start writing one now!"; 
+const std::string ViewCmd:: INVALID_INPUT_MESSAGE = "Invalind input";
 
 ViewCmd::ViewCmd(void) {
 }
@@ -53,7 +55,7 @@ TaskList::TList ViewCmd:: getSelectedTasks(){
     Storage* storage = Storage::getInstance();
     TaskList taskList = storage->getTaskList();
 	
-	ViewType::View ViewType = ViewType::determineViewType(_detail);  
+	 ViewType = ViewType::determineViewType(_detail);  
 	 switch (ViewType) {
         case ViewType::SUNDAY: {
 			time_t day = getDayPosition(0);
@@ -107,10 +109,10 @@ TaskList::TList ViewCmd:: getSelectedTasks(){
 			return selectedTasks;
         }
 		case ViewType::INVALID: {
-		//	selectedTasks = NULL;
+			return selectedTasks;
         }
 		default :{
-		//	selectedTasks = NULL;
+			return selectedTasks;
 		 }
 	 }
 }
@@ -124,7 +126,10 @@ UIObject ViewCmd::execute() {
     UIObject viewObj;
 	if(!selectedTasks.empty()){
 		viewObj.setTaskList(selectedTasks);
-	} else{
+	} else
+	if(selectedTasks.empty() && ViewType == 11){
+		viewObj.setHeaderText(INVALID_INPUT_MESSAGE);
+	}else{
 		viewObj.setHeaderText(NO_TASK_MESSAGE);
 	}
 	return viewObj;

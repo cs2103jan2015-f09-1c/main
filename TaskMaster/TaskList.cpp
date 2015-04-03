@@ -196,6 +196,7 @@ std::string TaskList::findTaskName(unsigned idActual) const{
 time_t TaskList:: findTaskDate(unsigned idActual) const{
 	constTaskIt it;
 	time_t taskTime;
+	time (&taskTime);
     for (it = _taskList.begin(); it != _taskList.end(); ++it) {
         unsigned curId = it->getTaskID();
         if (foundTask(idActual, curId)) {

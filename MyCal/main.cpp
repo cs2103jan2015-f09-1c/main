@@ -33,8 +33,9 @@ int main(int argc, char *argv[]) {
 		userInput = TextUI::getInput();
 		
 		MCLogger::log("User input: " + userInput);
-		UIObject controllerOutput;
-		controllerOutput = Controller::handleInput(userInput);
+		UIObject controllerOutput = Controller::handleInput(userInput);
+
+		TextUI::clearScreen();
 		TextUI::showOutput(controllerOutput);
 	}
 
