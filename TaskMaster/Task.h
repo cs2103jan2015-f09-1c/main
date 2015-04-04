@@ -10,13 +10,20 @@ public:
     void setTaskName(std::string name);
     std::string getTaskName() const;
 
+	// Tasks which do not have their begin times set are floating by default.
+	// Tasks which have their begin times = 0 are also set to floating.
+	// Nevertheless, the use of setFloating() method provides a clearer way to set a Task as floating.
+	void setFloating();
+	void setNotFloating();
     bool isFloating() const; 
 
     std::string getDateStr() const;
     std::string getBeginStr() const;
     std::string getEndStr() const;
+
     time_t getTaskBegin() const;
     time_t getTaskEnd() const;
+
     void setTaskBegin(time_t begin);
     void setTaskEnd(time_t end);
     

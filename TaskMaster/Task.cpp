@@ -18,6 +18,15 @@ std::string Task::getTaskName() const {
     return _taskName;
 }
 
+void Task::setFloating() {
+	_isFloating = true;
+}
+
+void Task::setNotFloating() {
+	_isFloating = false;
+}
+
+
 bool Task::isFloating() const {
     return _isFloating;
 }
