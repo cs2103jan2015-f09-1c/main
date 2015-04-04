@@ -61,8 +61,8 @@ std::string TextUI::QUALIFIER_DATE_BAR =
 std::string TextUI::DEFAULT_DATE_BAR = 
 	"[%1% %2% %3%] %|25t| Description";
 std:: string TextUI:: TIME_PRINT=
-	"%1%. [%2%] %|26t|";
-std:: string TextUI:: DONE_PRINT= "\t \t \t \t (done)";
+	"%1%. %2% %|26t|";
+//std:: string TextUI:: DONE_PRINT= "\t \t \t \t (done)";
 
 struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
     struct tm tmStruct;
@@ -72,7 +72,7 @@ struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
 
 bool TextUI::isUnscheduled(const time_t &taskDate) {
     struct tm localTime = convertToLocalTime(taskDate);
-	return (localTime).tm_year == 0;
+	return (localTime).tm_yday == 0;
 }
 
 std::string TextUI::getWkDayName(const time_t &taskDate) {
@@ -229,7 +229,7 @@ void TextUI::printDateBar(const time_t &taskDate) {
 	    std::string day = std::to_string(localTime.tm_mday);
 
 		hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
-		Color:: TextColor (4, 15 ,hStdOut);
+		Color:: TextColor (11, 0 ,hStdOut);
 
 		if(qualifier == ""){
 			std::cout << format(DEFAULT_DATE_BAR) % wkdayName % monthName % day;
@@ -252,7 +252,7 @@ void TextUI::printTasks(TaskList::TList tasks) {
 		std::string nowDate = "";
 		if(it->isFloating())
 		{
-			nowDate = "empty";
+			nowDate = "0";
 		}
 		else
 		{
@@ -282,7 +282,7 @@ void TextUI::printTasks(TaskList::TList tasks) {
 		std::string timePrint = "";
 		if(timeStart == "" && timeEnd == "")
 		{
-			timePrint = "----------------";
+			timePrint = "-------------------";
 		}
 		else if(timeEnd == "")
 		{
@@ -295,13 +295,12 @@ void TextUI::printTasks(TaskList::TList tasks) {
 
 		if(it->isDone()){
 			hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
-			Color:: TextColor (8, 15 ,hStdOut);
+			Color:: TextColor (8, 0 ,hStdOut);
 			std::cout << format(TIME_PRINT) %counter %timePrint;
 			std::cout << it->getTaskName();
-			std::cout << DONE_PRINT;
 		} else {
 			hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
-			Color:: TextColor (0, 15 ,hStdOut);
+			Color:: TextColor (15, 0 ,hStdOut);
 			std::cout << format(TIME_PRINT) %counter %timePrint;
 			std::cout << it->getTaskName();
 		}
@@ -330,21 +329,20 @@ void TextUI:: mappingNumber(TaskList::TList tasks){
 
 void TextUI::printWelcomeMsg() {
 	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
-	Color:: TextColor (4, 15 ,hStdOut);
-	FillConsoleOutputAttribute(hStdOut, _rotl(15,4) , 80 * 50,homeCoords , &count);
+	Color:: TextColor (11, 0 ,hStdOut);
+	FillConsoleOutputAttribute(hStdOut, _rotl(0,11) , 80 * 50,homeCoords , &count);
 	std::cout << WELCOME_MSG << std::endl << std:: endl;
 }
 
 void TextUI::printEnterCommand() {
 	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
-	Color:: TextColor (4, 15 ,hStdOut);
-	FillConsoleOutputAttribute(hStdOut, _rotl(15,4) , 80 * 50,homeCoords , &count);
+	Color:: TextColor (14, 0 ,hStdOut);
 	std::cout << ENTER_CMD;
 }
 
 std::string TextUI::getInput() {
 	std::string userInput;
-	Color:: TextColor (1, 15 ,hStdOut);
+	Color:: TextColor (14, 0 ,hStdOut);
 	std::getline(std::cin, userInput);
 	return userInput;
 }
@@ -355,7 +353,7 @@ void TextUI::showOutput(UIObject uiObj) {
     MappingNumber* mapping = MappingNumber::getInstance();
 
 	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
-	Color:: TextColor (1, 15 ,hStdOut);
+	Color:: TextColor (11, 0 ,hStdOut);
 	std::cout << uiObj.getHeaderText() << std::endl;
 	
 	mapping->clearMappingNumber();
