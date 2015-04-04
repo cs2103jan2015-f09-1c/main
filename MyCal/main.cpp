@@ -25,10 +25,12 @@ void printTasksToday() {
 int main(int argc, char *argv[]) {
     MCLogger::log("============= start program =============");
 
+	TextUI::clearScreen();
 	TextUI::printWelcomeMsg();
 	printTasksToday();
 
 	while (true) {        
+		TextUI::printEnterCommand();
 		std::string userInput;
 		userInput = TextUI::getInput();
 		

@@ -52,7 +52,7 @@ DWORD coord;
 COORD homeCoords = { 0, 0 };
 
 const std::string TextUI::WELCOME_MSG = "Welcome to MyCal!"; 
-const std::string TextUI::HELP_MSG = "Helpppp";
+const std::string TextUI::ENTER_CMD = "Enter command: ";
 const std::string TextUI::UNSCHEDULED_DATE_BAR = 
 	"[Unscheduled Tasks] %|25t| Description";
 std::string TextUI::QUALIFIER_DATE_BAR = 
@@ -333,13 +333,13 @@ void TextUI::printWelcomeMsg() {
 	Color:: TextColor (4, 15 ,hStdOut);
 	FillConsoleOutputAttribute(hStdOut, _rotl(15,4) , 80 * 50,homeCoords , &count);
 	std::cout << WELCOME_MSG << std::endl << std:: endl;
-	time_t curTime;
-    time(&curTime);
-	//printDateBar(curTime);
 }
 
-void TextUI::printHelp() {
-	std::cout << HELP_MSG << std::endl;
+void TextUI::printEnterCommand() {
+	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+	Color:: TextColor (4, 15 ,hStdOut);
+	FillConsoleOutputAttribute(hStdOut, _rotl(15,4) , 80 * 50,homeCoords , &count);
+	std::cout << ENTER_CMD;
 }
 
 std::string TextUI::getInput() {
