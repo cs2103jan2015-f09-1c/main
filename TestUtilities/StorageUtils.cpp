@@ -53,7 +53,7 @@ std::string StorageUtils::readFile(std::string filepath) {
     std::ifstream read(filepath); 
     std::ostringstream oss;
     while (std::getline(read, line)) {
-        oss << line;
+        oss << line << std::endl;
     }
 
     return oss.str();

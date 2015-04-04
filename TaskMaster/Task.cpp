@@ -18,6 +18,15 @@ std::string Task::getTaskName() const {
     return _taskName;
 }
 
+void Task::setFloating() {
+	_isFloating = true;
+}
+
+void Task::setNotFloating() {
+	_isFloating = false;
+}
+
+
 bool Task::isFloating() const {
     return _isFloating;
 }
@@ -27,7 +36,7 @@ std::string Task::getDateStr() const {
     tm beginStruct;
     localtime_s(&beginStruct, &_taskBegin);
     std::ostringstream beginOss;
-    beginOss << std::put_time(&beginStruct, "%a %b %d");
+    beginOss << std::put_time(&beginStruct, "%a %b %d %Y");
     return beginOss.str();
 }
 
@@ -92,12 +101,13 @@ void Task::setTaskID(unsigned id) {
 
 std::string Task::toString() const {
     std::ostringstream oss;
-    oss << getTaskID() << std::endl;
+    oss << getTaskID() << " ";
     oss << getTaskName() << std::endl;
-    oss << getDateStr() << std::endl ;
+    oss << getDateStr() << " ";
     oss << getBeginStr() << " - ";
     oss << getEndStr() << std::endl;
-    oss << isDone() << std::endl;
+    oss << "done: " << isDone() << " ";
+	oss << "float: " << isFloating();
 
     return oss.str();
 }

@@ -5,7 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include "ViewType.h"
-#include "Logger.h"
+#include "MCLogger.h"
 #include <time.h>
 
 const std::string ViewCmd:: NO_TASK_MESSAGE = "There is no task. Start writing one now!"; 

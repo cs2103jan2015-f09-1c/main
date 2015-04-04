@@ -9,7 +9,7 @@
 #include "Shlwapi.h" // PathFileExists
 #include "History.h"
 #include "State.h"
-#include "Logger.h"
+#include "MCLogger.h"
 
 DeleteCmd::DeleteCmd(void) {
 }

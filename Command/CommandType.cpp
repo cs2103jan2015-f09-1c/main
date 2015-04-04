@@ -1,5 +1,6 @@
 #include "CommandType.h"
-
+#include "CommandAlias.h"
+#include <iostream>
 CommandType::CommandType(void) {
 }
 
@@ -9,39 +10,87 @@ CommandType::~CommandType(void) {
 CommandType::Command CommandType::determineCmdType(std::string userCmd) {
     std::string cmdString = getFirstWord(userCmd);
 
-	if (cmdString == "add") {
+	if (CommandAlias::isAdd(cmdString)) {
 		return CommandType::ADD;
 	} else
-	if (cmdString == "delete") {
+	if (CommandAlias::isDel(cmdString)) {
 		return CommandType::DEL;
 	} else
-	if (cmdString == "edit") {
+	if (CommandAlias::isEdit(cmdString)) {
 		return CommandType::EDIT;
 	} else
-	if (cmdString == "undo") {
+	if (CommandAlias::isUndo(cmdString)) {
 		return CommandType::UNDO;
 	} else
-	if (cmdString == "search") {
+	if (CommandAlias::isSearch(cmdString)) {
 		return CommandType::SEARCH;
 	} else
-	if (cmdString == "view") {
+	if (CommandAlias::isView(cmdString)) {
 		return CommandType::VIEW;
 	} else 
-	if(cmdString == "done"){
+	if(CommandAlias::isDone(cmdString)){
 		return CommandType::DONE;
 	}else
-    if (cmdString == "storage") {
+    if (CommandAlias::isStorage(cmdString)) {
 		return CommandType::STORAGE;
 	} else 
-	if (cmdString == "exit") {
+	if (CommandAlias::isExit(cmdString)) {
 		return CommandType::EXIT_PROGRAM;
 	} else {
 		return CommandType::INVALID;
 	}
 }
 
-std::string CommandType::getFirstWord(std::string userCmd) {
-	std::istringstream iss(userCmd);
+std::string CommandType::filterOutCmd(std::string input) {
+	size_t firstWordLength = getFirstWord(input).length();
+
+	if (input.length() > firstWordLength) {
+		return input.substr(firstWordLength + 1);
+	}
+
+	// only one word in input string.
+	return "";
+}
+
+int CommandType::getNumOfChars(std::string userCmd) {
+	std::string cmdString = getFirstWord(userCmd);
+	return cmdString.length();
+}
+
+std::string CommandType::cmdToString(Command cmdType) {
+	if (cmdType == ADD) {
+		return "CommandType::ADD";
+	} else
+	if (cmdType == DEL) {
+		return "CommandType::DEL";
+	} else
+	if (cmdType == EDIT) {
+		return "CommandType::EDIT";
+	} else
+	if (cmdType == UNDO) {
+		return "CommandType::UNDO";
+	} else
+	if (cmdType == SEARCH) {
+		return "CommandType::SEARCH";
+	} else
+	if (cmdType == VIEW) {
+		return "CommandType::VIEW";
+	} else 
+	if(cmdType == DONE){
+		return "CommandType::DONE";
+	}else
+    if (cmdType == STORAGE) {
+		return "CommandType::STORAGE";
+	} else 
+	if (cmdType == EXIT_PROGRAM) {
+		return "CommandType::EXIT_PROGRAM";
+	} else {
+		return "CommandType::INVALID";
+	}
+}
+
+std::string CommandType::getFirstWord(std::string input) {
+	std::istringstream iss(input);
 	std::string firstWord;
 	iss >> firstWord;
 	return firstWord;

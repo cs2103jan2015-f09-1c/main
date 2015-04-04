@@ -1,5 +1,5 @@
 #include "History.h"
-
+#include "MCLogger.h"
 History* History::_instance = 0;
 
 History* History::getInstance() {
@@ -27,10 +27,12 @@ State History::getPreviousState() const {
 }
 
 void History::saveState(State state) {
+	MCLogger::log("History.cpp: save state " + state.toString());
     _previousState = state;
 }
 
 void History::clearHistory() {
+	MCLogger::log("History.cpp: clear history");
     _previousCommand = CommandType::INVALID;
 }
 

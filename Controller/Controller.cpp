@@ -3,7 +3,7 @@
 #include "Controller.h"
 #include "Interpreter.h"
 #include "Storage.h"
-#include "Logger.h"
+#include "MCLogger.h"
 #include "AddCmd.h"
 #include "EditCmd.h"
 #include "StorageCmd.h"
@@ -43,9 +43,11 @@ UIObject Controller::undoCommand(CommandType::Command cmdType) {
 
 UIObject Controller::handleInput(std::string input) {
     CommandType::Command cmdType = CommandType::determineCmdType(input);  
+	std::string filteredCmd = CommandType::filterOutCmd(input);
+
     switch (cmdType) {
         case CommandType::ADD: {
-            Logger::log("begin add command");
+            MCLogger::log("Controller.cpp: begin add command");
 
             AddCmd addCmdObj;
             Task task = Interpreter::parseAddCmd(input);
@@ -53,7 +55,7 @@ UIObject Controller::handleInput(std::string input) {
             return addCmdObj.execute();
         }
         case CommandType::DEL: {
-            Logger::log("begin delete command");
+            MCLogger::log("Controller.cpp: begin delete command");
 
             DeleteCmd delCmdObj;
             int TaskId = Interpreter::parseDelOrDoneCmd(input, NUM_CHARS_DELETE + 1);
@@ -61,7 +63,7 @@ UIObject Controller::handleInput(std::string input) {
             return delCmdObj.execute();
         }
         case CommandType::EDIT: {
-            Logger::log("begin edit command");
+            MCLogger::log("Controller.cpp: begin edit command");
 
             EditCmd editCmdObj;
             Task task = Interpreter::parseEditCmd(input);
@@ -69,7 +71,7 @@ UIObject Controller::handleInput(std::string input) {
             return editCmdObj.execute();
         }
         case CommandType::UNDO: {
-            Logger::log("begin undo command");
+            MCLogger::log("Controller.cpp: begin undo command");
             History *hist = History::getInstance();
             CommandType::Command prevCmd = hist->getPreviousCommand();
             
@@ -78,7 +80,7 @@ UIObject Controller::handleInput(std::string input) {
             return feedback;
         }
         case CommandType::SEARCH: {
-            Logger::log("begin search command");
+            MCLogger::log("Controller.cpp: begin search command");
 
 			SearchCmd SearchCmdObj;
 			TaskList::TList List = Interpreter::parseSearchCmd(input);
@@ -86,40 +88,43 @@ UIObject Controller::handleInput(std::string input) {
 			return SearchCmdObj.execute();
         }
         case CommandType::VIEW: {
-            Logger::log("begin view command");
+            MCLogger::log("Controller.cpp: begin view command");
 			ViewCmd ViewObj;
 			std::string detail = Interpreter::parseViewCmd(input);
 			ViewObj.prepareDetail(detail);
 			return ViewObj.execute();
         }
         case CommandType::STORAGE: {
-            Logger::log("begin storage command");
-            StorageCmd storageCmdObj;
-            std::string cmdDetails = Interpreter::parseStoreCmd(input);
-            storageCmdObj.cmdType(cmdDetails);
+            MCLogger::log("Controller.cpp: begin storage command");
+            std::string parsedCmd = Interpreter::parseStoreCmd(filteredCmd);
+			StorageCmd storageCmdObj;
+            storageCmdObj.cmdType(parsedCmd);
             return storageCmdObj.execute();
         }    
 		case CommandType::DONE: {
-            Logger::log("begin done command");
+            MCLogger::log("Controller.cpp: begin done command");
             DoneCmd doneCmdObj;
             int taskId = Interpreter::parseDelOrDoneCmd(input, NUM_CHARS_DONE + 1);
 			doneCmdObj.prepareTaskId(taskId);
             return doneCmdObj.execute();
         }
         case CommandType::EXIT_PROGRAM: {
-            Logger::log("============= exit program ==============");
+            MCLogger::log("============= exit program ==============");
             Storage::resetInstance();
+			MappingNumber::resetInstance();
+			History::resetInstance();
+
             exit(EXIT_SUCCESS);
         }
         case CommandType::INVALID: {
-            Logger::log("invalid command");
+            MCLogger::log("Controller.cpp: invalid command");
             UIObject invalidCmd;
-            invalidCmd.setHeaderText("The command entered is invalid.");
+            invalidCmd.setHeaderText("The command entered (" + input + ") is invalid.");
             return invalidCmd;
         }
         default: {
+			MCLogger::log("ERROR: UNRECOGNIZED COMMAND TYPE");
             assert(false);
-            Logger::log("invalid command");
             UIObject invalidCmd;
             invalidCmd.setHeaderText("The command entered is invalid.");
             return invalidCmd;

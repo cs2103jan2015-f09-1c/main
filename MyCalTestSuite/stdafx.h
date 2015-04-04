@@ -19,3 +19,4 @@
 #include "StorageUtils.h"
 #include "MockStorage.h"
 #include "DeleteCmd.h"
+#include "MCLogger.h"

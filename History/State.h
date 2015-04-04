@@ -10,6 +10,7 @@ public:
     Task getTask() const;
     void recordStorageLoc(std::string loc);
     std::string getStorageLoc() const;
+	std::string toString() const;
 
 private:
     Task _task;

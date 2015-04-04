@@ -41,7 +41,6 @@
 #include "Color.h"
 #include "boost/format.hpp"
 #include "MappingNumber.h"
-#include <fstream>
 
 using boost::format;
 
@@ -53,16 +52,17 @@ DWORD coord;
 COORD homeCoords = { 0, 0 };
 
 const std::string TextUI::WELCOME_MSG = "Welcome to MyCal!"; 
-const std::string TextUI::HELP_MSG = "Welcome to MyCal Preview";
+const std::string TextUI::ENTER_CMD = "Enter command: ";
 const std::string TextUI::UNSCHEDULED_DATE_BAR = 
-	"[Unscheduled Tasks] %|30t| Description";
+	"[Unscheduled Tasks] %|25t| Description";
 std::string TextUI::QUALIFIER_DATE_BAR = 
-	"[%1%, %2%, %3% %4% %5%] %|30t| Description";
+	"[%1% %2% %3% %4%] %|25t| Description";
 
 std::string TextUI::DEFAULT_DATE_BAR = 
-	"[%1%, %2% %3% %4%] %|30t| Description";
+	"[%1% %2% %3%] %|25t| Description";
 std:: string TextUI:: TIME_PRINT=
-	"%1%. [%2%] %|31t|";
+	"%1%. [%2%] %|26t|";
+std:: string TextUI:: DONE_PRINT= "\t \t \t \t (done)";
 
 struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
     struct tm tmStruct;
@@ -87,7 +87,7 @@ std::string TextUI::getWkDayName(const time_t &taskDate) {
 		case 3:
 			return "Wed";
 		case 4:
-			return "Thurs";
+			return "Thu";
 		case 5:
 			return "Fri";
 		case 6:
@@ -227,15 +227,14 @@ void TextUI::printDateBar(const time_t &taskDate) {
 	    std::string monthName = getMonthName(taskDate);
         struct tm localTime = convertToLocalTime(taskDate);
 	    std::string day = std::to_string(localTime.tm_mday);
-		std::string year = std::to_string(localTime.tm_year + 1900);
 
 		hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
 		Color:: TextColor (4, 15 ,hStdOut);
 
 		if(qualifier == ""){
-			std::cout << format(DEFAULT_DATE_BAR) % wkdayName % day % monthName  %year;
+			std::cout << format(DEFAULT_DATE_BAR) % wkdayName % monthName % day;
 		}else{
-			std::cout << format(QUALIFIER_DATE_BAR) % qualifier % wkdayName % day % monthName  %year;
+			std::cout << format(QUALIFIER_DATE_BAR) % qualifier % wkdayName % monthName % day;
 		}
 
 	    std::cout << std::endl;
@@ -299,6 +298,7 @@ void TextUI::printTasks(TaskList::TList tasks) {
 			Color:: TextColor (8, 15 ,hStdOut);
 			std::cout << format(TIME_PRINT) %counter %timePrint;
 			std::cout << it->getTaskName();
+			std::cout << DONE_PRINT;
 		} else {
 			hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
 			Color:: TextColor (0, 15 ,hStdOut);
@@ -333,24 +333,13 @@ void TextUI::printWelcomeMsg() {
 	Color:: TextColor (4, 15 ,hStdOut);
 	FillConsoleOutputAttribute(hStdOut, _rotl(15,4) , 80 * 50,homeCoords , &count);
 	std::cout << WELCOME_MSG << std::endl << std:: endl;
-	time_t curTime;
-    time(&curTime);
-	//printDateBar(curTime);
 }
 
-void TextUI::printHelp() {
-	std::cout << HELP_MSG << std::endl;
-
-	std::string line; 
-	std::ifstream inFile; 
-	inFile.open("MyCalHelp.txt");
-
-	while(std::getline(inFile, line)){ 
-		std::cout << line;
-		std::cout << std:: endl;
-	} 
-
-	inFile.close(); 
+void TextUI::printEnterCommand() {
+	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+	Color:: TextColor (4, 15 ,hStdOut);
+	FillConsoleOutputAttribute(hStdOut, _rotl(15,4) , 80 * 50,homeCoords , &count);
+	std::cout << ENTER_CMD;
 }
 
 std::string TextUI::getInput() {
@@ -364,6 +353,7 @@ std::string TextUI::getInput() {
 void TextUI::showOutput(UIObject uiObj) {
 	
     MappingNumber* mapping = MappingNumber::getInstance();
+
 	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
 	Color:: TextColor (1, 15 ,hStdOut);
 	std::cout << uiObj.getHeaderText() << std::endl;

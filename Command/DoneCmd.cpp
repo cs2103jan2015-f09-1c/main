@@ -7,7 +7,7 @@
 #include <assert.h>
 #include "History.h"
 #include "State.h"
-#include "Logger.h"
+#include "MCLogger.h"
 
 const std::string DoneCmd:: NO_MATCHING_TASK = "There is no matching task to be marked done.";
 const std::string DoneCmd:: DONE_MESSAGE = "Done: "; 

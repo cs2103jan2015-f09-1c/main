@@ -25,34 +25,25 @@ namespace MyCalTestSuite {
             delCmdObj.prepareTaskId((unsigned) 3);
             UIObject oneRemaining = delCmdObj.execute();
 
-            // check header text
-            std::string actualHeader = oneRemaining.getHeaderText();
-            std::string expectedHeader = "Remaining tasks for that day:";
-            Assert::AreEqual(expectedHeader, actualHeader);
+            Assert::AreEqual(std::string("Remaining tasks for that day:"), oneRemaining.getHeaderText());
 
-            // check task list
             TaskList actualTaskList;
             actualTaskList.loadTaskList(oneRemaining.getTaskList());
-            std::string expectedTaskStr = TaskStub::getSampleTask1().toString() + "\n";
-            Assert::AreEqual(expectedTaskStr, actualTaskList.toString());
+            Assert::AreEqual(TaskStub::getSampleTask1().toString() + "\n", actualTaskList.toString());
 
             // TEST FOR NO TASKS REMAINING
             delCmdObj.prepareTaskId((unsigned) 1);
             UIObject noneRemaining = delCmdObj.execute();
-            
-            // check header text
-            std::string actualHeader2 = noneRemaining.getHeaderText();
-            std::string expectedHeader2 = "No more tasks for that day!";
-            Assert::AreEqual(expectedHeader2, actualHeader2);
 
-            // check task list
+            Assert::AreEqual(std::string("No more tasks for that day!"), noneRemaining.getHeaderText());
+
             TaskList actualTaskList2;
             actualTaskList2.loadTaskList(noneRemaining.getTaskList());
             Assert::AreEqual(0, actualTaskList2.totalTasks());
 
             // check remaining tasks in storage
-            std::string expectedStorage = "5\ndummy T5\n1425986625\n1425990225\n0\n";;
-            Assert::AreEqual(expectedStorage, StorageUtils::readFile("tasklist.txt"));
+            Assert::AreEqual(std::string("5\ndummy T5\n1425986625\n1425990225\n0\n"), 
+				StorageUtils::readFile("tasklist.txt"));
 
             MockStorage::cleanMockStorage();
         }
@@ -78,7 +69,6 @@ namespace MyCalTestSuite {
 
             MockStorage::cleanMockStorage();
         }*/
-
 	};
 
 

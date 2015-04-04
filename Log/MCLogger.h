@@ -1,13 +1,13 @@
 #pragma once
 #include <string>
 
-class Logger {
+class MCLogger {
 private:
     static void writeToLog(std::string msg);
     static std::string getDateTime();
 public:
     static void log(std::string msg);
-    Logger(void);
-    ~Logger(void);
+    MCLogger(void);
+    ~MCLogger(void);
 };
 

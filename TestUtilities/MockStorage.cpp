@@ -1,6 +1,5 @@
 #include "MockStorage.h"
-
-// empty string means location of executable will be used.
+#include "MCLogger.h"
 
 MockStorage::MockStorage(void) {
 }
@@ -10,6 +9,7 @@ MockStorage::~MockStorage(void) {
 }
 
 void MockStorage::initMockStorage(TaskList taskList, std::string taskListLoc) {
+	MCLogger::log("MockStorage.cpp: initializing mock storage");
     StorageUtils::backupExistingFiles();
     StorageUtils::createSettingsFile(taskListLoc);
     Storage *storage = Storage::getInstance();
@@ -17,6 +17,7 @@ void MockStorage::initMockStorage(TaskList taskList, std::string taskListLoc) {
 }
 
 void MockStorage::cleanMockStorage(std::string taskListLoc) {
+	MCLogger::log("MockStorage.cpp: Clean mock storage");
     StorageUtils::removeTaskListFile(taskListLoc);
     StorageUtils::removeSettingsFile();
     StorageUtils::restoreExistingFiles();

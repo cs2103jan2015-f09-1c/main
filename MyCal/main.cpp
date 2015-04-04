@@ -2,7 +2,7 @@
 #include "UIObject.h"
 #include "TextUI.h"
 #include "Storage.h"
-#include "Logger.h"
+#include "MCLogger.h"
 
 void printTasksToday() {
     Storage *storage = Storage::getInstance();
@@ -23,19 +23,21 @@ void printTasksToday() {
 }
 
 int main(int argc, char *argv[]) {
-    Logger::log("============= start program =============");
+    MCLogger::log("============= start program =============");
 
+	TextUI::clearScreen();
 	TextUI::printWelcomeMsg();
 	printTasksToday();
 
-    Controller controllerService;
 	while (true) {        
+		TextUI::printEnterCommand();
 		std::string userInput;
 		userInput = TextUI::getInput();
+		
+		MCLogger::log("User input: " + userInput);
+		UIObject controllerOutput = Controller::handleInput(userInput);
 
-		UIObject controllerOutput;
-		controllerOutput = controllerService.handleInput(userInput);
-		TextUI:: clearScreen();
+		TextUI::clearScreen();
 		TextUI::showOutput(controllerOutput);
 	}
 
