@@ -48,6 +48,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HistoryUnitTests", "History
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TextUIUnitTests", "TextUIUnitTests\TextUIUnitTests.vcxproj", "{2AAE6A8B-93AD-48D9-95E9-F63979EFD66B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Aliases", "Aliases\Aliases.vcxproj", "{FAAFB6E6-7D99-4F18-B733-AA97F51DBDE2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -130,6 +132,10 @@ Global
 		{2AAE6A8B-93AD-48D9-95E9-F63979EFD66B}.Debug|Win32.Build.0 = Debug|Win32
 		{2AAE6A8B-93AD-48D9-95E9-F63979EFD66B}.Release|Win32.ActiveCfg = Release|Win32
 		{2AAE6A8B-93AD-48D9-95E9-F63979EFD66B}.Release|Win32.Build.0 = Release|Win32
+		{FAAFB6E6-7D99-4F18-B733-AA97F51DBDE2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FAAFB6E6-7D99-4F18-B733-AA97F51DBDE2}.Debug|Win32.Build.0 = Debug|Win32
+		{FAAFB6E6-7D99-4F18-B733-AA97F51DBDE2}.Release|Win32.ActiveCfg = Release|Win32
+		{FAAFB6E6-7D99-4F18-B733-AA97F51DBDE2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include "MappingNumber.h"
+#include "StorageAlias.h"
 
 using namespace std; 
 const size_t Interpreter::NUM_CHARS_VIEW = 4;
@@ -153,10 +154,14 @@ Task Interpreter::parseEditCmd(std::string input) {
 } 
 
 std::string Interpreter::parseStoreCmd(std::string input) {    
-    if (input == "") { 
+    if (StorageAlias::isGetLocation(input)) { 
         return "getLocation";
-    }
+    } else if (StorageAlias::isHelp(input)) {
+		return "help";
+	}
 
+	// take the entire original input as new storage location to be changed
+	// if it is neither "getLocation" nor "help".
     return input;
 }
 

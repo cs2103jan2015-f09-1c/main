@@ -52,7 +52,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)\Storage;$(SolutionDir)\TaskMaster;$(SolutionDir)\TextUI;$(SolutionDir)\Interpreter;$(SolutionDir)\History;$(SolutionDir)\Controller;$(SolutionDir)\Command;$(SolutionDir)\TestUtilities;$(SolutionDir)\Log;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)\Storage;$(SolutionDir)\TaskMaster;$(SolutionDir)\TextUI;$(SolutionDir)\Interpreter;$(SolutionDir)\History;$(SolutionDir)\Controller;$(SolutionDir)\Command;$(SolutionDir)\TestUtilities;$(SolutionDir)\Log;$(SolutionDir)\Aliases;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -69,7 +69,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)\Storage;$(SolutionDir)\TaskMaster;$(SolutionDir)\TextUI;$(SolutionDir)\Interpreter;$(SolutionDir)\History;$(SolutionDir)\Controller;$(SolutionDir)\Command;$(SolutionDir)\TestUtilities;$(SolutionDir)\Log;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(SolutionDir)\Storage;$(SolutionDir)\TaskMaster;$(SolutionDir)\TextUI;$(SolutionDir)\Interpreter;$(SolutionDir)\History;$(SolutionDir)\Controller;$(SolutionDir)\Command;$(SolutionDir)\TestUtilities;$(SolutionDir)\Log;$(SolutionDir)\Aliases;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -92,6 +92,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Aliases\Aliases.vcxproj">
+      <Project>{faafb6e6-7d99-4f18-b733-aa97f51dbde2}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Command\Command.vcxproj">
       <Project>{6f3d4173-e831-4527-b82e-113a7c0af81d}</Project>
     </ProjectReference>
