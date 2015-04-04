@@ -34,7 +34,7 @@ void Storage::updateStorage(TaskList taskList) {
 
     _maxID++; 
     _sessionStore = taskList;
-    writeTaskListTxt();
+    writeTaskListTxt(_sessionStore.getAll(), _taskListLoc);
 }
 
 void Storage::setStorageLoc(std::string newLoc) {
@@ -43,7 +43,7 @@ void Storage::setStorageLoc(std::string newLoc) {
 
     moveTaskList(_taskListLoc, newLoc);
     _taskListLoc = newLoc;
-    writeSettingsTxt();
+    writeSettingsTxt(_taskListLoc);
 }
 
 std::string Storage::getStorageLoc() const {
@@ -139,8 +139,8 @@ void Storage::initSessionStore() {
     }
 }
 
-void Storage::overwriteFile(std::string file, std::string contents, std::string loc="") {
-    std::string filepath = loc + file;
+void Storage::overwriteFile(std::string fileName, std::string contents, std::string loc="") {
+    std::string filepath = loc + fileName;
 	std::ofstream writeFile(filepath);
 	writeFile << contents;
 	writeFile.close();
@@ -153,26 +153,15 @@ void Storage::moveTaskList(std::string oldLoc, std::string newLoc) {
     rename(oldpath.c_str(), newpath.c_str());
 }
 
-void Storage::writeSettingsTxt() {
-    //This overwrites the exisiting file
-    //save to settings.txt in the following format:
-    //<File Location>
-    overwriteFile(SETTINGS_FILENAME, _taskListLoc);
+void Storage::writeSettingsTxt(std::string contents) {
+    overwriteFile(SETTINGS_FILENAME, contents);
 }
 
 
-void Storage::writeTaskListTxt() {
-    //This overwrites the exisiting file
-    //save to tasklist.txt in the following format:
-    // <taskid>
-    // <taskname>
-    // <taskbegin>
-    // <taskend>
-    // <isDone>
-    TaskList::TList list = _sessionStore.getAll();
+void Storage::writeTaskListTxt(TaskList::TList listToWrite, std::string writeLoc) {
     TaskList::taskIt it;
     std::ostringstream oss;
-    for (it = list.begin(); it != list.end(); ++it) {
+    for (it = listToWrite.begin(); it != listToWrite.end(); ++it) {
         oss << it->getTaskID() << std::endl;
         oss << it->getTaskName() << std::endl;
         oss << it->getTaskBegin() << std::endl;
@@ -180,5 +169,5 @@ void Storage::writeTaskListTxt() {
         oss << it->isDone() << std::endl;
     }
 
-    overwriteFile(TASKLIST_FILENAME, oss.str(), _taskListLoc); 
+    overwriteFile(TASKLIST_FILENAME, oss.str(), writeLoc); 
  }
