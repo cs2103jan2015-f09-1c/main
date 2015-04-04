@@ -8,6 +8,15 @@
 using namespace std; 
 const size_t Interpreter::NUM_CHARS_VIEW = 4;
 
+bool Interpreter::search(std::string keyword, Task task) {
+	std::string line = task.getTaskName();
+	if (line.find(keyword) != std::string::npos){
+		return true;
+	} else {
+		return false;
+	}
+}
+
 Task Interpreter::parseAddCmd(std::string input) {
 
 	Task a;
@@ -195,13 +204,13 @@ int Interpreter::parseDelOrDoneCmd(std::string input, int lengthCommand){
 	}
 
 
-	std::string Interpreter::parseViewCmd(std::string input){
+std::string Interpreter::parseViewCmd(std::string input){
 	std:: string detail;
 	detail = input.substr(NUM_CHARS_VIEW + 1);
 	return detail;
 	}
 
-	TaskList::TList Interpreter::parseSearchCmd (std::string input){
+TaskList::TList Interpreter::parseSearchCmd (std::string input){
 	std::string taskToDel = input.substr(7);
 	Storage *storage = Storage::getInstance();
 	TaskList tasklist = storage->getTaskList();
@@ -211,12 +220,13 @@ int Interpreter::parseDelOrDoneCmd(std::string input, int lengthCommand){
 
 	for (it = list.begin(); it != list.end(); ++it) {
 		Task task = *it;
-		if (Search(taskToDel, task)) {
+		if (search(taskToDel, task)) {
 			foundTaskList.push_back(task);
 		}
 	}
 	return foundTaskList;
 }
+
 Interpreter::Interpreter(void) {
 }
 
@@ -587,7 +597,7 @@ Task Interpreter::prepareDelOrDoneCmd(std::string input, int lengthCommand) {
 		else{
     for (it = list.begin(); it != list.end(); ++it) {
         Task task = *it;
-        if (Search(taskToDel, task)) {
+        if (search(taskToDel, task)) {
             return task;
 		}
 	}

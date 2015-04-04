@@ -21,15 +21,7 @@ class Interpreter
 private:
 	static const size_t NUM_CHARS_VIEW;
 
-	static bool Search(std::string keyword, Task task){
-		std::string line = task.getTaskName();
-		if (line.find(keyword) != std::string::npos){
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
+	static bool search(std::string keyword, Task task);
 	static int parse(std::string event, CalEvent *calEventOut);
 	static int IsLeapYear(int year); //return = 1 means leap year
 	static int month_days(int year, int month); //return number of days in a particular month
