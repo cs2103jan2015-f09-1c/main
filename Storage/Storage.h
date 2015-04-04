@@ -26,12 +26,12 @@ private:
     void overwriteFile(std::string file, std::string contents, std::string loc);
     void moveTaskList(std::string oldLoc, std::string newLoc);
 
-	//This overwrites the exisiting file
+	//writeSettingsTxt overwrites the exisiting file
 	//save to settings.txt in the following format:
-	//<File Location>
+	//<contents>
     void writeSettingsTxt(std::string contents);
 
-	//This overwrites the exisiting file
+	//writeTaskListTxt overwrites the exisiting file
 	//save to tasklist.txt in the following format:
 	// <taskid>
 	// <taskname>
