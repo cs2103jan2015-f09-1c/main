@@ -61,7 +61,7 @@ std::string TextUI::QUALIFIER_DATE_BAR =
 std::string TextUI::DEFAULT_DATE_BAR = 
 	"[%1% %2% %3%] %|25t| Description";
 std:: string TextUI:: TIME_PRINT=
-	"%1%. [%2%] %|26t|";
+	"%1%. %2% %|26t|";
 //std:: string TextUI:: DONE_PRINT= "\t \t \t \t (done)";
 
 struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
@@ -72,7 +72,7 @@ struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
 
 bool TextUI::isUnscheduled(const time_t &taskDate) {
     struct tm localTime = convertToLocalTime(taskDate);
-	return (localTime).tm_year == 0;
+	return (localTime).tm_yday == 0;
 }
 
 std::string TextUI::getWkDayName(const time_t &taskDate) {
@@ -252,7 +252,7 @@ void TextUI::printTasks(TaskList::TList tasks) {
 		std::string nowDate = "";
 		if(it->isFloating())
 		{
-			nowDate = "empty";
+			nowDate = "0";
 		}
 		else
 		{
@@ -282,7 +282,7 @@ void TextUI::printTasks(TaskList::TList tasks) {
 		std::string timePrint = "";
 		if(timeStart == "" && timeEnd == "")
 		{
-			timePrint = "----------------";
+			timePrint = "-------------------";
 		}
 		else if(timeEnd == "")
 		{
