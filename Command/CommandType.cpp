@@ -1,4 +1,5 @@
 #include "CommandType.h"
+#include <algorithm>
 
 CommandType::CommandType(void) {
 }
@@ -9,35 +10,45 @@ CommandType::~CommandType(void) {
 CommandType::Command CommandType::determineCmdType(std::string userCmd) {
     std::string cmdString = getFirstWord(userCmd);
 
-	if (cmdString == "add") {
+	if (isAdd(cmdString)) {
 		return CommandType::ADD;
 	} else
-	if (cmdString == "delete") {
+	if (isDel(cmdString)) {
 		return CommandType::DEL;
 	} else
-	if (cmdString == "edit") {
+	if (isEdit(cmdString)) {
 		return CommandType::EDIT;
 	} else
-	if (cmdString == "undo") {
+	if (isUndo(cmdString)) {
 		return CommandType::UNDO;
 	} else
-	if (cmdString == "search") {
+	if (isSearch(cmdString)) {
 		return CommandType::SEARCH;
 	} else
-	if (cmdString == "view") {
+	if (isView(cmdString)) {
 		return CommandType::VIEW;
 	} else 
-	if(cmdString == "done"){
+	if(isDone(cmdString)){
 		return CommandType::DONE;
 	}else
-    if (cmdString == "storage") {
+    if (isStorage(cmdString)) {
 		return CommandType::STORAGE;
 	} else 
-	if (cmdString == "exit") {
+	if (isExit(cmdString)) {
 		return CommandType::EXIT_PROGRAM;
 	} else {
 		return CommandType::INVALID;
 	}
+}
+
+std::string CommandType::filterOutCmd(std::string input) {
+	int firstWordLength = getFirstWord(input).length();
+	return input.substr(firstWordLength);
+}
+
+int CommandType::getNumOfChars(std::string userCmd) {
+	std::string cmdString = getFirstWord(userCmd);
+	return cmdString.length();
 }
 
 std::string CommandType::cmdToString(Command cmdType) {
@@ -72,9 +83,54 @@ std::string CommandType::cmdToString(Command cmdType) {
 	}
 }
 
-std::string CommandType::getFirstWord(std::string userCmd) {
-	std::istringstream iss(userCmd);
+std::string CommandType::getFirstWord(std::string input) {
+	std::istringstream iss(input);
 	std::string firstWord;
 	iss >> firstWord;
 	return firstWord;
+}
+
+bool CommandType::isAdd(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "add"; //|| cmd == "a";
+}
+
+bool CommandType::isDel(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "delete"; // || cmd == "del";
+}
+
+bool CommandType::isEdit(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "edit";// || cmd == "ed" || cmd == "e";
+}
+
+bool CommandType::isUndo(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "undo";// || cmd == "un" || cmd == "u";
+}
+
+bool CommandType::isSearch(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "search";// || cmd == "se" || cmd == "s";
+}
+
+bool CommandType::isView(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "view";// || cmd == "v";
+}
+
+bool CommandType::isDone(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "done";// || cmd == "d" || cmd == "mark" || cmd == "m";
+}
+
+bool CommandType::isStorage(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "storage" || cmd == "store";
+}
+
+bool CommandType::isExit(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "exit";// || cmd == "ex" || cmd == "x" || cmd == "quit" || cmd == "q";
 }

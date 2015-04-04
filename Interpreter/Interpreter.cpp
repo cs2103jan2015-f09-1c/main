@@ -5,7 +5,6 @@
 #include "MappingNumber.h"
 
 using namespace std; 
-const size_t Interpreter::NUM_CHARS_STORAGE = 7;
 const size_t Interpreter::NUM_CHARS_VIEW = 4;
 
 Task Interpreter::parseAddCmd(std::string input) {
@@ -154,15 +153,11 @@ Task Interpreter::parseEditCmd(std::string input) {
 } 
 
 std::string Interpreter::parseStoreCmd(std::string input) {    
-    std::string cmdDetails;
-    if (input == "storage") { 
-        return "location";
+    if (input == "") { 
+        return "getLocation";
     }
-    cmdDetails = input.substr(NUM_CHARS_STORAGE + 1); //+1 due to space
-    //todo: check whether substr is either "location" or
-    // a valid filepath
 
-    return cmdDetails;
+    return input;
 }
 
 

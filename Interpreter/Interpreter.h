@@ -19,7 +19,6 @@ typedef struct Cal
 class Interpreter
 {
 private:
-    static const size_t NUM_CHARS_STORAGE;
 	static const size_t NUM_CHARS_VIEW;
 
 	static bool Search(std::string keyword, Task task){

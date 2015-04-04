@@ -85,7 +85,7 @@ StorageCmd::~StorageCmd(void) {
 }
 
 void StorageCmd::cmdType(std::string detail) {
-    if (detail == "location") {
+    if (detail == "getLocation") {
         _isChangeLoc = false;
     } else {
         _fileLoc = detail;

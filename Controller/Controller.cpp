@@ -43,6 +43,8 @@ UIObject Controller::undoCommand(CommandType::Command cmdType) {
 
 UIObject Controller::handleInput(std::string input) {
     CommandType::Command cmdType = CommandType::determineCmdType(input);  
+	std::string filteredCmd = CommandType::filterOutCmd(input);
+
     switch (cmdType) {
         case CommandType::ADD: {
             MCLogger::log("Controller.cpp: begin add command");
@@ -94,9 +96,9 @@ UIObject Controller::handleInput(std::string input) {
         }
         case CommandType::STORAGE: {
             MCLogger::log("Controller.cpp: begin storage command");
-            StorageCmd storageCmdObj;
-            std::string cmdDetails = Interpreter::parseStoreCmd(input);
-            storageCmdObj.cmdType(cmdDetails);
+            std::string parsedCmd = Interpreter::parseStoreCmd(filteredCmd);
+			StorageCmd storageCmdObj;
+            storageCmdObj.cmdType(parsedCmd);
             return storageCmdObj.execute();
         }    
 		case CommandType::DONE: {
