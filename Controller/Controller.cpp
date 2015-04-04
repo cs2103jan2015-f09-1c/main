@@ -117,7 +117,7 @@ UIObject Controller::handleInput(std::string input) {
         case CommandType::INVALID: {
             MCLogger::log("Controller.cpp: invalid command");
             UIObject invalidCmd;
-            invalidCmd.setHeaderText("The command entered is invalid.");
+            invalidCmd.setHeaderText("The command entered (" + input + ") is invalid.");
             return invalidCmd;
         }
         default: {
