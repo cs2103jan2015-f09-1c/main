@@ -28,13 +28,11 @@ TaskList Storage::getTaskList() const {
 }
 
 void Storage::updateStorage(TaskList taskList) {
-	std::string log = "Storage.cpp: updating storage with " 
-		+ std::to_string(taskList.totalTasks()) + std::string(" tasks.");
-    MCLogger::log(log);
-
-    _maxID++; 
     _sessionStore = taskList;
     writeTaskListTxt(_sessionStore.getAll(), _taskListLoc);
+	std::string log = "Storage.cpp: storage updated with " 
+		+ std::to_string(taskList.totalTasks()) + std::string(" tasks.");
+    MCLogger::log(log);
 }
 
 void Storage::setStorageLoc(std::string newLoc) {
@@ -60,8 +58,8 @@ std::string Storage::getStorageLoc() const {
     return path;
 }
 
-unsigned Storage::getNextID() const {
-    return _maxID + 1;
+unsigned Storage::getNextID() const {	
+    return findMaxID(_sessionStore) + 1;
 }
 
 Storage::Storage(void) {
@@ -71,6 +69,20 @@ Storage::Storage(void) {
 
 
 Storage::~Storage(void) {
+}
+
+unsigned Storage::findMaxID(TaskList list) const {
+	TaskList::constTaskIt constIt;
+	TaskList::TList tList = list.getAll();
+	unsigned maxID = 0;
+
+	for (constIt = tList.begin(); constIt != tList.end(); constIt++) {
+		if (constIt->getTaskID() > maxID) {
+			maxID = constIt->getTaskID();
+		}
+	}
+
+	return maxID;
 }
 
 std::string Storage::getExeFileName() const {
@@ -99,7 +111,6 @@ void Storage::initSessionStore() {
     Task *curTask = NULL;
     std::string line;
     int counter = 0;
-    _maxID = 0;
 
     while (std::getline(readFile, line)) {
         counter++;
@@ -111,9 +122,6 @@ void Storage::initSessionStore() {
         case 1:
             curTask = new Task;
             id = std::stoul(line);
-            if (id > _maxID) {
-                _maxID = id;
-            }
             curTask->setTaskID(id);
             break;
         case 2:

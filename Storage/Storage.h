@@ -18,7 +18,8 @@ private:
 
     Storage(void);
 	~Storage(void);
-
+	
+	unsigned findMaxID(TaskList list) const;
     std::string getExeFileName() const;
     std::string getExePath() const;
     void loadTaskListLoc();
@@ -41,7 +42,6 @@ private:
     void writeTaskListTxt(TaskList::TList listToWrite, std::string writeLoc);
     
     static Storage* _instance;
-    unsigned _maxID;
     TaskList _sessionStore;
 	std::string _taskListLoc; //tastList.txt's location
 };
