@@ -16,12 +16,16 @@ public:
     void remove(unsigned id);
 	void markDone(unsigned id);
 	void markUndone(unsigned id);
+
+	//given taskID, returns taskName of the task
 	std::string findTaskName(unsigned idActual) const;
+
+	//given taskID, returns date of the task (in terms of begin time)
 	time_t findTaskDate(unsigned idActual) const;
 	Task findTask(unsigned idActual) const;
-
 	TList getTomorrow() const;
-    TList getDay(time_t day) const; //get tasks of a certain day
+	//given any time_t value, returns tasks which falls within that day
+    TList getDay(time_t day) const; 
     TList getToday() const;
     TList getAll() const;
 	TList getWeekly() const;
@@ -33,6 +37,8 @@ private:
     TList _taskList;
     bool isSameDay(time_t time1, time_t time2) const;
     static bool isEarlier(Task task1, Task task2);
+
+	//Sorts tasks by date, in ascending order (earliest first)
     void sortByDate();
     bool foundTask(unsigned idExpected, unsigned idActual) const;
     void replaceTask(taskIt pos, Task newTask);

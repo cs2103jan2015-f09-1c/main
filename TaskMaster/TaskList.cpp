@@ -173,12 +173,10 @@ void TaskList::markUndone(unsigned id){
 }
 
 
-//Sorts tasks by date, in ascending order (earliest first)
 void TaskList::sortByDate() {
     _taskList.sort(isEarlier);
 }
 
-//finding taskName from taskID
 std::string TaskList::findTaskName(unsigned idActual) const{
 	constTaskIt it;
 	std::string taskName;
@@ -192,7 +190,6 @@ std::string TaskList::findTaskName(unsigned idActual) const{
 	return taskName;
 }
 
-//finding taskDate from taskID
 time_t TaskList:: findTaskDate(unsigned idActual) const{
 	constTaskIt it;
 	time_t taskTime;

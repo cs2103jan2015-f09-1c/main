@@ -20,6 +20,7 @@ std::string Task::getTaskName() const {
 
 void Task::setFloating() {
 	_isFloating = true;
+	_taskBegin = 0;
 }
 
 void Task::setNotFloating() {
