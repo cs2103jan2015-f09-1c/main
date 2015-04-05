@@ -13,8 +13,6 @@
 #include "ViewCmd.h"
 #include "History.h"
 
-const size_t Controller::NUM_CHARS_DONE = 4;
-const size_t Controller::NUM_CHARS_DELETE = 6;
 
 UIObject Controller::undoCommand(CommandType::Command cmdType) {
     switch (cmdType) { 
@@ -58,7 +56,7 @@ UIObject Controller::handleInput(std::string input) {
             MCLogger::log("Controller.cpp: begin delete command");
 
             DeleteCmd delCmdObj;
-            int TaskId = Interpreter::parseDelOrDoneCmd(input, NUM_CHARS_DELETE + 1);
+            int TaskId = Interpreter::parseDelCmd(input);
             delCmdObj.prepareTaskId(TaskId);
             return delCmdObj.execute();
         }
@@ -104,7 +102,7 @@ UIObject Controller::handleInput(std::string input) {
 		case CommandType::DONE: {
             MCLogger::log("Controller.cpp: begin done command");
             DoneCmd doneCmdObj;
-            int taskId = Interpreter::parseDelOrDoneCmd(input, NUM_CHARS_DONE + 1);
+            int taskId = Interpreter::parseDoneCmd(input);
 			doneCmdObj.prepareTaskId(taskId);
             return doneCmdObj.execute();
         }
