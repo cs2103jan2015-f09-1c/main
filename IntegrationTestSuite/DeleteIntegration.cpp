@@ -81,11 +81,13 @@ namespace IntegrationTestSuite {
 			Assert::AreEqual(std::string("There is no matching task to be deleted."), outOfRange.getHeaderText());
 			Assert::IsTrue(outOfRange.getTaskList().empty());
 
-			UIObject noSpecifier = Controller::handleInput("delete"); // THIS CRASHES !!
-			Assert::AreEqual(std::string("There is no matching task to be deleted."), noSpecifier.getHeaderText());
-			Assert::IsTrue(noSpecifier.getTaskList().empty());
-
 			MockStorage::cleanMockStorage();
+		}
+
+		TEST_METHOD(DeleteHelp) {
+			UIObject noSpecifier = Controller::handleInput("delete"); // THIS CRASHES !!
+			Assert::AreEqual(std::string("Delete command help goes here"), noSpecifier.getHeaderText());
+			Assert::IsTrue(noSpecifier.getTaskList().empty());
 		}
 	};
 }
