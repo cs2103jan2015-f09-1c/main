@@ -2,8 +2,6 @@
 #include <iomanip> // put_time
 #include <sstream>
 
-
-
 int TaskStub::_secsInADay = 86400;
 int TaskStub::_secsInHalfDay = 43200;
 int TaskStub::_secsInAnHour = 3600;

@@ -13,4 +13,3 @@ public:
     static void removeSettingsFile();
     static std::string readFile(std::string filepath);
 };
-
