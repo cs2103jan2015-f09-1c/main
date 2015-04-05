@@ -56,10 +56,10 @@ const std::string TextUI::ENTER_CMD = "Enter command: ";
 const std::string TextUI::UNSCHEDULED_DATE_BAR = 
 	"[Unscheduled Tasks]       Description";
 std::string TextUI::QUALIFIER_DATE_BAR = 
-	"[%1% %2% %3% %4%] %|25t| Description";
+	"[%1%, %2% %3% %4% %5%] %|25t| Description";
 
 std::string TextUI::DEFAULT_DATE_BAR = 
-	"[%1% %2% %3%] %|25t| Description";
+	"[%1%, %2% %3% %4%] %|25t| Description";
 std:: string TextUI:: TIME_PRINT=
 	"%1%. %2% %|26t|";
 //std:: string TextUI:: DONE_PRINT= "\t \t \t \t (done)";
@@ -230,10 +230,12 @@ void TextUI::printDateBar(const time_t &taskDate) {
 		hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
 		Color:: TextColor (11, 0 ,hStdOut);
 
+		std:: string year = std::to_string(localTime.tm_year + 1900);
+
 		if(qualifier == ""){
-			std::cout << format(DEFAULT_DATE_BAR) % wkdayName % monthName % day;
+			std::cout << format(DEFAULT_DATE_BAR) % wkdayName % monthName % day %year;
 		}else{
-			std::cout << format(QUALIFIER_DATE_BAR) % qualifier % wkdayName % monthName % day;
+			std::cout << format(QUALIFIER_DATE_BAR) % qualifier % wkdayName % monthName % day %year;
 		}
 
 	    std::cout << std::endl;
