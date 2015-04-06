@@ -37,9 +37,9 @@ Task Interpreter::parseAddCmd(std::string input) {
 		a.setTaskName("");
 		return a;
 	}
-
+	
 	time_t starttime, endtime;
-	if (EventOut.year != -1)
+	if (EventOut.year!=-1)
 		tmConvert(EventOut, &starttime, &endtime);
 	else{
 		starttime = 0;
@@ -87,7 +87,6 @@ Task Interpreter::parseEditCmd(std::string input) {
 	TaskList tasklist = storage->getTaskList();
 	TaskList::TList list = tasklist.getAll();
 	TaskList::taskIt it;
-	
 	int num = 0;
 	for (it = list.begin(); it != list.end(); ++it) {
 		num++;
@@ -144,7 +143,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 		curStr.assign(tempEvent, 0, strlen(tempEvent));
 		parse(curStr, &EventOut);
 		time_t startt, endt;
-		if (EventOut.year != -1)
+		if (EventOut.year!=-1)
 			tmConvert(EventOut, &startt, &endt);
 		else{
 			startt = 0;
@@ -161,8 +160,10 @@ Task Interpreter::parseEditCmd(std::string input) {
 	}
 
 	storage->updateStorage(tasklist);
+
 	return a;
-} 
+}
+
 
 std::string Interpreter::parseStoreCmd(std::string input) {    
     if (StorageAlias::isGetLocation(input)) { 
@@ -248,7 +249,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 	else
 		cureve.assign(cal, 0, strlen(cal));
 	const char *cheve = cureve.c_str();
-	curEvent.event = cureve;    //���¼�
+	curEvent.event = cureve;    //´¿ÊÂ¼þ
 
 	//deal with "next" in a command
 	posNext = event.find(":next", 0);
@@ -422,8 +423,8 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 			curEvent.month = timeinfo.tm_mon + 1;
 			curEvent.day = timeinfo.tm_mday;
 		}
-		if (tmm>2400)  
-			return -1;
+		if (tmm>2400)  return -1;
+
 	}
 
 	//deal with "tomorrow" in a command
@@ -450,7 +451,6 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 	wDaySearch(curEvent.year, curEvent.month, curEvent.day, &curEvent.wday);
 	*calEventOut = curEvent;
 	return 1;
-		
 }
 
 void Interpreter::tmConvert(CalEvent Event, time_t *starttime, time_t *endtime)
