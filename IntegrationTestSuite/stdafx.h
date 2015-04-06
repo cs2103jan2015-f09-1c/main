@@ -17,5 +17,7 @@
 #include "StorageUtils.h"
 #include "MockStorage.h"
 #include "DeleteCmd.h"
+#include "DoneCmd.h"
+#include "ViewCmd.h"
 #include "MCLogger.h"
 #include "Controller.h"
