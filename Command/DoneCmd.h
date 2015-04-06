@@ -10,6 +10,7 @@ public:
 	std:: string markDone();
     UIObject execute();
 	UIObject undo();
+	std::string getHelp()const;
 	static const std::string NO_MATCHING_TASK;
 	static const std::string DONE_MESSAGE;
 	static const std::string UNDO_DONE_MESSAGE;

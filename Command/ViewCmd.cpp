@@ -147,7 +147,7 @@ std::string ViewCmd::getHelp() const {
 
 	std::string pt1 = "1. This command can be invoked by typing view [today/tomorrow/weekly/ \n";
 	pt1 = pt1 + "   monday-sunday]\n";
-	pt1 = pt1 + "Example: view today \n\n";
+	pt1 = pt1 + "Example: view today \n";
 
 	help = title + intro + pt1;
 
