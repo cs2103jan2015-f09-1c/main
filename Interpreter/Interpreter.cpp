@@ -176,12 +176,12 @@ std::string Interpreter::parseStoreCmd(std::string input) {
 	// if it is neither "getLocation" nor "help".
     return input;
 }
-/*
+
 int Interpreter::parseDelCmd(std::string input){
-	int TaskId = gettingTaskID(input, NUM_CHARS_DELETE+1);
+	int TaskId = gettingTaskID(input);
 	return TaskId;
 }
-*/
+
 int Interpreter::parseDoneCmd(std::string input){
 	int TaskId;
 

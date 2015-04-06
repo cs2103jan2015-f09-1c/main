@@ -12,7 +12,7 @@
 #include "DoneCmd.h"
 #include "ViewCmd.h"
 #include "History.h"
-#include "HelpCmd.h"
+//#include "HelpCmd.h"
 
 
 UIObject Controller::undoCommand(CommandType::Command cmdType) {
@@ -52,15 +52,15 @@ UIObject Controller::handleInput(std::string input) {
             Task task = Interpreter::parseAddCmd(input);
             addCmdObj.prepareTask(task);
             return addCmdObj.execute();
-        }/*
+        }
         case CommandType::DEL: {
             MCLogger::log("Controller.cpp: begin delete command");
 
             DeleteCmd delCmdObj;
-            int TaskId = Interpreter::parseDelCmd(input);
+            int TaskId = Interpreter::parseDelCmd(filteredCmd);
             delCmdObj.prepareTaskId(TaskId);
             return delCmdObj.execute();
-        }*/
+        }
         case CommandType::EDIT: {
             MCLogger::log("Controller.cpp: begin edit command");
 
