@@ -189,7 +189,7 @@ int Interpreter::parseDoneCmd(std::string input){
 
 std::string Interpreter::parseViewCmd(std::string input){
 	std:: string detail;
-	detail = input.substr(NUM_CHARS_VIEW + 1);
+	detail = input;
 	return detail;
 }
 
