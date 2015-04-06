@@ -52,7 +52,7 @@ UIObject Controller::handleInput(std::string input) {
             Task task = Interpreter::parseAddCmd(input);
             addCmdObj.prepareTask(task);
             return addCmdObj.execute();
-        }
+        }/*
         case CommandType::DEL: {
             MCLogger::log("Controller.cpp: begin delete command");
 
@@ -60,7 +60,7 @@ UIObject Controller::handleInput(std::string input) {
             int TaskId = Interpreter::parseDelCmd(input);
             delCmdObj.prepareTaskId(TaskId);
             return delCmdObj.execute();
-        }
+        }*/
         case CommandType::EDIT: {
             MCLogger::log("Controller.cpp: begin edit command");
 
@@ -103,7 +103,8 @@ UIObject Controller::handleInput(std::string input) {
 		case CommandType::DONE: {
             MCLogger::log("Controller.cpp: begin done command");
             DoneCmd doneCmdObj;
-            int taskId = Interpreter::parseDoneCmd(input);
+			int noOfChars = CommandType:: getNumOfChars(input);
+            int taskId = Interpreter::parseDoneCmd(filteredCmd);
 			doneCmdObj.prepareTaskId(taskId);
             return doneCmdObj.execute();
         }/*

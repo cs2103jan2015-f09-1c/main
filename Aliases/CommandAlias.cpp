@@ -40,7 +40,7 @@ bool CommandAlias::isView(std::string cmd) {
 
 bool CommandAlias::isDone(std::string cmd) {
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
-	return cmd == "done";// || cmd == "d" || cmd == "mark" || cmd == "m";
+	return cmd == "done" || cmd == "d" || cmd == "mark" || cmd == "m";
 }
 
 bool CommandAlias::isStorage(std::string cmd) {

@@ -29,7 +29,11 @@ UIObject DoneCmd:: execute(){
 	
 	if (taskId == 0){
 		doneObj.setHeaderText(NO_MATCHING_TASK);
-	 } else {
+	 }else 
+	 if (taskId == -1){
+		 std::string help = getHelp();
+		 doneObj.setHeaderText(help);
+	}else {
 	//get current tasks
     Storage* storage = Storage::getInstance();
     TaskList taskList = storage->getTaskList();
@@ -81,4 +85,22 @@ UIObject DoneCmd:: undo(){
 	undoMessage.setTaskList(selectedTasks);
 
     return undoMessage;
+}
+
+
+
+std::string DoneCmd::getHelp() const {
+	std::string help;
+
+	std::string title = "***************** COMMAND HELP: DONE  *****************\n\n";
+
+	std::string intro = "The view command allows you to mark done your task \n\n"; 
+
+	std::string pt1 = "1. This command can be invoked by typing done [Task number/ Task name] \n";
+	pt1 = pt1 + "Example: done 1 \n";
+	pt1 = pt1 + "         done meet mum \n";
+
+	help = title + intro + pt1;
+
+	return help;
 }

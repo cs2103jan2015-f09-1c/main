@@ -31,8 +31,8 @@ private:
 	static void Monthday(int year, int yearDay, int *pMonth, int *pDay); //input: year,yearDay
 	//output: the date of a particular day in a year
 	static int parseNumber(std::string input, int numCmdChars);
-	static int gettingTaskID(std::string input, int lengthCommand);
-	static Task prepareTask(std::string input, int lengthCommand);
+	static int gettingTaskID(std::string input);
+	static Task prepareTask(std::string input);
 	static int ConvertStrtoNum (std::string str);
 
 public:    
