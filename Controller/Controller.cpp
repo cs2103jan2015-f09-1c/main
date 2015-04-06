@@ -12,6 +12,7 @@
 #include "DoneCmd.h"
 #include "ViewCmd.h"
 #include "History.h"
+#include "HelpCmd.h"
 
 
 UIObject Controller::undoCommand(CommandType::Command cmdType) {
@@ -88,7 +89,7 @@ UIObject Controller::handleInput(std::string input) {
         case CommandType::VIEW: {
             MCLogger::log("Controller.cpp: begin view command");
 			ViewCmd ViewObj;
-			std::string detail = Interpreter::parseViewCmd(input);
+			std::string detail = Interpreter::parseViewCmd(filteredCmd);
 			ViewObj.prepareDetail(detail);
 			return ViewObj.execute();
         }
@@ -105,7 +106,12 @@ UIObject Controller::handleInput(std::string input) {
             int taskId = Interpreter::parseDoneCmd(input);
 			doneCmdObj.prepareTaskId(taskId);
             return doneCmdObj.execute();
-        }
+        }/*
+		case CommandType::HELP: {
+            MCLogger::log("Controller.cpp: begin help command");
+            HelpCmd helpCmdObj;
+            return helpCmdObj.execute();
+        }*/
         case CommandType::EXIT_PROGRAM: {
             MCLogger::log("============= exit program ==============");
             Storage::resetInstance();
