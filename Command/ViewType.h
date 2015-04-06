@@ -13,5 +13,9 @@ public:
     ~ViewType(void);
 
     static View determineViewType(std::string _detail);
+	static std::string filterOutCmd(std::string input);
+
+private:
+	 static std::string getFirstWord(std::string input);
 
 };
