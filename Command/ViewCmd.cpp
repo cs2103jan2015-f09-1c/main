@@ -56,6 +56,8 @@ TaskList::TList ViewCmd:: getSelectedTasks(){
     TaskList taskList = storage->getTaskList();
 	
 	 ViewType = ViewType::determineViewType(_detail);  
+	 std::string filteredCmd = ViewType::filterOutCmd(_detail);
+
 	 switch (ViewType) {
         case ViewType::SUNDAY: {
 			time_t day = getDayPosition(0);
