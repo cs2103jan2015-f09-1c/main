@@ -87,11 +87,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AddIntegration.cpp" />
+    <ClCompile Include="DoneIntegration.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="DeleteIntegration.cpp" />
+    <ClCompile Include="ViewIntegration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Aliases\Aliases.vcxproj">
