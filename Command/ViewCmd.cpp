@@ -130,10 +130,26 @@ UIObject ViewCmd::execute() {
 		viewObj.setTaskList(selectedTasks);
 	} else
 	if(selectedTasks.empty() && ViewType == 11){
-		viewObj.setHeaderText(INVALID_INPUT_MESSAGE);
+		std::string help = getHelp();
+		viewObj.setHeaderText(help);
 	}else{
 		viewObj.setHeaderText(NO_TASK_MESSAGE);
 	}
 	return viewObj;
 }
 
+std::string ViewCmd::getHelp() const {
+	std::string help;
+
+	std::string title = "***************** COMMAND HELP: VIEW  *****************\n\n";
+
+	std::string intro = "The view command allows you to view your tasklist on daily and weekly basis \n\n"; 
+
+	std::string pt1 = "1. This command can be invoked by typing view [today/tomorrow/weekly/ \n";
+	pt1 = pt1 + "   monday-sunday]\n";
+	pt1 = pt1 + "Example: view today \n\n";
+
+	help = title + intro + pt1;
+
+	return help;
+}
