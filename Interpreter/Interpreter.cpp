@@ -4,9 +4,9 @@
 #include <sstream>
 #include "MappingNumber.h"
 #include "StorageAlias.h"
+#include "DoneAlias.h"
 
 using namespace std; 
-const size_t Interpreter::NUM_CHARS_VIEW = 4;
 const size_t Interpreter::NUM_CHARS_DONE = 4;
 const size_t Interpreter::NUM_CHARS_DELETE = 6;
 
@@ -175,14 +175,20 @@ std::string Interpreter::parseStoreCmd(std::string input) {
 	// if it is neither "getLocation" nor "help".
     return input;
 }
-
+/*
 int Interpreter::parseDelCmd(std::string input){
 	int TaskId = gettingTaskID(input, NUM_CHARS_DELETE+1);
 	return TaskId;
 }
-
+*/
 int Interpreter::parseDoneCmd(std::string input){
-	int TaskId = gettingTaskID(input, NUM_CHARS_DONE+1);
+	int TaskId;
+
+	 if (DoneAlias::isInteger(input) || !DoneAlias::isHelp(input) ) { 
+		TaskId = gettingTaskID(input);
+    } else if (DoneAlias::isHelp(input)) {
+		TaskId = -1;
+	}
 	return TaskId;
 }
 
@@ -562,25 +568,25 @@ void Interpreter::Monthday(int year, int yearDay, int *pMonth, int *pDay)
 }
 
 
-Task Interpreter::prepareTask(std::string input, int lengthCommand) {
-    std::string taskToDel = input.substr(lengthCommand);
+Task Interpreter::prepareTask(std::string input) {
+    //std::string taskToDel = input.substr(lengthCommand);
     Storage *storage = Storage::getInstance();
     TaskList tasklist = storage->getTaskList();
     TaskList::TList list = tasklist.getAll();
     TaskList::taskIt it;
 
-	int _size = taskToDel.size();
+	int _size = input.size();
 	for (int i=0; i<_size; i++){
-		if (isdigit(taskToDel[i])){
+		if (isdigit(input[i])){
 				Task _task;
-				_task.setTaskName(taskToDel);
+				_task.setTaskName(input);
 				_task.setTaskID(0);
 				return _task;
 		}
 		else{
     for (it = list.begin(); it != list.end(); ++it) {
         Task task = *it;
-        if (search(taskToDel, task)) {
+        if (search(input, task)) {
             return task;
 		}
 	}
@@ -606,9 +612,9 @@ int Interpreter::ConvertStrtoNum(std::string str){
 	return integer;
 }
 
-int Interpreter::gettingTaskID(std::string input, int lengthCommand){
+int Interpreter::gettingTaskID(std::string input){
 	MappingNumber *mapping = MappingNumber::getInstance();
-	Task _task = prepareTask (input, lengthCommand);
+	Task _task = prepareTask(input);
 	std::string taskToDel = _task.getTaskName();
 	int TaskId;
 	int integer;
