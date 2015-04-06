@@ -65,10 +65,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CommandAlias.h" />
+    <ClInclude Include="DoneAlias.h" />
     <ClInclude Include="StorageAlias.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandAlias.cpp" />
+    <ClCompile Include="DoneAlias.cpp" />
     <ClCompile Include="StorageAlias.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
