@@ -35,7 +35,7 @@ bool CommandAlias::isSearch(std::string cmd) {
 
 bool CommandAlias::isView(std::string cmd) {
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
-	return cmd == "view";// || cmd == "v";
+	return cmd == "view" || cmd == "v";
 }
 
 bool CommandAlias::isDone(std::string cmd) {
@@ -48,7 +48,13 @@ bool CommandAlias::isStorage(std::string cmd) {
 	return cmd == "storage" || cmd == "store";
 }
 
+bool CommandAlias::isHelp(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "help";
+}
+
 bool CommandAlias::isExit(std::string cmd) {
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
 	return cmd == "exit";// || cmd == "ex" || cmd == "x" || cmd == "quit" || cmd == "q";
 }
+
