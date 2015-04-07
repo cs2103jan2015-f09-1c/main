@@ -105,10 +105,10 @@ Task Interpreter::parseEditCmd(std::string input) {
 	posTime = input.find("time", 0);
 	posName = input.find("name", 0);
 	if (posTime != -1){
-		cout << "privor  date:" << it->getDateStr() << endl;
-		cout << "       begin:" << it->getBeginStr() << endl;
-		cout << "         end:" << it->getEndStr() << endl << endl;
-		cout << "please input new  time:" << endl;
+		cout << "previous date:" << it->getDateStr() << endl;
+		cout << "        begin:" << it->getBeginStr() << endl;
+		cout << "          end:" << it->getEndStr() << endl << endl;
+		cout << "please input new time:" << endl;
 
 		cin.getline(tempEvent, LENGTH, '\n');
 		curStr.assign(tempEvent, 0, strlen(tempEvent));
@@ -117,13 +117,13 @@ Task Interpreter::parseEditCmd(std::string input) {
 		tmConvert(EventOut, &startt, &endt);
 		it->setTaskBegin(startt);
 		it->setTaskEnd(endt);
-		cout << "new     date:" << it->getDateStr() << endl;
+		cout << "    new date:" << it->getDateStr() << endl;
 		cout << "       begin:" << it->getBeginStr() << endl;
 		cout << "         end:" << it->getEndStr() << endl << endl;
 		a = *it;
 	}
 	else if (posName != -1) {
-		cout << "previor name:" << it->getTaskName() << endl;
+		cout << "previous name:" << it->getTaskName() << endl;
 		cout << "please input new name:" << endl;
 
 		cin.getline(tempEvent, LENGTH, '\n');
@@ -133,10 +133,10 @@ Task Interpreter::parseEditCmd(std::string input) {
 		a = *it;
 	}
 	else{
-		cout << "privor event:" << it->getTaskName() << endl;
-		cout << "        date:" << it->getDateStr() << endl;
-		cout << "       begin:" << it->getBeginStr() << endl;
-		cout << "         end:" << it->getEndStr() << endl << endl;
+		cout << "previous event:" << it->getTaskName() << endl;
+		cout << "         date:" << it->getDateStr() << endl;
+		cout << "        begin:" << it->getBeginStr() << endl;
+		cout << "          end:" << it->getEndStr() << endl << endl;
 
 		cout << "please input new event:" << endl;
 		cin.getline(tempEvent, LENGTH, '\n');
@@ -152,7 +152,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 		it->setTaskBegin(startt);
 		it->setTaskEnd(endt);
 		it->setTaskName(EventOut.event);
-		cout << "new    event:" << it->getTaskName() << endl;
+		cout << "   new event:" << it->getTaskName() << endl;
 		cout << "        date:" << it->getDateStr() << endl;
 		cout << "       begin:" << it->getBeginStr() << endl;
 		cout << "         end:" << it->getEndStr() << endl << endl;
