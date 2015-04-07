@@ -237,8 +237,8 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 	curEvent.month = -1;
 	curEvent.day = -1;
 	curEvent.wday = -1;
-	curEvent.time = 800;
-	curEvent.endtime = 1800;
+	curEvent.time = 2500;
+	curEvent.endtime = 2500;
 	curEvent.event = "\0";
 
 	//get time of "today"
@@ -255,7 +255,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 	else
 		cureve.assign(cal, 0, strlen(cal));
 	const char *cheve = cureve.c_str();
-	curEvent.event = cureve;    //´¿ÊÂ¼þ
+	curEvent.event = cureve;    
 
 	//deal with "next" in a command
 	posNext = event.find(":next", 0);
