@@ -7,6 +7,8 @@
 #include "DoneAlias.h"
 #include "DeleteAlias.h"
 #include "SearchAlias.h"
+#include "AddAlias.h"
+#include "CommandType.h"
 
 using namespace std; 
 const size_t Interpreter::NUM_CHARS_DONE = 4;
@@ -22,8 +24,14 @@ bool Interpreter::search(std::string keyword, Task task) {
 }
 
 Task Interpreter::parseAddCmd(std::string input) {
-
+	std::string detail = CommandType::filterOutCmd(input);
 	Task a;
+
+	if (AddAlias::isHelp(detail)){
+		int TaskId = -1;
+		a.setTaskID (TaskId);
+	}
+	else{
 	int flag;
 
 	CalEvent EventOut;
@@ -33,7 +41,7 @@ Task Interpreter::parseAddCmd(std::string input) {
 	event.assign(cal, 4, strlen(cal) - 4);
 	flag = parse(event, &EventOut);
 	if (flag <= -1){
-		cout << "input error,please check the input" << endl;
+		std::cout << "input error,please check the input" << std::endl;
 		a.setTaskBegin(0);
 		a.setTaskEnd(0);
 		a.setTaskName("");
@@ -50,6 +58,7 @@ Task Interpreter::parseAddCmd(std::string input) {
 	a.setTaskBegin(starttime);
 	a.setTaskEnd(endtime);
 	a.setTaskName(EventOut.event);
+	}
 	return a;
 }
 
@@ -225,11 +234,6 @@ TaskList::TList Interpreter::parseSearchCmd (std::string input){
 		Task _task = *it;
 		if (search(input, _task)) {
 			foundTaskList.push_back(_task);
-		}
-		else{
-			Task task;
-			task.setTaskID (0);
-			foundTaskList.push_back(task);
 		}
 	}
 	}
