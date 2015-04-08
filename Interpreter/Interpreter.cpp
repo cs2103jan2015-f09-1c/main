@@ -5,6 +5,7 @@
 #include "MappingNumber.h"
 #include "StorageAlias.h"
 #include "DoneAlias.h"
+#include "DeleteAlias.h"
 
 using namespace std; 
 const size_t Interpreter::NUM_CHARS_DONE = 4;
@@ -178,7 +179,13 @@ std::string Interpreter::parseStoreCmd(std::string input) {
 }
 
 int Interpreter::parseDelCmd(std::string input){
-	int TaskId = gettingTaskID(input);
+	int TaskId; 
+	if (DeleteAlias::isInteger(input) || !DeleteAlias::isHelp(input)){
+		TaskId = gettingTaskID(input);
+	}
+	else if (DeleteAlias::isHelp(input)){
+		TaskId = -1;
+	}
 	return TaskId;
 }
 
