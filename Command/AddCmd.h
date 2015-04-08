@@ -9,6 +9,8 @@ public:
     UIObject execute();
     UIObject undo();
 
+	static const std::string ADD_MESSAGE;
+	static const std::string UNDO_MESSAGE;
 private:
     Task _task;
 };

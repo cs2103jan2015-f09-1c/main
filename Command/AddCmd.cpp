@@ -8,9 +8,10 @@
 #include "State.h"
 #include "MCLogger.h"
 
+const std::string AddCmd::ADD_MESSAGE = "Task added" ;
+const std::string AddCmd::UNDO_MESSAGE = "Task removed from storage:";
 AddCmd::AddCmd(void) {
 }
-
 
 AddCmd::~AddCmd(void) {
 }
@@ -49,7 +50,7 @@ UIObject AddCmd::execute() {
     tasksThatDay = taskList.getDay(_task.getTaskBegin());
 
     UIObject addObj;
-    addObj.setHeaderText("Task added.");
+    addObj.setHeaderText(ADD_MESSAGE);
     addObj.setTaskList(tasksThatDay);
 
     return addObj;
@@ -76,8 +77,9 @@ UIObject AddCmd::undo() {
     UIObject undoMessage;
 
 	TaskList::TList tasksThatDay;
-    tasksThatDay = taskList.getDay(_task.getTaskBegin());
-	undoMessage.setHeaderText("Undo successfully");
+    tasksThatDay.push_back (task);
+
+	undoMessage.setHeaderText(UNDO_MESSAGE);
 	undoMessage.setTaskList(tasksThatDay);
 
     return undoMessage;
