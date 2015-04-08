@@ -27,6 +27,9 @@
     <ClInclude Include="DeleteAlias.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SearchAlias.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandAlias.cpp">
@@ -39,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DeleteAlias.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SearchAlias.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
