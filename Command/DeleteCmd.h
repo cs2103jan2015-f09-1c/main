@@ -8,6 +8,7 @@ public:
 	void recordInHistory(Task task);
     UIObject execute();
     UIObject undo();
+	std::string getHelp()const;
 
 	static const std::string NO_MATCHING_TASK;
 	static const std::string NO_TASK_MESSAGE;
