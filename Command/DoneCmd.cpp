@@ -61,6 +61,7 @@ void DoneCmd::recordInHistory(Task task) {
     hist->saveCommand(CommandType::DONE);
 }
 
+
 UIObject DoneCmd:: undo(){
 	History *hist = History::getInstance();
 
@@ -80,9 +81,11 @@ UIObject DoneCmd:: undo(){
 	hist->clearHistory();
 
     UIObject undoMessage;
+	TaskList::TList tasksThatDay;
+	tasksThatDay = taskList.getDay(task.getTaskBegin());
 
 	undoMessage.setHeaderText(task.getTaskName() + UNDO_DONE_MESSAGE );
-	undoMessage.setTaskList(selectedTasks);
+	undoMessage.setTaskList(tasksThatDay);
 
     return undoMessage;
 }

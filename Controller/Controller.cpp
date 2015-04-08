@@ -29,6 +29,10 @@ UIObject Controller::undoCommand(CommandType::Command cmdType) {
             StorageCmd editCmd;
             return editCmd.undo();
         }
+		case CommandType::DONE: {
+            DoneCmd doneCmd;
+            return doneCmd.undo();
+        }
         case CommandType::STORAGE: {
             StorageCmd storageCmd;
             return storageCmd.undo();
