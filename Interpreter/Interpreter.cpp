@@ -6,6 +6,7 @@
 #include "StorageAlias.h"
 #include "DoneAlias.h"
 #include "DeleteAlias.h"
+#include "SearchAlias.h"
 
 using namespace std; 
 const size_t Interpreter::NUM_CHARS_DONE = 4;
@@ -208,18 +209,29 @@ std::string Interpreter::parseViewCmd(std::string input){
 }
 
 TaskList::TList Interpreter::parseSearchCmd (std::string input){
-	std::string taskToDel = input.substr(7);
 	Storage *storage = Storage::getInstance();
 	TaskList tasklist = storage->getTaskList();
 	TaskList::TList list = tasklist.getAll();
 	TaskList::TList foundTaskList;
 	TaskList::taskIt it;
 
+	if (SearchAlias::isHelp(input)){
+		Task task;
+		task.setTaskID(-1);
+			foundTaskList.push_back(task);
+	}
+	else{
 	for (it = list.begin(); it != list.end(); ++it) {
-		Task task = *it;
-		if (search(taskToDel, task)) {
+		Task _task = *it;
+		if (search(input, _task)) {
+			foundTaskList.push_back(_task);
+		}
+		else{
+			Task task;
+			task.setTaskID (0);
 			foundTaskList.push_back(task);
 		}
+	}
 	}
 	return foundTaskList;
 }
