@@ -5,11 +5,15 @@
 #include <iostream>
 #include <sstream>
 #include <assert.h>
-#include "InvalidFilePathException.h"
-#include "Shlwapi.h" // PathFileExists
+#include <time.h>
 #include "History.h"
 #include "State.h"
 #include "MCLogger.h"
+
+const std::string DeleteCmd::NO_MATCHING_TASK =  "There is no matching task to be deleted.";
+const std::string DeleteCmd::NO_TASK_MESSAGE = "Task deleted successfully.No more tasks for that day!";
+const std::string DeleteCmd::REMAINING_TASK_MESSAGE = "Task deleted successfully. Remaining tasks for that day:";
+const std::string DeleteCmd::UNDO_MESSAGE = "Task added back to storage:";
 
 DeleteCmd::DeleteCmd(void) {
 }
@@ -35,7 +39,10 @@ UIObject DeleteCmd::execute() {
   TaskList taskList = storage->getTaskList();
 
   if (TaskId == 0){
-	  temp.setHeaderText("There is no matching task to be deleted.");
+	  temp.setHeaderText(NO_MATCHING_TASK);
+  }
+  else if (TaskId == -1){
+	  temp.setHeaderText(getHelp());
   }
   else{
 	  Task ActualTask = taskList.findTask(TaskId);
@@ -49,10 +56,10 @@ UIObject DeleteCmd::execute() {
       temp.setTaskList(tasksThatDay);
 	  
 	  if (tasksThatDay.empty()){
-		  temp.setHeaderText("No more tasks for that day!");
+		  temp.setHeaderText(NO_TASK_MESSAGE);
 	  }
 	  else{
-		  temp.setHeaderText("Remaining tasks for that day:");
+		  temp.setHeaderText(REMAINING_TASK_MESSAGE);
 	  }
   }
 	 //return UI Object 
@@ -81,11 +88,27 @@ UIObject DeleteCmd::undo() {
     UIObject undoMessage;
   
     TaskList::TList tasksThatDay;
-    tasksThatDay = taskList.getDay(task.getTaskBegin());
+    tasksThatDay.push_back(task);
 
 	//return UIObject
-	undoMessage.setHeaderText("Undo successfully.");
+	undoMessage.setHeaderText(UNDO_MESSAGE);
 	undoMessage.setTaskList(tasksThatDay);
 
     return undoMessage;
+}
+
+std::string DeleteCmd::getHelp() const{
+	std::string help;
+
+	std::string title = "***************** COMMAND HELP: DELETE  *****************\n\n";
+
+	std::string intro = "The delete command allows you to remove your task \n\n"; 
+
+	std::string pt1 = "1. This command can be invoked by typing delete [Task number/ Task name] \n";
+	pt1 = pt1 + "Example: delete 1 \n";
+	pt1 = pt1 + "         delete meet mum \n";
+
+	help = title + intro + pt1;
+
+	return help;
 }

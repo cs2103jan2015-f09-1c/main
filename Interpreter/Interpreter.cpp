@@ -5,6 +5,7 @@
 #include "MappingNumber.h"
 #include "StorageAlias.h"
 #include "DoneAlias.h"
+#include "DeleteAlias.h"
 
 using namespace std; 
 const size_t Interpreter::NUM_CHARS_DONE = 4;
@@ -37,9 +38,9 @@ Task Interpreter::parseAddCmd(std::string input) {
 		a.setTaskName("");
 		return a;
 	}
-
+	
 	time_t starttime, endtime;
-	if (EventOut.year != -1)
+	if (EventOut.year!=-1)
 		tmConvert(EventOut, &starttime, &endtime);
 	else{
 		starttime = 0;
@@ -87,7 +88,6 @@ Task Interpreter::parseEditCmd(std::string input) {
 	TaskList tasklist = storage->getTaskList();
 	TaskList::TList list = tasklist.getAll();
 	TaskList::taskIt it;
-	
 	int num = 0;
 	for (it = list.begin(); it != list.end(); ++it) {
 		num++;
@@ -106,10 +106,10 @@ Task Interpreter::parseEditCmd(std::string input) {
 	posTime = input.find("time", 0);
 	posName = input.find("name", 0);
 	if (posTime != -1){
-		cout << "privor  date:" << it->getDateStr() << endl;
-		cout << "       begin:" << it->getBeginStr() << endl;
-		cout << "         end:" << it->getEndStr() << endl << endl;
-		cout << "please input new  time:" << endl;
+		cout << "previous date:" << it->getDateStr() << endl;
+		cout << "        begin:" << it->getBeginStr() << endl;
+		cout << "          end:" << it->getEndStr() << endl << endl;
+		cout << "please input new time:" << endl;
 
 		cin.getline(tempEvent, LENGTH, '\n');
 		curStr.assign(tempEvent, 0, strlen(tempEvent));
@@ -118,13 +118,13 @@ Task Interpreter::parseEditCmd(std::string input) {
 		tmConvert(EventOut, &startt, &endt);
 		it->setTaskBegin(startt);
 		it->setTaskEnd(endt);
-		cout << "new     date:" << it->getDateStr() << endl;
+		cout << "    new date:" << it->getDateStr() << endl;
 		cout << "       begin:" << it->getBeginStr() << endl;
 		cout << "         end:" << it->getEndStr() << endl << endl;
 		a = *it;
 	}
 	else if (posName != -1) {
-		cout << "previor name:" << it->getTaskName() << endl;
+		cout << "previous name:" << it->getTaskName() << endl;
 		cout << "please input new name:" << endl;
 
 		cin.getline(tempEvent, LENGTH, '\n');
@@ -134,17 +134,17 @@ Task Interpreter::parseEditCmd(std::string input) {
 		a = *it;
 	}
 	else{
-		cout << "privor event:" << it->getTaskName() << endl;
-		cout << "        date:" << it->getDateStr() << endl;
-		cout << "       begin:" << it->getBeginStr() << endl;
-		cout << "         end:" << it->getEndStr() << endl << endl;
+		cout << "previous event:" << it->getTaskName() << endl;
+		cout << "         date:" << it->getDateStr() << endl;
+		cout << "        begin:" << it->getBeginStr() << endl;
+		cout << "          end:" << it->getEndStr() << endl << endl;
 
 		cout << "please input new event:" << endl;
 		cin.getline(tempEvent, LENGTH, '\n');
 		curStr.assign(tempEvent, 0, strlen(tempEvent));
 		parse(curStr, &EventOut);
 		time_t startt, endt;
-		if (EventOut.year != -1)
+		if (EventOut.year!=-1)
 			tmConvert(EventOut, &startt, &endt);
 		else{
 			startt = 0;
@@ -153,7 +153,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 		it->setTaskBegin(startt);
 		it->setTaskEnd(endt);
 		it->setTaskName(EventOut.event);
-		cout << "new    event:" << it->getTaskName() << endl;
+		cout << "   new event:" << it->getTaskName() << endl;
 		cout << "        date:" << it->getDateStr() << endl;
 		cout << "       begin:" << it->getBeginStr() << endl;
 		cout << "         end:" << it->getEndStr() << endl << endl;
@@ -161,8 +161,10 @@ Task Interpreter::parseEditCmd(std::string input) {
 	}
 
 	storage->updateStorage(tasklist);
+
 	return a;
-} 
+}
+
 
 std::string Interpreter::parseStoreCmd(std::string input) {    
     if (StorageAlias::isGetLocation(input)) { 
@@ -175,12 +177,18 @@ std::string Interpreter::parseStoreCmd(std::string input) {
 	// if it is neither "getLocation" nor "help".
     return input;
 }
-/*
+
 int Interpreter::parseDelCmd(std::string input){
-	int TaskId = gettingTaskID(input, NUM_CHARS_DELETE+1);
+	int TaskId; 
+	if (DeleteAlias::isInteger(input) || !DeleteAlias::isHelp(input)){
+		TaskId = gettingTaskID(input);
+	}
+	else if (DeleteAlias::isHelp(input)){
+		TaskId = -1;
+	}
 	return TaskId;
 }
-*/
+
 int Interpreter::parseDoneCmd(std::string input){
 	int TaskId;
 
@@ -236,8 +244,8 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 	curEvent.month = -1;
 	curEvent.day = -1;
 	curEvent.wday = -1;
-	curEvent.time = 800;
-	curEvent.endtime = 1800;
+	curEvent.time = 2500;
+	curEvent.endtime = 2500;
 	curEvent.event = "\0";
 
 	//get time of "today"
@@ -254,7 +262,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 	else
 		cureve.assign(cal, 0, strlen(cal));
 	const char *cheve = cureve.c_str();
-	curEvent.event = cureve;    //���¼�
+	curEvent.event = cureve;    
 
 	//deal with "next" in a command
 	posNext = event.find(":next", 0);
@@ -428,8 +436,8 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 			curEvent.month = timeinfo.tm_mon + 1;
 			curEvent.day = timeinfo.tm_mday;
 		}
-		if (tmm>2400)  
-			return -1;
+		if (tmm>2400)  return -1;
+
 	}
 
 	//deal with "tomorrow" in a command
@@ -456,7 +464,6 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 	wDaySearch(curEvent.year, curEvent.month, curEvent.day, &curEvent.wday);
 	*calEventOut = curEvent;
 	return 1;
-		
 }
 
 void Interpreter::tmConvert(CalEvent Event, time_t *starttime, time_t *endtime)

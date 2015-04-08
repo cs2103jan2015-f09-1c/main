@@ -65,11 +65,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CommandAlias.h" />
+    <ClInclude Include="DeleteAlias.h" />
     <ClInclude Include="DoneAlias.h" />
     <ClInclude Include="StorageAlias.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandAlias.cpp" />
+    <ClCompile Include="DeleteAlias.cpp" />
     <ClCompile Include="DoneAlias.cpp" />
     <ClCompile Include="StorageAlias.cpp" />
   </ItemGroup>

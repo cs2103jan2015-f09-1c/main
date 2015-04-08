@@ -4,8 +4,6 @@
 #include "TaskStub.h"
 
 class MockStorage {
-private:
-
 public:
     MockStorage(void);
     ~MockStorage(void);
