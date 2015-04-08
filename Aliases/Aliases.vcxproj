@@ -64,6 +64,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AddAlias.h" />
     <ClInclude Include="CommandAlias.h" />
     <ClInclude Include="DeleteAlias.h" />
     <ClInclude Include="DoneAlias.h" />
@@ -71,6 +72,7 @@
     <ClInclude Include="StorageAlias.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AddAlias.cpp" />
     <ClCompile Include="CommandAlias.cpp" />
     <ClCompile Include="DeleteAlias.cpp" />
     <ClCompile Include="DoneAlias.cpp" />
