@@ -96,7 +96,7 @@ std::string DoneCmd::getHelp() const {
 
 	std::string intro = "The view command allows you to mark done your task \n\n"; 
 
-	std::string pt1 = "1. This command can be invoked by typing done [Task number/ Task name] \n";
+	std::string pt1 = "1. This command can be invoked by typing done [task number / task name] \n";
 	pt1 = pt1 + "Example: done 1 \n";
 	pt1 = pt1 + "         done meet mum \n";
 

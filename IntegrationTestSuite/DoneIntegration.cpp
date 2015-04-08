@@ -16,7 +16,8 @@ namespace IntegrationTestSuite {
 			TaskList::TList list = controllerOutput.getTaskList();
 			TaskList taskList;
 			taskList.loadTaskList(list);
-			std::string expectedList = "4 dummy T4\nTue Mar 10 2015 07:23 AM - 08:23 AM\ndone: 0 float: 0\n";
+			std::string expectedList =	"4 dummy T4\nTue Mar 10 2015 07:23 AM - 08:23 AM\ndone: 0 float: 0\n "
+				+ std::string("5 dummy T5\nTue Mar 10 2015 07:23 PM - 08:23 PM\ndone: 0 float: 0\n ");
 			Assert::AreEqual(expectedList, taskList.toString());
 
 			MockStorage::cleanMockStorage();
