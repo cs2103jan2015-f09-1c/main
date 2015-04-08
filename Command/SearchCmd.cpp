@@ -20,7 +20,7 @@ UIObject SearchCmd::execute() {
     UIObject temp;
 	Task task = List.front();
 	//Search
-	if (List.empty()){
+	if (task.getTaskID() == 0){
 		temp.setHeaderText (NO_MATCHING_TASK);
 	}
 	else if (task.getTaskID() == -1){
