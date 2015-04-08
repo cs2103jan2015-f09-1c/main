@@ -256,8 +256,8 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 	curEvent.month = -1;
 	curEvent.day = -1;
 	curEvent.wday = -1;
-	curEvent.time = 2500;
-	curEvent.endtime = 2500;
+	curEvent.time = 800;
+	curEvent.endtime = 1000;
 	curEvent.event = "\0";
 
 	//get time of "today"
