@@ -237,6 +237,11 @@ TaskList::TList Interpreter::parseSearchCmd (std::string input){
 		}
 	}
 	}
+	if (foundTaskList.empty()){
+			Task task;
+				task.setTaskID (0);
+				foundTaskList.push_back(task);
+	}
 	return foundTaskList;
 }
 
