@@ -25,7 +25,7 @@ namespace MyCalTestSuite {
             delCmdObj.prepareTaskId((unsigned) 3);
             UIObject oneRemaining = delCmdObj.execute();
 
-            Assert::AreEqual(std::string("Remaining tasks for that day:"), oneRemaining.getHeaderText());
+            Assert::AreEqual(std::string("Task deleted successfully. Remaining tasks for that day:"), oneRemaining.getHeaderText());
 
             TaskList actualTaskList;
             actualTaskList.loadTaskList(oneRemaining.getTaskList());
@@ -35,7 +35,7 @@ namespace MyCalTestSuite {
             delCmdObj.prepareTaskId((unsigned) 1);
             UIObject noneRemaining = delCmdObj.execute();
 
-            Assert::AreEqual(std::string("No more tasks for that day!"), noneRemaining.getHeaderText());
+            Assert::AreEqual(std::string("Task deleted successfully. No more tasks for that day!"), noneRemaining.getHeaderText());
 
             TaskList actualTaskList2;
             actualTaskList2.loadTaskList(noneRemaining.getTaskList());

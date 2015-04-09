@@ -2,6 +2,7 @@
 #include "Storage.h"
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 #include "MappingNumber.h"
 #include "StorageAlias.h"
 #include "DoneAlias.h"
@@ -9,13 +10,18 @@
 #include "SearchAlias.h"
 #include "AddAlias.h"
 #include "CommandType.h"
+#include "TaskNotFoundException.h"
+#include "InvalidInputException.h"
 
 using namespace std; 
 const size_t Interpreter::NUM_CHARS_DONE = 4;
 const size_t Interpreter::NUM_CHARS_DELETE = 6;
 
 bool Interpreter::search(std::string keyword, Task task) {
+    std::transform(keyword.begin(), keyword.end(), keyword.begin(), ::tolower);
 	std::string line = task.getTaskName();
+    std::transform(line.begin(), line.end(), line.begin(), ::tolower);
+
 	if (line.find(keyword) != std::string::npos){
 		return true;
 	} else {
@@ -41,11 +47,7 @@ Task Interpreter::parseAddCmd(std::string input) {
 	event.assign(cal, 4, strlen(cal) - 4);
 	flag = parse(event, &EventOut);
 	if (flag <= -1){
-		std::cout << "input error,please check the input" << std::endl;
-		a.setTaskBegin(0);
-		a.setTaskEnd(0);
-		a.setTaskName("");
-		return a;
+		throw InvalidInputException("Unrecognized time or date. Please check the input.");
 	}
 	
 	time_t starttime, endtime;
@@ -88,8 +90,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 
 	int recID = atoi(recch);
 	if (recID <= 0) {
-		cout << "edit record error, please check" << endl;
-		return a;
+		throw InvalidInputException("Invalid input, please check again");
 	}
 
 	//search for task
@@ -107,8 +108,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 		}
 	}
 	if (findF == 0)	{
-		cout << "can't find the record" << endl;
-		return a;
+        throw TaskNotFoundException("Can't find the record!");
 	}
 	char tempEvent[LENGTH];
 	string curStr;

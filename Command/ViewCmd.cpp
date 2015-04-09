@@ -9,7 +9,6 @@
 #include <time.h>
 
 const std::string ViewCmd:: NO_TASK_MESSAGE = "There is no task. Start writing one now!"; 
-const std::string ViewCmd:: INVALID_INPUT_MESSAGE = "Invalind input";
 
 ViewCmd::ViewCmd(void) {
 }

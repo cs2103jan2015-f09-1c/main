@@ -76,7 +76,6 @@
     <ClInclude Include="DeleteCmd.h" />
     <ClInclude Include="EditCmd.h" />
     <ClInclude Include="DoneCmd.h" />
-    <ClInclude Include="InvalidIndex.h" />
     <ClInclude Include="SearchCmd.h" />
     <ClInclude Include="StorageCmd.h" />
     <ClInclude Include="ViewCmd.h" />
@@ -89,7 +88,6 @@
     <ClCompile Include="DeleteCmd.cpp" />
     <ClCompile Include="EditCmd.cpp" />
     <ClCompile Include="DoneCmd.cpp" />
-    <ClCompile Include="InvalidIndex.cpp" />
     <ClCompile Include="SearchCmd.cpp" />
     <ClCompile Include="StorageCmd.cpp" />
     <ClCompile Include="ViewCmd.cpp" />

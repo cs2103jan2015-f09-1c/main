@@ -12,6 +12,8 @@
 #include "DoneCmd.h"
 #include "ViewCmd.h"
 #include "History.h"
+#include "TaskNotFoundException.h"
+#include "InvalidInputException.h"
 //#include "HelpCmd.h"
 
 
@@ -28,6 +30,10 @@ UIObject Controller::undoCommand(CommandType::Command cmdType) {
         case CommandType::EDIT: {
             StorageCmd editCmd;
             return editCmd.undo();
+        }
+		case CommandType::DONE: {
+            DoneCmd doneCmd;
+            return doneCmd.undo();
         }
         case CommandType::STORAGE: {
             StorageCmd storageCmd;
@@ -63,11 +69,20 @@ UIObject Controller::handleInput(std::string input) {
         }
         case CommandType::EDIT: {
             MCLogger::log("Controller.cpp: begin edit command");
-
-            EditCmd editCmdObj;
-            Task task = Interpreter::parseEditCmd(input);
-            editCmdObj.prepareTask(task);
-            return editCmdObj.execute();
+            try {
+                EditCmd editCmdObj;
+                Task task = Interpreter::parseEditCmd(input);
+                editCmdObj.prepareTask(task);
+                return editCmdObj.execute();
+            } catch (TaskNotFoundException &e) {
+                UIObject notFound;
+                notFound.setHeaderText(e.what());
+                return notFound;
+            } catch (InvalidInputException &e) {
+                UIObject invalidInput;
+                invalidInput.setHeaderText(e.what());
+                return invalidInput;
+            }
         }
         case CommandType::UNDO: {
             MCLogger::log("Controller.cpp: begin undo command");
@@ -124,7 +139,7 @@ UIObject Controller::handleInput(std::string input) {
         case CommandType::INVALID: {
             MCLogger::log("Controller.cpp: invalid command");
             UIObject invalidCmd;
-            invalidCmd.setHeaderText("The command entered (" + input + ") is invalid.");
+            invalidCmd.setHeaderText("The command entered \"" + input + "\" is invalid.");
             return invalidCmd;
         }
         default: {
