@@ -17,6 +17,7 @@ public:
 	void setNotFloating();
     bool isTaskWithoutTime() const;
     void setTaskWithoutTime();
+    void setTaskWithTime();
     bool isFloating() const; 
 
     std::string getDateStr() const;

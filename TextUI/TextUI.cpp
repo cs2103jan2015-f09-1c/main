@@ -229,7 +229,7 @@ void TextUI::printTasks(TaskList::TList tasks) {
 		}
 
 		std::string timePrint = "";
-		if(it->taskWithoutTime()){
+		if(it->isTaskWithoutTime()){
 			timePrint = "-------------------";
 		}
 		else if(timeEnd == ""){

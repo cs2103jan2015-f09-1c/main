@@ -90,8 +90,6 @@ void Task::setTaskBegin(time_t begin) {
     } else {
         _isFloating = false;
     }
-
-	checkTaskWithoutTime();
 }
 
 void Task::setTaskEnd(time_t end) {
