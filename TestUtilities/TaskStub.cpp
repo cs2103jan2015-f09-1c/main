@@ -24,6 +24,8 @@ time_t TaskStub::_15Apr9AM = _14Apr9AM + _secsInADay;
 time_t TaskStub::_16Apr9AM = _15Apr9AM + _secsInADay;
 time_t TaskStub::_17Apr9AM = _16Apr9AM + _secsInADay;
 time_t TaskStub::_19Apr9AM = _17Apr9AM + 2*_secsInADay;
+time_t TaskStub::_Today9AM = getCurrentTime();
+time_t TaskStub::_Tomorrow9AM = _Today9AM+ _secsInADay;
 
 std::string TaskStub::timetToString(time_t timing) {
     //refer to std::put_time fmt
@@ -72,6 +74,24 @@ time_t TaskStub::getSampleTimeApr() {
     sampleTime.tm_year = 115;
            
     rawTime = mktime(&sampleTime);
+    return rawTime;
+}
+
+time_t TaskStub::getCurrentTime() {
+	time_t rawTime;
+	time_t curTime;
+
+	struct tm  *sampleTime;
+	time (&curTime);
+	sampleTime = localtime(&curTime);
+
+	sampleTime->tm_hour = 9;
+    sampleTime->tm_isdst = 0;
+    sampleTime->tm_min = 0;
+    sampleTime->tm_sec = 0;
+
+    rawTime = mktime(sampleTime);
+    
     return rawTime;
 }
 
@@ -278,6 +298,24 @@ Task TaskStub::getSampleTask22() {
     return task;
 }
 
+Task TaskStub::getSampleTask23() {
+    Task task;
+    task.setTaskID((unsigned) 23);
+    task.setTaskName("dummy T23");
+    task.setTaskBegin(_Today9AM);
+    task.setTaskEnd(_Today9AM + _secsInHalfDay);
+    return task;
+}
+
+Task TaskStub::getSampleTask24() {
+    Task task;
+    task.setTaskID((unsigned) 24);
+    task.setTaskName("dummy T24");
+    task.setTaskBegin(_Tomorrow9AM);
+    task.setTaskEnd(_Tomorrow9AM + _secsInHalfDay);
+    return task;
+}
+
 TaskList TaskStub::getLargeTaskList() {
     TaskList list;
     list.add(getSampleTask1());
@@ -316,5 +354,12 @@ TaskList TaskStub::getAprTaskList() {
     list.add(getSampleTask21());
     list.add(getSampleTask22());
     return list;
+}
+
+TaskList TaskStub::getCurrentTaskList() {
+    TaskList list;
+    list.add(getSampleTask23());
+	list.add(getSampleTask24());
+	return list;
 }
 
