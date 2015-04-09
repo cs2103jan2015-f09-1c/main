@@ -1,3 +1,4 @@
+//@Seow Yan Yi A0086626W
 #include <sstream>
 #include <assert.h>
 #include "Controller.h"
@@ -53,11 +54,16 @@ UIObject Controller::handleInput(std::string input) {
     switch (cmdType) {
         case CommandType::ADD: {
             MCLogger::log("Controller.cpp: begin add command");
-
-            AddCmd addCmdObj;
-            Task task = Interpreter::parseAddCmd(input);
-            addCmdObj.prepareTask(task);
-            return addCmdObj.execute();
+            try {
+                Task task = Interpreter::parseAddCmd(input);
+                AddCmd addCmdObj;
+                addCmdObj.prepareTask(task);
+                return addCmdObj.execute();
+            } catch(InvalidInputException &e) {
+                UIObject invalidInput;
+                invalidInput.setHeaderText(e.what());
+                return invalidInput;
+            }
         }
         case CommandType::DEL: {
             MCLogger::log("Controller.cpp: begin delete command");

@@ -10,6 +10,7 @@
 #include "SearchAlias.h"
 #include "AddAlias.h"
 #include "CommandType.h"
+#include "MCLogger.h"
 #include "TaskNotFoundException.h"
 #include "InvalidInputException.h"
 
@@ -289,15 +290,15 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	if (posNext != -1){
 		i = posNext + 6;
 		k = 0;
-		char weekx[10]; // extracted word
+		char weekx[10]; 
 		strcpy_s(weekx, "\0");
-        //Extracting 
-		while (i<strlen(cal)){ // loop through all letters
-			if (cal[i] >= 'A' && cal[i] <= 'Z' || cal[i] >= 'a' && cal[i] <= 'z') { // is alpha
+
+        while (i<strlen(cal)){
+			if (cal[i] >= 'A' && cal[i] <= 'Z' || cal[i] >= 'a' && cal[i] <= 'z') { 
 				weekx[k] = cal[i];
 				k++;
 			}
-			else if (cal[i] == ' ') { // end of word
+			else if (cal[i] == ' ') { 
 				if (k != 0) break;
 			}
 			else {
@@ -306,13 +307,18 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 			i++;
 		}
 		string strweek;
-		strweek.assign(weekx, 0, strlen(weekx)); // copy from 0 to strlen
+		strweek.assign(weekx, 0, strlen(weekx)); 
         std::transform(strweek.begin(), strweek.end(), strweek.begin(), ::tolower);
+        bool foundDay = false;
 		for (i = 0; i<7; i++){
-			if (strweek.find(week[i], 0) != -1) break;
+			if (strweek.find(week[i], 0) != -1) {
+                foundDay = true;
+                break;
+            }
 		}
-		if (i == 7)
-			return -1;
+		if (foundDay == false) {
+            throw InvalidInputException("Unrecognized day. Please check your input.");
+        }
 
 		int yday, year, wday, nextwday;
 		year = timeinfo.tm_year + 1900;
