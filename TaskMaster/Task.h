@@ -15,7 +15,7 @@ public:
 	// Nevertheless, the use of setFloating() method provides a clearer way to set a Task as floating.
 	void setFloating();
 	void setNotFloating();
-    void setTaskWithoutTime();
+    void checkTaskWithoutTime();
     bool isFloating() const; 
 	bool taskWithoutTime() const;
 

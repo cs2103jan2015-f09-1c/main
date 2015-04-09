@@ -37,7 +37,7 @@ bool Task::taskWithoutTime() const{
 	return _isWithoutTime;
 }
 
-void Task::setTaskWithoutTime() {
+void Task::checkTaskWithoutTime() {
 	struct tm * timeinfo;
 	timeinfo = localtime (&_taskBegin);
 	if(timeinfo->tm_hour == 1){
@@ -89,6 +89,8 @@ void Task::setTaskBegin(time_t begin) {
     } else {
         _isFloating = false;
     }
+
+	checkTaskWithoutTime();
 }
 
 void Task::setTaskEnd(time_t end) {
