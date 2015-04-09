@@ -10,12 +10,12 @@ CommandAlias::~CommandAlias(void) {
 
 bool CommandAlias::isAdd(std::string cmd) {
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
-	return cmd == "add"; //|| cmd == "a";
+	return cmd == "add"|| cmd == "a";
 }
 
 bool CommandAlias::isDel(std::string cmd) {
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
-	return cmd == "delete"; // || cmd == "del";
+	return cmd == "delete" || cmd == "del";
 }
 
 bool CommandAlias::isEdit(std::string cmd) {
@@ -25,12 +25,12 @@ bool CommandAlias::isEdit(std::string cmd) {
 
 bool CommandAlias::isUndo(std::string cmd) {
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
-	return cmd == "undo";// || cmd == "un" || cmd == "u";
+	return cmd == "undo" || cmd == "un" || cmd == "u";
 }
 
 bool CommandAlias::isSearch(std::string cmd) {
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
-	return cmd == "search";// || cmd == "se" || cmd == "s";
+	return cmd == "search" || cmd == "se" || cmd == "s";
 }
 
 bool CommandAlias::isView(std::string cmd) {
