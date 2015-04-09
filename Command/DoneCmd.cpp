@@ -61,6 +61,7 @@ void DoneCmd::recordInHistory(Task task) {
     hist->saveCommand(CommandType::DONE);
 }
 
+
 UIObject DoneCmd:: undo(){
 	History *hist = History::getInstance();
 
@@ -80,9 +81,11 @@ UIObject DoneCmd:: undo(){
 	hist->clearHistory();
 
     UIObject undoMessage;
+	TaskList::TList tasksThatDay;
+	tasksThatDay = taskList.getDay(task.getTaskBegin());
 
 	undoMessage.setHeaderText(task.getTaskName() + UNDO_DONE_MESSAGE );
-	undoMessage.setTaskList(selectedTasks);
+	undoMessage.setTaskList(tasksThatDay);
 
     return undoMessage;
 }
@@ -96,7 +99,7 @@ std::string DoneCmd::getHelp() const {
 
 	std::string intro = "The done command allows you to mark done your task \n\n"; 
 
-	std::string pt1 = "1. This command can be invoked by typing done [Task number/ Task name] \n";
+	std::string pt1 = "1. This command can be invoked by typing done [task number / task name] \n";
 	pt1 = pt1 + "Example: done 1 \n";
 	pt1 = pt1 + "         done meet mum \n";
 

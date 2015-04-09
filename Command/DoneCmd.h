@@ -18,5 +18,4 @@ public:
 
 private:
 	int taskId;
-	TaskList::TList selectedTasks;
 };
