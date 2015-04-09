@@ -10,7 +10,6 @@ public:
 	TaskList::TList getSelectedTasks();
     UIObject execute();
 	static const std::string NO_TASK_MESSAGE;
-	static const std::string INVALID_INPUT_MESSAGE;
 	std::string getHelp()const;
 
 private:
