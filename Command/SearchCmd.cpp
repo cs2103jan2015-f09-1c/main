@@ -43,8 +43,10 @@ std::string SearchCmd::getHelp() const{
 	std::string intro = "The search command allows you to look for a task \n\n"; 
 
 	std::string pt1 = "1. This command can be invoked by typing search [Key word] \n";
+	pt1 = pt1 + "Aliases: s, se \n\n";
 	pt1 = pt1 + "Example: search meeting \n";
-	pt1 = pt1 + "         search movies with John \n";
+	pt1 = pt1 + "         s movies with John \n";
+	pt1 = pt1 + "         se John\n";
 
 	help = title + intro + pt1;
 

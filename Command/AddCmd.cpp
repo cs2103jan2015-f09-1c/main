@@ -101,9 +101,10 @@ std::string AddCmd::getHelp() const{
 	pt1 = pt1 + "TIME {:at time}\n";
     pt1 = pt1 + "     {:from startTime to endTime}\n";
 	pt1 = pt1 + "     {:by time}]\n";
-	pt1 = pt1 + "DATE {:dateSpecifier}\n";
+	pt1 = pt1 + "DATE {:dateSpecifier}\n\n";
+	pt1 = pt1 + "Aliases: a \n\n";
 	pt1 = pt1 + "Example: add meeting :at 230pm \n";
-	pt1 = pt1 + "         add project due :tomorrow\n";
+	pt1 = pt1 + "         a project due :tomorrow\n";
 
 	help = title + intro + pt1;
 

@@ -105,8 +105,9 @@ std::string DeleteCmd::getHelp() const{
 	std::string intro = "The delete command allows you to remove your task \n\n"; 
 
 	std::string pt1 = "1. This command can be invoked by typing delete [Task number/ Task name] \n";
+	pt1 = pt1 + "Aliases: del \n\n";
 	pt1 = pt1 + "Example: delete 1 \n";
-	pt1 = pt1 + "         delete meet mum \n";
+	pt1 = pt1 + "         del meet mum \n";
 
 	help = title + intro + pt1;
 
