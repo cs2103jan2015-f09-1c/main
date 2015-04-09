@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 
-// Testing that is independent from time: view all
-// Testing that is dependent on time: view today, tomorrow, weekly and any of the day, hence, it might
-//not be valid when there is a change of day (cuurent time).
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace IntegrationTestSuite {		
@@ -86,32 +83,32 @@ namespace IntegrationTestSuite {
 		*/
 
 			TEST_METHOD(ViewToday) {
-			MockStorage::initMockStorage(TaskStub::getAprTaskList());
+			MockStorage::initMockStorage(TaskStub::getCurrentTaskList());
 
 			UIObject controllerOutput = Controller::handleInput("view today");
 
 			TaskList::TList list = controllerOutput.getTaskList();
 			TaskList taskList;
 			taskList.loadTaskList(list);
-			std::string expectedList = "12 dummy T12\nThu Apr 09 2015 09:00 AM - 10:00 AM\ndone: 0 float: 0\n";
+			std::string expectedList = "23 dummy T23\n09:00 AM - 09:00 PM\ndone: 0 float: 0\n";
 
-			Assert::AreEqual(expectedList, taskList.toString());
+			Assert::AreEqual(expectedList, taskList.toStringWithoutDate());
 
 			MockStorage::cleanMockStorage();
 		}
 
 			TEST_METHOD(ViewTomorrow) {
-			MockStorage::initMockStorage(TaskStub::getAprTaskList());
+			MockStorage::initMockStorage(TaskStub::getCurrentTaskList());
 
 			UIObject controllerOutput = Controller::handleInput("view tomorrow");
 
 			TaskList::TList list = controllerOutput.getTaskList();
 			TaskList taskList;
 			taskList.loadTaskList(list);
-			std::string expectedList = ("13 dummy T13\nFri Apr 10 2015 09:00 AM - 09:00 PM\ndone: 0 float: 0\n")
-				+ std::string("14 dummy T14\nFri Apr 10 2015 09:00 AM - 10:00 AM\ndone: 0 float: 0\n");
+			std::string expectedList = "24 dummy T24\n09:00 AM - 09:00 PM\ndone: 0 float: 0\n";
 
-			Assert::AreEqual(expectedList, taskList.toString());
+
+			Assert::AreEqual(expectedList, taskList.toStringWithoutDate());
 
 			MockStorage::cleanMockStorage();
 		}
