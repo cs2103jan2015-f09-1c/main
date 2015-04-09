@@ -64,15 +64,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AddAlias.h" />
     <ClInclude Include="CommandAlias.h" />
     <ClInclude Include="DeleteAlias.h" />
     <ClInclude Include="DoneAlias.h" />
+    <ClInclude Include="SearchAlias.h" />
     <ClInclude Include="StorageAlias.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AddAlias.cpp" />
     <ClCompile Include="CommandAlias.cpp" />
     <ClCompile Include="DeleteAlias.cpp" />
     <ClCompile Include="DoneAlias.cpp" />
+    <ClCompile Include="SearchAlias.cpp" />
     <ClCompile Include="StorageAlias.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

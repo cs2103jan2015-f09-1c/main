@@ -86,7 +86,7 @@ UIObject Controller::handleInput(std::string input) {
             MCLogger::log("Controller.cpp: begin search command");
 
 			SearchCmd SearchCmdObj;
-			TaskList::TList List = Interpreter::parseSearchCmd(input);
+			TaskList::TList List = Interpreter::parseSearchCmd(filteredCmd);
 			SearchCmdObj.prepareList(List);
 			return SearchCmdObj.execute();
         }

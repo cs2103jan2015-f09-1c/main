@@ -2,17 +2,24 @@
 #include "Storage.h"
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 #include "MappingNumber.h"
 #include "StorageAlias.h"
 #include "DoneAlias.h"
 #include "DeleteAlias.h"
+#include "SearchAlias.h"
+#include "AddAlias.h"
+#include "CommandType.h"
 
 using namespace std; 
 const size_t Interpreter::NUM_CHARS_DONE = 4;
 const size_t Interpreter::NUM_CHARS_DELETE = 6;
 
 bool Interpreter::search(std::string keyword, Task task) {
+    std::transform(keyword.begin(), keyword.end(), keyword.begin(), ::tolower);
 	std::string line = task.getTaskName();
+    std::transform(line.begin(), line.end(), line.begin(), ::tolower);
+
 	if (line.find(keyword) != std::string::npos){
 		return true;
 	} else {
@@ -21,8 +28,14 @@ bool Interpreter::search(std::string keyword, Task task) {
 }
 
 Task Interpreter::parseAddCmd(std::string input) {
-
+	std::string detail = CommandType::filterOutCmd(input);
 	Task a;
+
+	if (AddAlias::isHelp(detail)){
+		int TaskId = -1;
+		a.setTaskID (TaskId);
+	}
+	else{
 	int flag;
 
 	CalEvent EventOut;
@@ -32,7 +45,7 @@ Task Interpreter::parseAddCmd(std::string input) {
 	event.assign(cal, 4, strlen(cal) - 4);
 	flag = parse(event, &EventOut);
 	if (flag <= -1){
-		cout << "input error,please check the input" << endl;
+		std::cout << "input error,please check the input" << std::endl;
 		a.setTaskBegin(0);
 		a.setTaskEnd(0);
 		a.setTaskName("");
@@ -49,6 +62,7 @@ Task Interpreter::parseAddCmd(std::string input) {
 	a.setTaskBegin(starttime);
 	a.setTaskEnd(endtime);
 	a.setTaskName(EventOut.event);
+	}
 	return a;
 }
 
@@ -208,18 +222,29 @@ std::string Interpreter::parseViewCmd(std::string input){
 }
 
 TaskList::TList Interpreter::parseSearchCmd (std::string input){
-	std::string taskToDel = input.substr(7);
 	Storage *storage = Storage::getInstance();
 	TaskList tasklist = storage->getTaskList();
 	TaskList::TList list = tasklist.getAll();
 	TaskList::TList foundTaskList;
 	TaskList::taskIt it;
 
-	for (it = list.begin(); it != list.end(); ++it) {
-		Task task = *it;
-		if (search(taskToDel, task)) {
+	if (SearchAlias::isHelp(input)){
+		Task task;
+		task.setTaskID(-1);
 			foundTaskList.push_back(task);
+	}
+	else{
+	for (it = list.begin(); it != list.end(); ++it) {
+		Task _task = *it;
+		if (search(input, _task)) {
+			foundTaskList.push_back(_task);
 		}
+	}
+	}
+	if (foundTaskList.empty()){
+			Task task;
+				task.setTaskID (0);
+				foundTaskList.push_back(task);
 	}
 	return foundTaskList;
 }
@@ -244,8 +269,8 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 	curEvent.month = -1;
 	curEvent.day = -1;
 	curEvent.wday = -1;
-	curEvent.time = 2500;
-	curEvent.endtime = 2500;
+	curEvent.time = 800;
+	curEvent.endtime = 1000;
 	curEvent.event = "\0";
 
 	//get time of "today"
