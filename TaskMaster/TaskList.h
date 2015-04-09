@@ -32,6 +32,7 @@ public:
     void loadTaskList(TList list);
     int totalTasks() const;
     std::string toString() const;
+	std::string toStringWithoutDate() const;
 
 private:
     TList _taskList;
