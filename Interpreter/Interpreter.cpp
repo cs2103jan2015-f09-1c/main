@@ -18,7 +18,13 @@ using namespace std;
 const size_t Interpreter::NUM_CHARS_DONE = 4;
 const size_t Interpreter::NUM_CHARS_DELETE = 6;
 
-bool Interpreter::search(std::string keyword, Task task) {
+size_t Interpreter::caseInsensitiveFind(std::string input, std::string pattern, size_t pos) {
+    std::transform(input.begin(), input.end(), input.begin(), ::tolower);
+    std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
+    return input.find(pattern, pos);
+}
+
+bool Interpreter::searchSubStr(std::string keyword, Task task) {
     std::transform(keyword.begin(), keyword.end(), keyword.begin(), ::tolower);
 	std::string line = task.getTaskName();
     std::transform(line.begin(), line.end(), line.begin(), ::tolower);
@@ -233,7 +239,7 @@ TaskList::TList Interpreter::parseSearchCmd (std::string input){
 	else{
 	for (it = list.begin(); it != list.end(); ++it) {
 		Task _task = *it;
-		if (search(input, _task)) {
+		if (searchSubStr(input, _task)) {
 			foundTaskList.push_back(_task);
 		}
 	}
@@ -286,7 +292,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	curEvent.event = cureve;    
 
 	//deal with "next" in a command
-	posNext = event.find(":next", 0);
+	posNext = caseInsensitiveFind(event, ":next");
 	if (posNext != -1){
 		i = posNext + 6;
 		k = 0;
@@ -342,7 +348,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	}
 
 	//deal with "from" in a command
-	posFrom = event.find(":from", 0);
+	posFrom = caseInsensitiveFind(event, ":from");
 	if (posFrom != -1){
 		i = posFrom + 6;
 		k = 0;
@@ -353,32 +359,37 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		strcpy_s(apm[0], "am");
 		strcpy_s(apm[1], "am");
 		while (i<strlen(cal)) {
+            //cal[i] gives ASCII code 
+
 			if (cal[i] >= '0' && cal[i] <= '9') {
 				tmch[num][k] = cal[i];
 				k++;
 			}
-			else if (cal[i] == 'a' || cal[i] == 'p' || cal[i] == 'm') {
+			else if (cal[i] == 'a' || cal[i] == 'A' || cal[i] == 'p' || cal[i] == 'P'||
+                cal[i] == 'm' || cal[i] == 'M') {
 				apm[num][j] = cal[i];
 				j++;
 			}
-			else if (cal[i] == 't' || cal[i] == '-') {
+			else if (cal[i] == 't' || cal[i] == 'T' || cal[i] == '-') { // check :to
 				k = 0;
 				j = 0;
 				tim[num] = atoi(tmch[num]);
 				num++;
 			}
-			else;
 			i++;
 		}
 		tim[num] = atoi(tmch[num]);
 		for (int ii = 0; ii<2; ii++) {
-			if (strcmp(apm[ii], "pm") == 0){
-				if (tim[ii]>100)
+			if (strcmp(apm[ii], "pm") == 0){  
+				if (tim[ii]>100) {
 					tim[ii] = tim[ii] + 1200;
-				else
-					tim[ii] = tim[ii] + 12;
+                } else {
+                    tim[ii] = tim[ii] + 12;
+                }
 			}
-			if (tim[ii]<100) tim[ii] = tim[ii] * 100;
+			if (tim[ii]<100) {
+                tim[ii] = tim[ii] * 100;
+            }
 		}
 		curEvent.year = timeinfo.tm_year + 1900;
 		curEvent.month = timeinfo.tm_mon + 1;
@@ -388,7 +399,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	}
 
 	//deal with "on" in a command
-	posOn = event.find(":on", 0);
+	posOn = caseInsensitiveFind(event, ":on"); 
 	if (posOn != -1)	{
 		i = posOn + 4;
 		k = 0;
@@ -427,7 +438,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	}
 
 	//deal with "at" in a command
-	posAt = event.find(":at", 0);
+	posAt = caseInsensitiveFind(event, ":at"); 
 	if (posAt != -1){
 		i = posAt + 4;
 		k = 0;
@@ -469,8 +480,11 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	}
 
 	//deal with "tomorrow" in a command
-	posTmr1 = event.find(":tmr", 0);
-	posTmr2 = event.find(":tomorrow", 0);
+	posTmr1 = caseInsensitiveFind(event, ":tmr"); 
+    if (posTmr1 == string::npos) {
+        posTmr1 = caseInsensitiveFind(event, ":tom"); 
+    }
+	posTmr2 = caseInsensitiveFind(event, ":tomorrow"); 
 	if (posTmr1 != -1 || posTmr2 != -1){
 		int yday, year;
 		year = timeinfo.tm_year + 1900;
@@ -621,7 +635,7 @@ Task Interpreter::prepareTask(std::string input) {
 		else{
     for (it = list.begin(); it != list.end(); ++it) {
         Task task = *it;
-        if (search(input, task)) {
+        if (searchSubStr(input, task)) {
             return task;
 		}
 	}
