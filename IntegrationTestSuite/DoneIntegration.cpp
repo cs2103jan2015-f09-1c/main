@@ -9,18 +9,18 @@ namespace IntegrationTestSuite {
 		TEST_METHOD(DoneByName) {
 			MockStorage::initMockStorage(TaskStub::getLargeTaskList());
 
-			UIObject controllerOutput = Controller::handleInput("done dummy T5");
+			UIObject output = Controller::handleInput("done dummy T2");
 
-			Assert::AreEqual(std::string("Done: dummy T5"), controllerOutput.getHeaderText());
-
-			TaskList::TList list = controllerOutput.getTaskList();
+			Assert::AreEqual(std::string("Done: dummy T2"), output.getHeaderText());
+			
 			TaskList taskList;
-			taskList.loadTaskList(list);
-			std::string expectedList =	"4 dummy T4\nTue Mar 10 2015 07:23 AM - 08:23 AM\ndone: 0 float: 0\n "
-				+ std::string("5 dummy T5\nTue Mar 10 2015 07:23 PM - 08:23 PM\ndone: 0 float: 0\n ");
+			taskList.loadTaskList(output.getTaskList());
+			std::string expectedList =	"1 dummy T1\nMon Mar 09 2015 07:23 AM - 08:23 AM\ndone: 0 float: 0\n"
+				+ std::string("2 dummy T2\nMon Mar 09 2015 07:23 AM - 07:23 PM\ndone: 1 float: 0\n")
+				+ std::string("3 dummy T3\nMon Mar 09 2015 07:23 PM - 08:23 PM\ndone: 0 float: 0\n");
 			Assert::AreEqual(expectedList, taskList.toString());
+			
 
-			MockStorage::cleanMockStorage();
 		}
 
 
@@ -30,17 +30,16 @@ namespace IntegrationTestSuite {
 			UIObject viewOutput = Controller::handleInput("view all");
 			TextUI::showOutput(viewOutput);
 
-			UIObject del2Output = Controller::handleInput("done 2");
+			UIObject output = Controller::handleInput("done 3");
 
-			std::string expectedHeader = "Done: dummy T2";
-			Assert::AreEqual(expectedHeader, del2Output.getHeaderText());
+			std::string expectedHeader = "Done: dummy T3";
+			Assert::AreEqual(expectedHeader, output.getHeaderText());
 
-			TaskList::TList list = del2Output.getTaskList();
 			TaskList taskList;
-			taskList.loadTaskList(list);
-			std::string expectedList = "1 dummy T1\nMon Mar 09 2015 07:23 AM - 08:23 AM\ndone: 0 float: 0\n"
-				+ std::string("2 dummy T3\nMon Mar 09 2015 07:23 PM - 08:23 PM\ndone: 0 float: 0\n")
-				+ std::string("3 dummy T3\nMon Mar 09 2015 07:23 PM - 08:23 PM\ndone: 0 float: 0\n");
+			taskList.loadTaskList(output.getTaskList());
+			std::string expectedList =	"1 dummy T1\nMon Mar 09 2015 07:23 AM - 08:23 AM\ndone: 0 float: 0\n"
+				+ std::string("2 dummy T2\nMon Mar 09 2015 07:23 AM - 07:23 PM\ndone: 1 float: 0\n")
+				+ std::string("3 dummy T3\nMon Mar 09 2015 07:23 PM - 08:23 PM\ndone: 1 float: 0\n");
 			Assert::AreEqual(expectedList, taskList.toString());
 
 			MockStorage::cleanMockStorage();
@@ -49,19 +48,27 @@ namespace IntegrationTestSuite {
 		TEST_METHOD(UndoAfterDone) {
 			MockStorage::initMockStorage(TaskStub::getLargeTaskList());
 
-			Controller::handleInput("done dummy T5");
+		//	UIObject viewOutput = Controller::handleInput("view all");
+		//	TextUI::showOutput(viewOutput);
+
 			Controller::handleInput("done dummy T4");
-			UIObject undoOutput = Controller::handleInput("undo");
+			UIObject output = Controller::handleInput("undo");
 
-			Assert::AreEqual(std::string("dummy T4 has been marked undone!"), undoOutput.getHeaderText());
+			Assert::AreEqual(std::string("dummy T4 has been marked undone!"), output.getHeaderText());
 
+			TaskList taskList;
+			taskList.loadTaskList(output.getTaskList());
+			std::string expectedList =	"4 dummy T4\nTue Mar 10 2015 07:23 AM - 08:23 AM\ndone: 0 float: 0\n"
+				+ std::string("5 dummy T5\nTue Mar 10 2015 07:23 PM - 08:23 PM\ndone: 0 float: 0\n");
+
+			Assert::AreEqual(expectedList, taskList.toString());
 			MockStorage::cleanMockStorage();
 		}
 
 		TEST_METHOD(InvalidDone) {
 			MockStorage::initMockStorage(TaskStub::getSmallTaskList());
 			
-			UIObject garbageOutput = Controller::handleInput("delete %&*#");
+			UIObject garbageOutput = Controller::handleInput("done %&*#");
 			Assert::AreEqual(std::string("There is no matching task to be marked done."), garbageOutput.getHeaderText());
 			Assert::IsTrue(garbageOutput.getTaskList().empty());
 
@@ -73,12 +80,25 @@ namespace IntegrationTestSuite {
 
 			MockStorage::cleanMockStorage();
 		}
-		/*
+
+		
 		TEST_METHOD(DoneHelp) {
 			UIObject noSpecifier = Controller::handleInput("done"); // THIS CRASHES !!
-			Assert::AreEqual(std::string("Done command help goes here"), noSpecifier.getHeaderText());
+			std::string help;
+
+			std::string title = "***************** COMMAND HELP: DONE  *****************\n\n";
+
+			std::string intro = "The done command allows you to mark done your task \n\n"; 
+
+			std::string pt1 = "1. This command can be invoked by typing done [task number / task name] \n";
+			pt1 = pt1 + "Example: done 1 \n";
+			pt1 = pt1 + "         done meet mum \n";
+
+			help = title + intro + pt1;
+
+			Assert::AreEqual(std::string(help), noSpecifier.getHeaderText());
 			Assert::IsTrue(noSpecifier.getTaskList().empty());
 		}
-		*/
+		
 	};
 }
