@@ -20,7 +20,7 @@ bool CommandAlias::isDel(std::string cmd) {
 
 bool CommandAlias::isEdit(std::string cmd) {
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
-	return cmd == "edit";// || cmd == "ed" || cmd == "e";
+	return cmd == "edit" || cmd == "ed" || cmd == "e";
 }
 
 bool CommandAlias::isUndo(std::string cmd) {
