@@ -36,44 +36,456 @@ bool Interpreter::searchSubStr(std::string keyword, Task task) {
 	}
 }
 
-Task Interpreter::parseAddCmd(std::string input) {
-	std::string detail = CommandType::filterOutCmd(input);
-	Task a;
+struct tm Interpreter::getToday() {
+	time_t rawtime;
+	struct tm  timeinfo;
+	time(&rawtime);
+	localtime_s(&timeinfo, &rawtime);
+    return timeinfo;
+}
 
+bool Interpreter::isFloatingTask(std::string input) {
+    if (input.find(":") == std::string::npos) {
+        return true;
+    }
+
+    return false;
+}
+
+bool Interpreter::isWithoutTimeTask(size_t posAt, size_t posFrom, size_t posTo) {
+    return posAt == std::string::npos && posFrom == std::string::npos && posTo == std::string::npos;
+}
+
+
+void Interpreter::Monthday(int year, int yearDay, int *pMonth, int *pDay)
+//input: year,yearDay: year & nth day in a year
+//output: pMonth,pDay: month day
+{
+	int dec;
+	if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))  dec = 0;
+	else dec = 1;
+	if (yearDay >= 1 && yearDay <= 31) 	{
+		*pMonth = 1;
+		*pDay = yearDay;
+	}
+	else if (yearDay >= 32 && yearDay <= 60 - dec) {
+		*pMonth = 2;
+		*pDay = yearDay - 31;
+	}
+	else if (yearDay >= 61 - dec && yearDay <= 91 - dec){
+		*pMonth = 3;
+		*pDay = yearDay - (60 - dec);
+	}
+	else if (yearDay >= 92 - dec && yearDay <= 121 - dec){
+		*pMonth = 4;
+		*pDay = yearDay - (91 - dec);
+	}
+	else if (yearDay >= 122 - dec && yearDay <= 152 - dec){
+		*pMonth = 5;
+		*pDay = yearDay - (121 - dec);
+	}
+	else if (yearDay >= 153 - dec && yearDay <= 182 - dec){
+		*pMonth = 6;
+		*pDay = yearDay - (152 - dec);
+	}
+	else if (yearDay >= 183 - dec && yearDay <= 212 - dec){
+		*pMonth = 7;
+		*pDay = yearDay - (182 - dec);
+	}
+	else if (yearDay >= 214 - dec && yearDay <= 244 - dec){
+		*pMonth = 8;
+		*pDay = yearDay - (213 - dec);
+	}
+	else if (yearDay >= 245 - dec && yearDay <= 274 - dec){
+		*pMonth = 9;
+		*pDay = yearDay - (244 - dec);
+	}
+	else if (yearDay >= 275 - dec && yearDay <= 305 - dec){
+		*pMonth = 10;
+		*pDay = yearDay - (274 - dec);
+	}
+	else if (yearDay >= 306 - dec && yearDay <= 335 - dec){
+		*pMonth = 11;
+		*pDay = yearDay - (305 - dec);
+	}
+	else if (yearDay >= 336 - dec && yearDay <= 366 - dec) {
+		*pMonth = 12;
+		*pDay = yearDay - (335 - dec);
+	}
+
+}
+
+std::string Interpreter::parseTaskName(std::string input) {
+	int posFirstColon = input.find(":", 0);
+
+	if (posFirstColon == std::string::npos) {
+		return input;
+    } else {
+		return input.substr(0, posFirstColon);
+    } 
+}
+
+CalEvent Interpreter::parseTime(std::string input,  size_t pos, size_t offset) {
+	size_t i, j, k;
+	CalEvent curEvent;
+
+	curEvent.year = -1;
+	curEvent.month = -1;
+	curEvent.day = -1;
+	curEvent.wday = -1;
+	curEvent.time = 800;
+
+	//get time of "today"
+	struct tm  timeinfo = getToday();
+
+	const char *cal = input.c_str();
+
+    i = pos + offset;
+	k = 0;
+	j = 0;
+	char tm[10], apm[3];
+	int tmm;
+	strcpy_s(apm, "am");
+	while (i<strlen(cal)) {
+		if (cal[i] >= '0' && cal[i] <= '9') {
+			tm[k] = cal[i];
+			k++;
+		}
+		else if (cal[i] == 'a' || cal[i] == 'A' || cal[i] == 'p' || cal[i] == 'P'||
+            cal[i] == 'm' || cal[i] == 'M') {
+			apm[j] = cal[i];
+			j++;
+		}
+
+		if (j >= 2) {
+            break;
+        }
+		i++;
+	}
+
+	tmm = atoi(tm);
+	if (strcmp(apm, "pm") == 0){
+        MCLogger::log("inside am pm loop");
+		if (tmm>100) {
+            MCLogger::log("tmm = " + to_string(tmm));
+			tmm = tmm + 1200;
+            MCLogger::log("converted tmm = " + to_string(tmm));
+        }
+		else {
+            MCLogger::log("tmm = " + to_string(tmm));
+			tmm = tmm + 12;
+            MCLogger::log("converted tmm = " + to_string(tmm));
+        }
+	}
+	if (tmm<100) {
+        tmm = tmm * 100;
+    }
+
+	curEvent.time = tmm;
+
+	if (tmm>2400) {
+        throw InvalidInputException("Unrecognized time2. Please check the input.");
+    }
+
+    return curEvent;
+}
+
+CalEvent Interpreter::parseNext(std::string input, size_t posNext) {
+	char week[7][10] = { "sun", "mon", "tues", "wed", "thur", "fri", "sat" };
+	size_t i, k;
+	CalEvent curEvent;
+
+	curEvent.year = -1;
+	curEvent.month = -1;
+	curEvent.day = -1;
+	curEvent.wday = -1;
+	curEvent.time = 800;
+
+	//get time of "today"
+	struct tm  timeinfo = getToday();
+
+	const char *cal = input.c_str();
+
+    string cureve;
+	int posEvent = input.find(":", 0);
+	if (posEvent != -1) //if colon found, 
+		cureve.assign(cal, 0, posEvent); // 0 to first colon
+	else
+		cureve.assign(cal, 0, strlen(cal)); //not found. Just copy over entire string
+
+    i = posNext + 6;
+	k = 0;
+	char weekx[10]; 
+	strcpy_s(weekx, "\0");
+
+    while (i<strlen(cal)){
+		if (cal[i] >= 'A' && cal[i] <= 'Z' || cal[i] >= 'a' && cal[i] <= 'z') { 
+			weekx[k] = cal[i];
+			k++;
+		}
+		else if (cal[i] == ' ') { 
+			if (k != 0) break;
+		}
+		else {
+			break;
+		}
+		i++;
+	}
+	string strweek;
+	strweek.assign(weekx, 0, strlen(weekx)); 
+    std::transform(strweek.begin(), strweek.end(), strweek.begin(), ::tolower);
+    bool foundDay = false;
+	for (i = 0; i<7; i++){
+		if (strweek.find(week[i], 0) != -1) {
+            foundDay = true;
+            break;
+        }
+	}
+	if (foundDay == false) {
+        throw InvalidInputException("Unrecognized day. Please check your input.");
+    }
+
+	int yday, year, wday, nextwday;
+	year = timeinfo.tm_year + 1900;
+	yday = timeinfo.tm_yday + 1;
+	wday = timeinfo.tm_wday;
+	nextwday = 6 - wday + i + 1;
+	if (yday <= 365 - nextwday){
+		int pMonth, pDay;
+		Monthday(year, yday + nextwday, &pMonth, &pDay);
+		curEvent.year = year;
+		curEvent.month = pMonth;
+		curEvent.day = pDay;
+	}
+	else{
+		int pMonth, pDay;
+		Monthday(year + 1, yday + nextwday - 365, &pMonth, &pDay);
+		curEvent.year = year + 1;
+		curEvent.month = pMonth;
+		curEvent.day = pDay;
+	}
+
+    wDaySearch(curEvent.year, curEvent.month, curEvent.day, &curEvent.wday);
+    return curEvent;
+}
+
+CalEvent Interpreter::parseOn(std::string input, size_t posOn) {
+    size_t i, k;
+	CalEvent curEvent;
+
+	curEvent.year = -1;
+	curEvent.month = -1;
+	curEvent.day = -1;
+	curEvent.wday = -1;
+	curEvent.time = 800;
+
+	//get time of "today"
+	struct tm  timeinfo = getToday();
+
+	const char *cal = input.c_str();
+
+    string cureve;
+	int posEvent = input.find(":", 0);
+	if (posEvent != -1) //if colon found, 
+		cureve.assign(cal, 0, posEvent); // 0 to first colon
+	else
+		cureve.assign(cal, 0, strlen(cal)); //not found. Just copy over entire string
+
+    i = posOn + 4;
+	k = 0;
+	char dat[3][5];
+	int dmy[3];
+	int num = 0;
+
+	while (i<strlen(cal)) {
+		if (cal[i] >= '0' && cal[i] <= '9') {
+			dat[num][k] = cal[i];
+			k++;
+		}
+		else if (cal[i] == '/') {
+			k = 0;
+			num++;
+		}
+		else {
+			if (num != 2) {
+				i++;
+				continue;
+			}
+			else
+				break;
+		}
+		i++;
+	}
+	for (i = 0; i<3; i++)
+		dmy[i] = atoi(dat[i]);
+	curEvent.year = dmy[2];
+	curEvent.month = dmy[1];
+	curEvent.day = dmy[0];
+
+	if (curEvent.month>12 || curEvent.month <= 0 || curEvent.day>31 || curEvent.day <= 0) {
+        throw InvalidInputException("Unrecognized date. Please check your input.");
+    }
+
+    wDaySearch(curEvent.year, curEvent.month, curEvent.day, &curEvent.wday);
+    return curEvent;
+}
+
+CalEvent Interpreter::parseFrom(std::string input, size_t posFrom) {
+    return parseTime(input, posFrom, 6);
+}
+
+CalEvent Interpreter::parseAt(std::string input, size_t posAt) {
+    return parseTime(input, posAt, 4);
+}
+
+CalEvent Interpreter::parseTo(std::string input, size_t posTo){
+    return parseTime(input, posTo, 4);
+}
+
+CalEvent Interpreter::parseTomorrow() {
+	CalEvent curEvent;
+
+	curEvent.year = -1;
+	curEvent.month = -1;
+	curEvent.day = -1;
+	curEvent.wday = -1;
+	curEvent.time = 800;
+
+	//get time of "today"
+	struct tm  timeinfo = getToday();
+
+	int yday, year;
+	year = timeinfo.tm_year + 1900;
+	yday = timeinfo.tm_yday + 1;
+	if (yday == 365){
+		curEvent.year = year + 1;
+		curEvent.month = 1;
+		curEvent.day = 1;
+	}
+	else{
+		int pMonth, pDay;
+		Monthday(year, yday + 1, &pMonth, &pDay);
+		curEvent.year = year;
+		curEvent.month = pMonth;
+		curEvent.day = pDay;
+	}
+    wDaySearch(curEvent.year, curEvent.month, curEvent.day, &curEvent.wday);
+    return curEvent;
+}
+
+
+Task Interpreter::parseAddCmd(std::string detail) {
+    size_t posFirstOn = caseInsensitiveFind(detail, ":on");
+    size_t posSecondOn = caseInsensitiveFind(detail, ":on", posFirstOn);
+    size_t posFrom = caseInsensitiveFind(detail, ":from");
+    size_t posAt = caseInsensitiveFind(detail, ":at");
+    size_t posTo = caseInsensitiveFind(detail, ":to");
+    size_t posNext = caseInsensitiveFind(detail, ":next");
+	size_t posFirstTmr = caseInsensitiveFind(detail, ":tmr"); 
+    if (posFirstTmr == string::npos) {
+        posFirstTmr = caseInsensitiveFind(detail, ":tom"); 
+    }
+	size_t posSecondTmr = caseInsensitiveFind(detail, ":tomorrow", posFirstTmr);// will posFirstTmr == npos work as 0 index too?
+
+
+    if (posFrom != std::string::npos && posAt != std::string::npos) {
+	    throw InvalidInputException("Invalid input. You are trying to enter more than one begin timing for your event!");
+    }
+
+    // is floating task
+    if (isFloatingTask(detail)) {
+        MCLogger::log("interpreter is floating task cond");
+        Task floating;
+        floating.setFloating();
+        floating.setTaskBegin(0);
+        floating.setTaskEnd(0);
+        floating.setTaskName(parseTaskName(detail));
+        return floating;
+    }
+
+    struct tm today = getToday();
+    
+    CalEvent begin;
+    // has a user-specified date for begin of task
+    if (posFirstOn != std::string::npos) {
+        MCLogger::log("interpreter pos first on");
+        begin = parseOn(detail, posFirstOn);
+    } else if (posFirstTmr != std::string::npos) {
+        // begin date is tomorrow
+        begin = parseTomorrow();
+    } else {
+        // set default date to today
+        begin.year = today.tm_year + 1900;
+        begin.month = today.tm_mon + 1;
+        begin.day = today.tm_mday;
+    }
+    
+    CalEvent end;
+    // has a user-specified date for end of task
+    if (posSecondOn != std::string::npos) {
+        end = parseOn(detail, posSecondOn);
+    } else if (posSecondTmr != std::string::npos) {
+        // end date is tomorrow
+        end = parseTomorrow();
+    } else {
+        // set default date to today
+        end.year = today.tm_year + 1900;
+        end.month = today.tm_mon + 1;
+        end.day = today.tm_mday;
+    }
+
+    // task has no specified time
+    if (isWithoutTimeTask(posAt, posFrom, posTo)) {
+        Task withoutTime;
+        withoutTime.setTaskWithoutTime();
+        withoutTime.setTaskName(parseTaskName(detail));
+        time_t startDate, endDate;
+        tmConvert(begin, &startDate);
+        tmConvert(end, &endDate);
+        withoutTime.setTaskBegin(startDate);
+        withoutTime.setTaskEnd(endDate);
+
+        return withoutTime;
+    }
+
+    // has a user-specified time for begin of task
+    if (posFrom != std::string::npos) {
+        begin.time = parseFrom(detail, posFrom).time;
+    } else if (posAt != std::string::npos) {
+        begin.time = parseAt(detail, posAt).time;
+    } else {
+        begin.time = 900;
+    }
+
+    // has a user-specified time for end of task
+    if (posTo != std::string::npos) {
+        end.time = parseTo(detail, posTo).time;
+    } else {
+        end.time = begin.time + 100;
+        MCLogger::log("end time set to " + to_string(end.time));
+    }
+
+    // normal task with specified date and time
+	Task normal;
 	if (AddAlias::isHelp(detail)){
 		int TaskId = -1;
-		a.setTaskID (TaskId);
-	}
-	else{
-	int flag;
+		normal.setTaskID (TaskId);
+        return normal;
+	} 
 
-	CalEvent EventOut;
+	time_t startTime, endTime;
+    tmConvert(begin, &startTime);
+    tmConvert(end, &endTime);
 
-	string event;
-	const char *cal = input.c_str();
-	event.assign(cal, 4, strlen(cal) - 4);
-	flag = parse(event, &EventOut);
-	if (flag <= -1){
-		throw InvalidInputException("Unrecognized time or date. Please check the input.");
-	}
-	
-	time_t starttime, endtime;
-	if (EventOut.year!=-1)
-		tmConvert(EventOut, &starttime, &endtime);
-	else{
-		starttime = 0;
-		endtime = 0;
-	}
-	a.setTaskBegin(starttime);
-	a.setTaskEnd(endtime);
-	a.setTaskName(EventOut.event);
-	}
-	return a;
+	normal.setTaskBegin(startTime);
+	normal.setTaskEnd(endTime);
+	normal.setTaskName(parseTaskName(detail));	
+	return normal;
 }
 
 Task Interpreter::parseEditCmd(std::string input) {
 	Task a;
-	CalEvent EventOut;
+	/*CalEvent EventOut;
 
 	a.setTaskBegin(0);
 	a.setTaskEnd(0);
@@ -109,7 +521,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 	int num = 0;
 	for (it = list.begin(); it != list.end(); ++it) {
 		num++;
-		if (/*it->getTaskID()*/num == recID){
+		if (num == recID){
 			findF = 1;
 			break;
 		}
@@ -177,7 +589,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 		a = *it;
 	}
 
-	storage->updateStorage(tasklist);
+	storage->updateStorage(tasklist);*/
 
 	return a;
 }
@@ -259,10 +671,8 @@ Interpreter::~Interpreter(void) {
 }
 
 
-
-
 int Interpreter::parse(string event, CalEvent *calEventOut) {
-	char week[7][10] = { "sun", "mon", "tues", "wed", "thur", "fri", "sat" };
+	/*char week[7][10] = { "sun", "mon", "tues", "wed", "thur", "fri", "sat" };
 	int posOn, posAt, posTmr1, posTmr2, posNext, posFrom, posEvent;
 	int i, j, k;
 	CalEvent curEvent;
@@ -272,7 +682,6 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	curEvent.day = -1;
 	curEvent.wday = -1;
 	curEvent.time = 800;
-	curEvent.endtime = 1000;
 	curEvent.event = "\0";
 
 	//get time of "today"
@@ -284,11 +693,11 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 
 	string cureve;
 	posEvent = event.find(":", 0);
-	if (posEvent != -1)
-		cureve.assign(cal, 0, posEvent);
+	if (posEvent != -1) //if colon found, 
+		cureve.assign(cal, 0, posEvent); // 0 to first colon
 	else
-		cureve.assign(cal, 0, strlen(cal));
-	const char *cheve = cureve.c_str();
+		cureve.assign(cal, 0, strlen(cal)); //not found. Just copy over entire string
+	//const char *cheve = cureve.c_str();
 	curEvent.event = cureve;    
 
 	//deal with "next" in a command
@@ -346,7 +755,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 			curEvent.day = pDay;
 		}
 	}
-
+    
 	//deal with "from" in a command
 	posFrom = caseInsensitiveFind(event, ":from");
 	if (posFrom != -1){
@@ -501,30 +910,26 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 			curEvent.month = pMonth;
 			curEvent.day = pDay;
 		}
-	}
+	}*/
 
-	wDaySearch(curEvent.year, curEvent.month, curEvent.day, &curEvent.wday);
-	*calEventOut = curEvent;
+	//wDaySearch(curEvent.year, curEvent.month, curEvent.day, &curEvent.wday);
+	//*calEventOut = curEvent;
 	return 1;
 }
 
-void Interpreter::tmConvert(CalEvent Event, time_t *starttime, time_t *endtime)
-{
+void Interpreter::tmConvert(CalEvent Event, time_t *eventTime) {
 
-	int year, mon, day, yday, tim1, tim2;
+	int year, mon, day, yday, tim1;
 
 	year = Event.year;
 	mon = Event.month;
 	day = Event.day;
 	tim1 = Event.time;
-	tim2 = Event.endtime;
 	yday = 0;
 	for (int i = 1; i < Event.month; i++)
 		yday = yday + month_days(year, i);
 	yday = yday + day;
-	*starttime = (year - 1970) * 365 * 24 * 3600 + yday * 24 * 3600 + (tim1 / 100) * 3600 + (tim1 % 100) * 60 + 232 * 3600;
-	if (tim2 == -1) *endtime = *starttime;
-	else *endtime = (year - 1970) * 365 * 24 * 3600 + yday * 24 * 3600 + (tim2 / 100) * 3600 + (tim2 % 100) * 60 + 232 * 3600;
+	*eventTime = (year - 1970) * 365 * 24 * 3600 + yday * 24 * 3600 + (tim1 / 100) * 3600 + (tim1 % 100) * 60 + 232 * 3600;
 }
 
 int Interpreter::IsLeapYear(int year)
@@ -556,66 +961,6 @@ void Interpreter::wDaySearch(int year, int month, int day, int *wday)
 	s = year - 1 + (float)(year - 1) / 4 + (float)(year - 1) / 100 + (float)(year - 1) / 400 - 40 + c;
 	*wday = (int)s % 7;
 }
-
-
-void Interpreter::Monthday(int year, int yearDay, int *pMonth, int *pDay)
-//input: year,yearDay: year & nth day in a year
-//output: pMonth,pDay: month day
-{
-	int dec;
-	if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))  dec = 0;
-	else dec = 1;
-	if (yearDay >= 1 && yearDay <= 31) 	{
-		*pMonth = 1;
-		*pDay = yearDay;
-	}
-	else if (yearDay >= 32 && yearDay <= 60 - dec) {
-		*pMonth = 2;
-		*pDay = yearDay - 31;
-	}
-	else if (yearDay >= 61 - dec && yearDay <= 91 - dec){
-		*pMonth = 3;
-		*pDay = yearDay - (60 - dec);
-	}
-	else if (yearDay >= 92 - dec && yearDay <= 121 - dec){
-		*pMonth = 4;
-		*pDay = yearDay - (91 - dec);
-	}
-	else if (yearDay >= 122 - dec && yearDay <= 152 - dec){
-		*pMonth = 5;
-		*pDay = yearDay - (121 - dec);
-	}
-	else if (yearDay >= 153 - dec && yearDay <= 182 - dec){
-		*pMonth = 6;
-		*pDay = yearDay - (152 - dec);
-	}
-	else if (yearDay >= 183 - dec && yearDay <= 212 - dec){
-		*pMonth = 7;
-		*pDay = yearDay - (182 - dec);
-	}
-	else if (yearDay >= 214 - dec && yearDay <= 244 - dec){
-		*pMonth = 8;
-		*pDay = yearDay - (213 - dec);
-	}
-	else if (yearDay >= 245 - dec && yearDay <= 274 - dec){
-		*pMonth = 9;
-		*pDay = yearDay - (244 - dec);
-	}
-	else if (yearDay >= 275 - dec && yearDay <= 305 - dec){
-		*pMonth = 10;
-		*pDay = yearDay - (274 - dec);
-	}
-	else if (yearDay >= 306 - dec && yearDay <= 335 - dec){
-		*pMonth = 11;
-		*pDay = yearDay - (305 - dec);
-	}
-	else if (yearDay >= 336 - dec && yearDay <= 366 - dec) {
-		*pMonth = 12;
-		*pDay = yearDay - (335 - dec);
-	}
-
-}
-
 
 Task Interpreter::prepareTask(std::string input) {
     //std::string taskToDel = input.substr(lengthCommand);

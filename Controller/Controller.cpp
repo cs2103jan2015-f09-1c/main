@@ -55,7 +55,7 @@ UIObject Controller::handleInput(std::string input) {
         case CommandType::ADD: {
             MCLogger::log("Controller.cpp: begin add command");
             try {
-                Task task = Interpreter::parseAddCmd(input);
+                Task task = Interpreter::parseAddCmd(filteredCmd);
                 AddCmd addCmdObj;
                 addCmdObj.prepareTask(task);
                 return addCmdObj.execute();

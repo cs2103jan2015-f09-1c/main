@@ -33,10 +33,10 @@ namespace MyCalTestSuite {
 		}
 
 		TEST_METHOD(TestParseAddCmd) {
-			std::string floatingInput = "add CS2103 tutorial";
+			std::string floatingInput = "CS2103 tutorial";
             Task floatingTask = Interpreter::parseAddCmd(floatingInput);
             Assert::AreEqual(std::string("CS2103 tutorial"), floatingTask.getTaskName());
-            //Assert::IsTrue(floatingTask.isFloating()); //This fails. If floating task, set default start time = 0
+            Assert::IsTrue(floatingTask.isFloating()); //This fails. If floating task, set default start time = 0
             
             //task2 gettaskbegin fails. User inputs 10 mar 2016, should get
             //10/03/16 12:31 PM. We get 13/03/15 12:31 AM instead.
