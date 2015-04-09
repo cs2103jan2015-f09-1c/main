@@ -3,14 +3,17 @@
 #include <sstream> 
 #include <iomanip> // put_time
 
-Task::Task(void): _taskID(0), _isDone(false), _isFloating(true),
-    _taskBegin(0), _taskEnd(0) {
-
+Task::Task(void):   _taskID(0), 
+                    _isDone(false), 
+                    _isFloating(true),
+                    _isWithoutTime(false),
+                    _taskBegin(0),
+                    _taskEnd(0) {
 }
-
 
 Task::~Task(void) {
 }
+
 void Task::setTaskName(std::string name) {
     _taskName = name;
 }
@@ -33,18 +36,16 @@ bool Task::isFloating() const {
     return _isFloating;
 }
 
-bool Task::taskWithoutTime() const{
+bool Task::isTaskWithoutTime() const{
 	return _isWithoutTime;
 }
 
-void Task::checkTaskWithoutTime() {
-	struct tm * timeinfo;
-	timeinfo = localtime (&_taskBegin);
-	if(timeinfo->tm_hour == 1){
-		_isWithoutTime = true;
-	}else {
-		_isWithoutTime = false;
-	}
+void Task::setTaskWithoutTime() {
+    _isWithoutTime = true;
+}
+
+void Task::setTaskWithTime() {
+    _isWithoutTime = false;
 }
 
 std::string Task::getDateStr() const {
