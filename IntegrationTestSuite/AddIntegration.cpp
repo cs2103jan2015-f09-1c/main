@@ -10,7 +10,7 @@ namespace IntegrationTestSuite {
 			MockStorage::initMockStorage(TaskStub::getSmallTaskList());
 
 			UIObject output = Controller::handleInput("add I am a floating task");
-			Assert::AreEqual(std::string("Task added."), output.getHeaderText());
+			Assert::AreEqual(std::string("Task added"), output.getHeaderText());
 
 			TaskList taskList;
 			taskList.loadTaskList(output.getTaskList());

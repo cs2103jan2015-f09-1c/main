@@ -9,7 +9,7 @@
 #include "MCLogger.h"
 
 const std::string AddCmd::ADD_MESSAGE = "Task added" ;
-const std::string AddCmd::UNDO_MESSAGE = "Task removed from storage:";
+const std::string AddCmd::UNDO_MESSAGE = "Task removed from storage.";
 AddCmd::AddCmd(void) {
 }
 

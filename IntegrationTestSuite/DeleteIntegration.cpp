@@ -9,9 +9,9 @@ namespace IntegrationTestSuite {
 		TEST_METHOD(DeleteByName) {
 			MockStorage::initMockStorage(TaskStub::getLargeTaskList());
 
-			UIObject controllerOutput = Controller::handleInput("delete dummy T5");
+			UIObject controllerOutput = Controller::handleInput("delete T5");
 
-			Assert::AreEqual(std::string("Remaining tasks for that day:"), controllerOutput.getHeaderText());
+			Assert::AreEqual(std::string("Task deleted successfully. Remaining tasks for that day:"), controllerOutput.getHeaderText());
 
 			TaskList::TList list = controllerOutput.getTaskList();
 			TaskList taskList;
@@ -27,7 +27,7 @@ namespace IntegrationTestSuite {
 			Controller::handleInput("delete dummy T5");
 			UIObject controllerOutput = Controller::handleInput("delete dummy T4");
 			
-			Assert::AreEqual(std::string("No more tasks for that day!"), controllerOutput.getHeaderText());
+			Assert::AreEqual(std::string("Task deleted successfully. No more tasks for that day!"), controllerOutput.getHeaderText());
 
 			TaskList::TList list = controllerOutput.getTaskList();
 			Assert::IsTrue(list.empty());
@@ -43,7 +43,7 @@ namespace IntegrationTestSuite {
 
 			UIObject del2Output = Controller::handleInput("delete 2");
 
-			std::string expectedHeader = "Remaining tasks for that day:";
+			std::string expectedHeader = "Task deleted successfully. Remaining tasks for that day:";
 			Assert::AreEqual(expectedHeader, del2Output.getHeaderText());
 
 			TaskList::TList list = del2Output.getTaskList();
@@ -63,7 +63,7 @@ namespace IntegrationTestSuite {
 			Controller::handleInput("delete dummy T4");
 			UIObject undoOutput = Controller::handleInput("undo");
 
-			Assert::AreEqual(std::string("Undo successfully."), undoOutput.getHeaderText());
+			Assert::AreEqual(std::string("Task added back to storage."), undoOutput.getHeaderText());
 
 			MockStorage::cleanMockStorage();
 		}
