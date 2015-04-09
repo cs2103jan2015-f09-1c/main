@@ -2,6 +2,7 @@
 #include "Storage.h"
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 #include "MappingNumber.h"
 #include "StorageAlias.h"
 #include "DoneAlias.h"
@@ -15,7 +16,10 @@ const size_t Interpreter::NUM_CHARS_DONE = 4;
 const size_t Interpreter::NUM_CHARS_DELETE = 6;
 
 bool Interpreter::search(std::string keyword, Task task) {
+    std::transform(keyword.begin(), keyword.end(), keyword.begin(), ::tolower);
 	std::string line = task.getTaskName();
+    std::transform(line.begin(), line.end(), line.begin(), ::tolower);
+
 	if (line.find(keyword) != std::string::npos){
 		return true;
 	} else {
