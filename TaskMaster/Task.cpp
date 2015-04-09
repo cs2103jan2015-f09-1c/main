@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "Task.h"
 #include <sstream> 
 #include <iomanip> // put_time
@@ -30,6 +31,20 @@ void Task::setNotFloating() {
 
 bool Task::isFloating() const {
     return _isFloating;
+}
+
+bool Task::taskWithoutTime() const{
+	return _isWithoutTime;
+}
+
+void Task::setTaskWithoutTime() {
+	struct tm * timeinfo;
+	timeinfo = localtime (&_taskBegin);
+	if(timeinfo->tm_hour == 1){
+		_isWithoutTime = true;
+	}else {
+		_isWithoutTime = false;
+	}
 }
 
 std::string Task::getDateStr() const {
@@ -110,5 +125,16 @@ std::string Task::toString() const {
     oss << "done: " << isDone() << " ";
 	oss << "float: " << isFloating();
 
+    return oss.str();
+}
+
+std::string Task::toStringWithoutDate() const {
+    std::ostringstream oss;
+    oss << getTaskID() << " ";
+    oss << getTaskName() << std::endl;
+    oss << getBeginStr() << " - ";
+    oss << getEndStr() << std::endl;
+    oss << "done: " << isDone() << " ";
+	oss << "float: " << isFloating();
     return oss.str();
 }

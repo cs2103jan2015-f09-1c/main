@@ -15,7 +15,9 @@ public:
 	// Nevertheless, the use of setFloating() method provides a clearer way to set a Task as floating.
 	void setFloating();
 	void setNotFloating();
+    void setTaskWithoutTime();
     bool isFloating() const; 
+	bool taskWithoutTime() const;
 
     std::string getDateStr() const;
     std::string getBeginStr() const;
@@ -35,6 +37,7 @@ public:
     void setTaskID(unsigned id);
 
     std::string toString() const;
+	std::string toStringWithoutDate() const; // for testing purpose
 
 private:
     unsigned _taskID;
@@ -43,5 +46,6 @@ private:
     time_t _taskEnd;
     bool _isFloating;
     bool _isDone;
+	bool _isWithoutTime;
 };
 

@@ -123,6 +123,17 @@ std::string TaskList::toString() const {
     return oss.str();
 }
 
+//For testing purpose
+std::string TaskList::toStringWithoutDate() const {
+      std::ostringstream oss;
+    constTaskIt it;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        oss << it->toStringWithoutDate() << std::endl;
+    }
+
+    return oss.str();
+}
+
 bool TaskList::isSameDay(time_t time1, time_t time2) const {
     tm tmstruct1;
     localtime_s(&tmstruct1, &time1);
