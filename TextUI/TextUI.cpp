@@ -62,7 +62,7 @@ std::string TextUI::DEFAULT_DATE_BAR =
 	"[%1%, %2% %3% %4%] %|25t| Description";
 std:: string TextUI:: TIME_PRINT=
 	"%1%. %2% %|26t|";
-//std:: string TextUI:: DONE_PRINT= "\t \t \t \t (done)";
+std:: string TextUI:: DONE_PRINT= " (done)";
 
 struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
     struct tm tmStruct;
@@ -137,82 +137,35 @@ std::string TextUI::getQualifierName(const time_t &taskDate) {
     struct tm * nowTime;
     nowTime = localtime (&currentTime);
 
-	if(localTime.tm_year == nowTime->tm_year)	//if the year is same
-	{
-		if (localTime.tm_yday == nowTime->tm_yday)
-		{
+	if(localTime.tm_year == nowTime->tm_year) { //if the year is same
+		if (localTime.tm_yday == nowTime->tm_yday){
 			return "Today";
-		}
-		else if(localTime.tm_yday == nowTime->tm_yday -1)
-		{
+		}else 
+		if(localTime.tm_yday == nowTime->tm_yday -1){
 			return "Yesterday";
 		}
-		else if(localTime.tm_yday == nowTime->tm_yday +1)
-		{
+		else 
+		if(localTime.tm_yday == nowTime->tm_yday +1){
 			return "Tomorrow";
 		}
-	}
-	else //if year is different
-	{
+	}//if year is different
+	else {
 		//to check if yesterday, check whether localTime's is 31 Dec and nowTime is 1 Jan and localTime's year is nowTime's year - 1
 		if(localTime.tm_year == nowTime->tm_year - 1 
 			&& localTime.tm_mday == 31 && localTime.tm_mon == 11 
-			&&  nowTime->tm_mday == 1 && nowTime->tm_mon == 0)
-		{
+			&&  nowTime->tm_mday == 1 && nowTime->tm_mon == 0) {
 			return "Yesterday";
 		}
 
-		
 		//to check if tomorrow, check whether localTime's is 1 Jan and nowTime is 31 Dec and localTime's year is nowTime's year + 1
 		if(localTime.tm_year == nowTime->tm_year + 1 
 			&& localTime.tm_mday == 1 && localTime.tm_mon == 0 
-			&&  nowTime->tm_mday == 31 && nowTime->tm_mon == 11)
-		{
+			&&  nowTime->tm_mday == 31 && nowTime->tm_mon == 11) {
 			return "Tomorrow";
 		}
 	}
 	return "";
 }
-
-/*
-std::string TextUI::getTimeName(const time_t &taskDate) {
-    struct tm localTime = convertToLocalTime(taskDate);
-	std::string timeString = "";
-	std::string amPm = "";
-	if(localTime.tm_hour >= 12)
-	{
-		if(localTime.tm_hour == 12)
-		{
-			timeString =  std::to_string(localTime.tm_hour);
-			amPm = "pm";
-		}
-		else
-		{
-			timeString =  std::to_string(localTime.tm_hour-12);
-			amPm = "pm";
-		}
-	}
-	else
-	{
-		if(localTime.tm_hour == 0)
-		{
-			timeString =  "12";
-			amPm = "am";
-		}
-		else
-		{
-			timeString =  std::to_string(localTime.tm_hour);
-			amPm = "am";
-		}
-	}
-	if(localTime.tm_min > 0)
-	{
-		timeString = timeString + ":" + std::to_string(localTime.tm_min);
-	}
-	timeString = timeString + amPm;
-	return timeString;
-}
-*/
 
 void TextUI::printDateBar(const time_t &taskDate) {
   
@@ -251,46 +204,37 @@ void TextUI::printTasks(TaskList::TList tasks) {
 	for (it = tasks.begin(); it != tasks.end(); ++it){
 	
 		std::string nowDate = "";
-		if(it->isFloating())
-		{
+		if(it->isFloating()){
 			nowDate = "0";
-		}
-		else
-		{
+		}else {
 			nowDate = it->getDateStr();
 		}
 
 		//if different date then print date bar
-		if(lastDate != nowDate)
-		{
+		if(lastDate != nowDate){
 			std::cout << std::endl;
 			printDateBar(it->getTaskBegin());
 		}
-		lastDate = nowDate;
 
+		lastDate = nowDate;
 		std::string timeStart = "";
 		
-		if(!isUnscheduled(it->getTaskBegin()))
-		{
+		if(!isUnscheduled(it->getTaskBegin())){
 			timeStart =  it->getBeginStr();
 		}
 		
 		std::string timeEnd = "";
-		if(!isUnscheduled(it->getTaskEnd() ))
-		{
+		if(!isUnscheduled(it->getTaskEnd())){
 			timeEnd = it->getEndStr();
 		}
+
 		std::string timePrint = "";
-		if(timeStart == "" && timeEnd == "")
-		{
+		if(it->taskWithoutTime()){
 			timePrint = "-------------------";
 		}
-		else if(timeEnd == "")
-		{
+		else if(timeEnd == ""){
 			timePrint = timeStart;
-		}
-		else
-		{
+		}else {
 			timePrint = timeStart+" - "+timeEnd;
 		}
 
@@ -299,6 +243,7 @@ void TextUI::printTasks(TaskList::TList tasks) {
 			Color:: TextColor (8, 0 ,hStdOut);
 			std::cout << format(TIME_PRINT) %counter %timePrint;
 			std::cout << it->getTaskName();
+			std::cout << DONE_PRINT;
 		} else {
 			hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
 			Color:: TextColor (15, 0 ,hStdOut);
