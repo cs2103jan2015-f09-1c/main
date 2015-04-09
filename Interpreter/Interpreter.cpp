@@ -10,6 +10,8 @@
 #include "SearchAlias.h"
 #include "AddAlias.h"
 #include "CommandType.h"
+#include "TaskNotFoundException.h"
+#include "InvalidInputException.h"
 
 using namespace std; 
 const size_t Interpreter::NUM_CHARS_DONE = 4;
@@ -45,11 +47,7 @@ Task Interpreter::parseAddCmd(std::string input) {
 	event.assign(cal, 4, strlen(cal) - 4);
 	flag = parse(event, &EventOut);
 	if (flag <= -1){
-		std::cout << "input error,please check the input" << std::endl;
-		a.setTaskBegin(0);
-		a.setTaskEnd(0);
-		a.setTaskName("");
-		return a;
+		throw InvalidInputException("Unrecognized time or date. Please check the input.");
 	}
 	
 	time_t starttime, endtime;
@@ -92,8 +90,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 
 	int recID = atoi(recch);
 	if (recID <= 0) {
-		cout << "edit record error, please check" << endl;
-		return a;
+		throw InvalidInputException("Invalid input, please check again");
 	}
 
 	//search for task
@@ -111,8 +108,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 		}
 	}
 	if (findF == 0)	{
-		cout << "can't find the record" << endl;
-		return a;
+        throw TaskNotFoundException("Can't find the record!");
 	}
 	char tempEvent[LENGTH];
 	string curStr;
@@ -258,9 +254,8 @@ Interpreter::~Interpreter(void) {
 
 
 
-int Interpreter::parse(string event, CalEvent *calEventOut)
-{
-	char week[7][10] = { "Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat" };
+int Interpreter::parse(string event, CalEvent *calEventOut) {
+	char week[7][10] = { "sun", "mon", "tues", "wed", "thur", "fri", "sat" };
 	int posOn, posAt, posTmr1, posTmr2, posNext, posFrom, posEvent;
 	int i, j, k;
 	CalEvent curEvent;
@@ -294,14 +289,15 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 	if (posNext != -1){
 		i = posNext + 6;
 		k = 0;
-		char weekx[10];
+		char weekx[10]; // extracted word
 		strcpy_s(weekx, "\0");
-		while (i<strlen(cal)){
-			if (cal[i] >= 'A' && cal[i] <= 'Z' || cal[i] >= 'a' && cal[i] <= 'z') {
+        //Extracting 
+		while (i<strlen(cal)){ // loop through all letters
+			if (cal[i] >= 'A' && cal[i] <= 'Z' || cal[i] >= 'a' && cal[i] <= 'z') { // is alpha
 				weekx[k] = cal[i];
 				k++;
 			}
-			else if (cal[i] == ' ') {
+			else if (cal[i] == ' ') { // end of word
 				if (k != 0) break;
 			}
 			else {
@@ -310,7 +306,8 @@ int Interpreter::parse(string event, CalEvent *calEventOut)
 			i++;
 		}
 		string strweek;
-		strweek.assign(weekx, 0, strlen(weekx));
+		strweek.assign(weekx, 0, strlen(weekx)); // copy from 0 to strlen
+        std::transform(strweek.begin(), strweek.end(), strweek.begin(), ::tolower);
 		for (i = 0; i<7; i++){
 			if (strweek.find(week[i], 0) != -1) break;
 		}

@@ -171,9 +171,8 @@ void TextUI::printDateBar(const time_t &taskDate) {
   
     if (isUnscheduled(taskDate)) {
 	    std::cout << UNSCHEDULED_DATE_BAR << std::endl << std::endl;
+	}else {
 
-    } else {
-		
 		std::string qualifier = getQualifierName(taskDate);
 	    std::string wkdayName = getWkDayName(taskDate);
 	    std::string monthName = getMonthName(taskDate);
@@ -187,7 +186,7 @@ void TextUI::printDateBar(const time_t &taskDate) {
 
 		if(qualifier == ""){
 			std::cout << format(DEFAULT_DATE_BAR) % wkdayName % monthName % day %year;
-		}else{
+		}else {
 			std::cout << format(QUALIFIER_DATE_BAR) % qualifier % wkdayName % monthName % day %year;
 		}
 

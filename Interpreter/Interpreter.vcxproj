@@ -71,9 +71,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Interpreter.h" />
+    <ClInclude Include="InvalidInputException.h" />
+    <ClInclude Include="TaskNotFoundException.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Interpreter.cpp" />
+    <ClCompile Include="InvalidInputException.cpp" />
+    <ClCompile Include="TaskNotFoundException.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
