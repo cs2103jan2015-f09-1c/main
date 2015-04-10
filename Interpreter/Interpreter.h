@@ -22,8 +22,14 @@ private:
 	static const size_t NUM_CHARS_VIEW;
 	static const size_t NUM_CHARS_DONE;
 	static const size_t NUM_CHARS_DELETE;
-
-	static bool search(std::string keyword, Task task);
+    
+    // searchs "input" for first occurence of the sequence "pattern"
+    // When pos is specified, the search only includes characters at or after position pos, 
+    // ignoring any possible occurrences that include characters before pos.
+    // This search is case insensitive and returns position of the first character of the first match.
+    static size_t caseInsensitiveFind(std::string input, std::string pattern, size_t pos = 0);
+    // returns true if the substring is found
+	static bool searchSubStr(std::string keyword, Task task);
 	static int parse(std::string event, CalEvent *calEventOut);
 	static int IsLeapYear(int year); //return = 1 means leap year
 	static int month_days(int year, int month); //return number of days in a particular month
@@ -36,7 +42,7 @@ private:
 	static int ConvertStrtoNum (std::string str);
 
 public:    
-    static Task parseAddCmd(std::string input);
+    static Task parseAddCmd(std::string detail);
     static Task parseEditCmd(std::string input);
     static std::string parseStoreCmd(std::string input);
     static int parseDelCmd(std::string input);

@@ -10,6 +10,7 @@
 #include "SearchAlias.h"
 #include "AddAlias.h"
 #include "CommandType.h"
+#include "MCLogger.h"
 #include "TaskNotFoundException.h"
 #include "InvalidInputException.h"
 
@@ -17,7 +18,13 @@ using namespace std;
 const size_t Interpreter::NUM_CHARS_DONE = 4;
 const size_t Interpreter::NUM_CHARS_DELETE = 6;
 
-bool Interpreter::search(std::string keyword, Task task) {
+size_t Interpreter::caseInsensitiveFind(std::string input, std::string pattern, size_t pos) {
+    std::transform(input.begin(), input.end(), input.begin(), ::tolower);
+    std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
+    return input.find(pattern, pos);
+}
+
+bool Interpreter::searchSubStr(std::string keyword, Task task) {
     std::transform(keyword.begin(), keyword.end(), keyword.begin(), ::tolower);
 	std::string line = task.getTaskName();
     std::transform(line.begin(), line.end(), line.begin(), ::tolower);
@@ -29,8 +36,7 @@ bool Interpreter::search(std::string keyword, Task task) {
 	}
 }
 
-Task Interpreter::parseAddCmd(std::string input) {
-	std::string detail = CommandType::filterOutCmd(input);
+Task Interpreter::parseAddCmd(std::string detail) {
 	Task a;
 
 	if (AddAlias::isHelp(detail)){
@@ -43,8 +49,8 @@ Task Interpreter::parseAddCmd(std::string input) {
 	CalEvent EventOut;
 
 	string event;
-	const char *cal = input.c_str();
-	event.assign(cal, 4, strlen(cal) - 4);
+	const char *cal = detail.c_str();
+	event.assign(cal);
 	flag = parse(event, &EventOut);
 	if (flag <= -1){
 		throw InvalidInputException("Unrecognized time or date. Please check the input.");
@@ -77,8 +83,8 @@ Task Interpreter::parseEditCmd(std::string input) {
 
 	const char *cal = input.c_str();
 
-	int i = 5;
-	int k = 0;
+	size_t i = 5;
+	size_t k = 0;
 	char recch[4];
 	while (i < strlen(cal)) {
 		if (cal[i] >= '0' && cal[i] <= '9') {
@@ -232,7 +238,7 @@ TaskList::TList Interpreter::parseSearchCmd (std::string input){
 	else{
 	for (it = list.begin(); it != list.end(); ++it) {
 		Task _task = *it;
-		if (search(input, _task)) {
+		if (searchSubStr(input, _task)) {
 			foundTaskList.push_back(_task);
 		}
 	}
@@ -257,7 +263,7 @@ Interpreter::~Interpreter(void) {
 int Interpreter::parse(string event, CalEvent *calEventOut) {
 	char week[7][10] = { "sun", "mon", "tues", "wed", "thur", "fri", "sat" };
 	int posOn, posAt, posTmr1, posTmr2, posNext, posFrom, posEvent;
-	int i, j, k;
+	size_t i, j, k;
 	CalEvent curEvent;
 
 	curEvent.year = -1;
@@ -285,19 +291,19 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	curEvent.event = cureve;    
 
 	//deal with "next" in a command
-	posNext = event.find(":next", 0);
+	posNext = caseInsensitiveFind(event, ":next");
 	if (posNext != -1){
 		i = posNext + 6;
 		k = 0;
-		char weekx[10]; // extracted word
+		char weekx[10]; 
 		strcpy_s(weekx, "\0");
-        //Extracting 
-		while (i<strlen(cal)){ // loop through all letters
-			if (cal[i] >= 'A' && cal[i] <= 'Z' || cal[i] >= 'a' && cal[i] <= 'z') { // is alpha
+
+        while (i<strlen(cal)){
+			if (cal[i] >= 'A' && cal[i] <= 'Z' || cal[i] >= 'a' && cal[i] <= 'z') { 
 				weekx[k] = cal[i];
 				k++;
 			}
-			else if (cal[i] == ' ') { // end of word
+			else if (cal[i] == ' ') { 
 				if (k != 0) break;
 			}
 			else {
@@ -306,13 +312,18 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 			i++;
 		}
 		string strweek;
-		strweek.assign(weekx, 0, strlen(weekx)); // copy from 0 to strlen
+		strweek.assign(weekx, 0, strlen(weekx)); 
         std::transform(strweek.begin(), strweek.end(), strweek.begin(), ::tolower);
+        bool foundDay = false;
 		for (i = 0; i<7; i++){
-			if (strweek.find(week[i], 0) != -1) break;
+			if (strweek.find(week[i], 0) != -1) {
+                foundDay = true;
+                break;
+            }
 		}
-		if (i == 7)
-			return -1;
+		if (foundDay == false) {
+            throw InvalidInputException("Unrecognized day. Please check your input.");
+        }
 
 		int yday, year, wday, nextwday;
 		year = timeinfo.tm_year + 1900;
@@ -336,7 +347,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	}
 
 	//deal with "from" in a command
-	posFrom = event.find(":from", 0);
+	posFrom = caseInsensitiveFind(event, ":from");
 	if (posFrom != -1){
 		i = posFrom + 6;
 		k = 0;
@@ -347,32 +358,37 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		strcpy_s(apm[0], "am");
 		strcpy_s(apm[1], "am");
 		while (i<strlen(cal)) {
+            //cal[i] gives ASCII code 
+
 			if (cal[i] >= '0' && cal[i] <= '9') {
 				tmch[num][k] = cal[i];
 				k++;
 			}
-			else if (cal[i] == 'a' || cal[i] == 'p' || cal[i] == 'm') {
+			else if (cal[i] == 'a' || cal[i] == 'A' || cal[i] == 'p' || cal[i] == 'P'||
+                cal[i] == 'm' || cal[i] == 'M') {
 				apm[num][j] = cal[i];
 				j++;
 			}
-			else if (cal[i] == 't' || cal[i] == '-') {
+			else if (cal[i] == 't' || cal[i] == 'T' || cal[i] == '-') { // check :to
 				k = 0;
 				j = 0;
 				tim[num] = atoi(tmch[num]);
 				num++;
 			}
-			else;
 			i++;
 		}
 		tim[num] = atoi(tmch[num]);
 		for (int ii = 0; ii<2; ii++) {
-			if (strcmp(apm[ii], "pm") == 0){
-				if (tim[ii]>100)
+			if (strcmp(apm[ii], "pm") == 0){  
+				if (tim[ii]>100) {
 					tim[ii] = tim[ii] + 1200;
-				else
-					tim[ii] = tim[ii] + 12;
+                } else {
+                    tim[ii] = tim[ii] + 12;
+                }
 			}
-			if (tim[ii]<100) tim[ii] = tim[ii] * 100;
+			if (tim[ii]<100) {
+                tim[ii] = tim[ii] * 100;
+            }
 		}
 		curEvent.year = timeinfo.tm_year + 1900;
 		curEvent.month = timeinfo.tm_mon + 1;
@@ -382,7 +398,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	}
 
 	//deal with "on" in a command
-	posOn = event.find(":on", 0);
+	posOn = caseInsensitiveFind(event, ":on"); 
 	if (posOn != -1)	{
 		i = posOn + 4;
 		k = 0;
@@ -421,7 +437,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	}
 
 	//deal with "at" in a command
-	posAt = event.find(":at", 0);
+	posAt = caseInsensitiveFind(event, ":at"); 
 	if (posAt != -1){
 		i = posAt + 4;
 		k = 0;
@@ -463,8 +479,11 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	}
 
 	//deal with "tomorrow" in a command
-	posTmr1 = event.find(":tmr", 0);
-	posTmr2 = event.find(":tomorrow", 0);
+	posTmr1 = caseInsensitiveFind(event, ":tmr"); 
+    if (posTmr1 == string::npos) {
+        posTmr1 = caseInsensitiveFind(event, ":tom"); 
+    }
+	posTmr2 = caseInsensitiveFind(event, ":tomorrow"); 
 	if (posTmr1 != -1 || posTmr2 != -1){
 		int yday, year;
 		year = timeinfo.tm_year + 1900;
@@ -615,7 +634,7 @@ Task Interpreter::prepareTask(std::string input) {
 		else{
     for (it = list.begin(); it != list.end(); ++it) {
         Task task = *it;
-        if (search(input, task)) {
+        if (searchSubStr(input, task)) {
             return task;
 		}
 	}

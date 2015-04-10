@@ -11,5 +11,7 @@
 #include "CppUnitTest.h"
 
 #include "DeleteCmd.h"
+#include "AddCmd.h"
+#include "EditCmd.h"
 #include "UIObject.h"
 #include "MockStorage.h"

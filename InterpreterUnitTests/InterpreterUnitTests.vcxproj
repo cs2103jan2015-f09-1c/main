@@ -91,6 +91,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MyCalTestSuite\InterpreterTest.cpp" />
+    <ClCompile Include="InterpreterAddTestNegative.cpp" />
+    <ClCompile Include="InterpreterAddTestPositive.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

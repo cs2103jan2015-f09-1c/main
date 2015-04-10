@@ -29,5 +29,8 @@
     <ClCompile Include="..\MyCalTestSuite\DeleteCmdTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AddCmdTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -78,21 +78,27 @@ time_t TaskStub::getSampleTimeApr() {
 }
 
 time_t TaskStub::getCurrentTime() {
-	time_t rawTime;
-	time_t curTime;
+	time_t rawtime;
+	time(&rawtime);
+    return rawtime;
+}
 
-	struct tm  *sampleTime;
-	time (&curTime);
-	sampleTime = localtime(&curTime);
+std::string TaskStub::getCurrentDate() {
+    time_t curTime = getCurrentTime();
+    tm dateStruct;
+    localtime_s(&dateStruct, &curTime);
+    std::ostringstream beginOss;
+    beginOss << std::put_time(&dateStruct, "%a %b %d %Y");
+    return beginOss.str();
+}
 
-	sampleTime->tm_hour = 9;
-    sampleTime->tm_isdst = 0;
-    sampleTime->tm_min = 0;
-    sampleTime->tm_sec = 0;
-
-    rawTime = mktime(sampleTime);
-    
-    return rawTime;
+std::string TaskStub::getTomorrowDate() {
+    time_t curTime = getCurrentTime() + _secsInADay;
+    tm dateStruct;
+    localtime_s(&dateStruct, &curTime);
+    std::ostringstream beginOss;
+    beginOss << std::put_time(&dateStruct, "%a %b %d %Y");
+    return beginOss.str();
 }
 
 Task TaskStub::getSampleTask1() {
