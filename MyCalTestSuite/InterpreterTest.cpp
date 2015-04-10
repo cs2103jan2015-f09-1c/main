@@ -31,7 +31,7 @@ namespace MyCalTestSuite {
 				return false;
 			}
 		}
-
+        /*
 		TEST_METHOD(TestParseAddCmd) {
 			std::string floatingInput = "add CS2103 tutorial";
             Task floatingTask = Interpreter::parseAddCmd(floatingInput);
@@ -54,7 +54,7 @@ namespace MyCalTestSuite {
             std::string task2End = timetToString(task2.getTaskEnd());
             //Assert::AreEqual(std::string("10/03/16 12:31 PM"), task2Begin);            
             //Assert::AreEqual(std::string("??"), task2End);                      
-		}
+		}*/
 
 		TEST_METHOD (TestParseSearchCmd){
 			std::string input = "search meeting";

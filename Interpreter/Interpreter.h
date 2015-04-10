@@ -42,7 +42,7 @@ private:
 	static int ConvertStrtoNum (std::string str);
 
 public:    
-    static Task parseAddCmd(std::string input);
+    static Task parseAddCmd(std::string detail);
     static Task parseEditCmd(std::string input);
     static std::string parseStoreCmd(std::string input);
     static int parseDelCmd(std::string input);

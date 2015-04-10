@@ -36,8 +36,7 @@ bool Interpreter::searchSubStr(std::string keyword, Task task) {
 	}
 }
 
-Task Interpreter::parseAddCmd(std::string input) {
-	std::string detail = CommandType::filterOutCmd(input);
+Task Interpreter::parseAddCmd(std::string detail) {
 	Task a;
 
 	if (AddAlias::isHelp(detail)){
@@ -50,8 +49,8 @@ Task Interpreter::parseAddCmd(std::string input) {
 	CalEvent EventOut;
 
 	string event;
-	const char *cal = input.c_str();
-	event.assign(cal, 4, strlen(cal) - 4);
+	const char *cal = detail.c_str();
+	event.assign(cal);
 	flag = parse(event, &EventOut);
 	if (flag <= -1){
 		throw InvalidInputException("Unrecognized time or date. Please check the input.");
@@ -84,8 +83,8 @@ Task Interpreter::parseEditCmd(std::string input) {
 
 	const char *cal = input.c_str();
 
-	int i = 5;
-	int k = 0;
+	size_t i = 5;
+	size_t k = 0;
 	char recch[4];
 	while (i < strlen(cal)) {
 		if (cal[i] >= '0' && cal[i] <= '9') {
@@ -264,7 +263,7 @@ Interpreter::~Interpreter(void) {
 int Interpreter::parse(string event, CalEvent *calEventOut) {
 	char week[7][10] = { "sun", "mon", "tues", "wed", "thur", "fri", "sat" };
 	int posOn, posAt, posTmr1, posTmr2, posNext, posFrom, posEvent;
-	int i, j, k;
+	size_t i, j, k;
 	CalEvent curEvent;
 
 	curEvent.year = -1;
