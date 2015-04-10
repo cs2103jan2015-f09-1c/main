@@ -5,7 +5,6 @@ public:
     DeleteCmd(void);
     ~DeleteCmd(void);
     void prepareTaskId(int _TaskId);
-	void recordInHistory(Task task);
     UIObject execute();
     UIObject undo();
 	std::string getHelp()const;
@@ -15,5 +14,6 @@ public:
 	static const std::string REMAINING_TASK_MESSAGE;
 	static const std::string UNDO_MESSAGE;
 private:
+    void recordInHistory(Task task);
     int TaskId;
 };

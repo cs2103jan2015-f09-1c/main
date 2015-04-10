@@ -19,6 +19,7 @@ CommandType::Command History::getPreviousCommand() const {
 }
 
 void History::saveCommand(CommandType::Command cmd) {
+    MCLogger::log("History.cpp: Command " + CommandType::cmdToString(cmd) + " saved");
     _previousCommand = cmd;
 }
 

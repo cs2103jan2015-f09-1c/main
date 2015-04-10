@@ -11,6 +11,8 @@ typedef struct Cal {
 	int day;
 	int wday;        //value 0-6 represents Sun,Mon,...,Sat
 	int time;        //time format is 24hours. e.g. 0 = 12am, 800 = 8am, 1200 = 12pm, 2359 = 1159pm
+    int endtime;
+    std::string event; 
 } CalEvent;
 
 class Interpreter

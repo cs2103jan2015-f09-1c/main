@@ -467,7 +467,7 @@ Task Interpreter::parseAddCmd(std::string detail) {
 
     // normal task with specified date and time
 	Task normal;
-	if (AddAlias::isHelp(detail)){
+	if (AddAlias::isHelp(detail)){ // exception?
 		int TaskId = -1;
 		normal.setTaskID (TaskId);
         return normal;
@@ -484,8 +484,10 @@ Task Interpreter::parseAddCmd(std::string detail) {
 }
 
 Task Interpreter::parseEditCmd(std::string input) {
-	Task a;
-	/*CalEvent EventOut;
+    Task a;
+
+
+	CalEvent EventOut;
 
 	a.setTaskBegin(0);
 	a.setTaskEnd(0);
@@ -543,8 +545,12 @@ Task Interpreter::parseEditCmd(std::string input) {
 		cin.getline(tempEvent, LENGTH, '\n');
 		curStr.assign(tempEvent, 0, strlen(tempEvent));
 		parse(curStr, &EventOut);
+
 		time_t startt, endt;
-		tmConvert(EventOut, &startt, &endt);
+		tmConvert(EventOut, &startt);
+        EventOut.time = EventOut.endtime;
+        tmConvert(EventOut, &endt);
+
 		it->setTaskBegin(startt);
 		it->setTaskEnd(endt);
 		cout << "    new date:" << it->getDateStr() << endl;
@@ -573,8 +579,11 @@ Task Interpreter::parseEditCmd(std::string input) {
 		curStr.assign(tempEvent, 0, strlen(tempEvent));
 		parse(curStr, &EventOut);
 		time_t startt, endt;
-		if (EventOut.year!=-1)
-			tmConvert(EventOut, &startt, &endt);
+		if (EventOut.year!=-1) {
+			tmConvert(EventOut, &startt);
+            EventOut.time = EventOut.endtime;
+            tmConvert(EventOut, &endt);
+        }
 		else{
 			startt = 0;
 			endt = 0;
@@ -589,7 +598,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 		a = *it;
 	}
 
-	storage->updateStorage(tasklist);*/
+	//storage->updateStorage(tasklist);
 
 	return a;
 }
@@ -672,7 +681,7 @@ Interpreter::~Interpreter(void) {
 
 
 int Interpreter::parse(string event, CalEvent *calEventOut) {
-	/*char week[7][10] = { "sun", "mon", "tues", "wed", "thur", "fri", "sat" };
+	char week[7][10] = { "sun", "mon", "tues", "wed", "thur", "fri", "sat" };
 	int posOn, posAt, posTmr1, posTmr2, posNext, posFrom, posEvent;
 	int i, j, k;
 	CalEvent curEvent;
@@ -910,10 +919,10 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 			curEvent.month = pMonth;
 			curEvent.day = pDay;
 		}
-	}*/
+	}
 
-	//wDaySearch(curEvent.year, curEvent.month, curEvent.day, &curEvent.wday);
-	//*calEventOut = curEvent;
+	wDaySearch(curEvent.year, curEvent.month, curEvent.day, &curEvent.wday);
+	*calEventOut = curEvent;
 	return 1;
 }
 
@@ -1032,4 +1041,4 @@ int Interpreter::gettingTaskID(std::string input){
 		TaskId = ID;
 	}
 		return TaskId;
-	}
+}
