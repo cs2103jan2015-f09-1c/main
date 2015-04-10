@@ -28,18 +28,20 @@ private:
 	static time_t _19Apr9AM;
 	static time_t _Today9AM;
 	static time_t _Tomorrow9AM;
-    // given a type time_t, returns local time in the format
-    // DD/MM/YY HH:MM AM
-    static std::string timetToString(time_t timing);
 
 public:
     TaskStub(void);
     ~TaskStub(void);
+    // given a type time_t, returns local time in the format
+    // DD/MM/YY HH:MM AM
+    static std::string timetToString(time_t timing);
     // returns an arbitrary hard coded time 09/03/15 07:23 AM
     static time_t getSampleTime();
 	// returns an arbitrary hard coded time 13/04/15 09:00 AM
 	static time_t getSampleTimeApr();
 	static time_t getCurrentTime();
+    static std::string getCurrentDate();
+    static std::string getTomorrowDate();
 
     // 9 March 15, undone, 07:23 AM
     static Task getSampleTask1();
