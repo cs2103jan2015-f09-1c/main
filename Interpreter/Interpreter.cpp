@@ -290,10 +290,16 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	const char *cheve = cureve.c_str();
 	curEvent.event = cureve;    
 
+    if (posEvent != -1) {
+        event.erase(std::remove(event.begin() + posEvent, event.end(), ' '), event.end());
+    }
+    
+    cal = event.c_str();
+
 	//deal with "next" in a command
 	posNext = caseInsensitiveFind(event, ":next");
 	if (posNext != -1){
-		i = posNext + 6;
+		i = posNext + 5;
 		k = 0;
 		char weekx[10]; 
 		strcpy_s(weekx, "\0");
@@ -349,7 +355,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	//deal with "from" in a command
 	posFrom = caseInsensitiveFind(event, ":from");
 	if (posFrom != -1){
-		i = posFrom + 6;
+		i = posFrom + 5;
 		k = 0;
 		j = 0;
 		char tmch[2][10], apm[2][5];
@@ -400,7 +406,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	//deal with "on" in a command
 	posOn = caseInsensitiveFind(event, ":on"); 
 	if (posOn != -1)	{
-		i = posOn + 4;
+		i = posOn + 3;
 		k = 0;
 		char dat[3][5];
 		int dmy[3];
@@ -411,7 +417,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 				dat[num][k] = cal[i];
 				k++;
 			}
-			else if (cal[i] == '/') {
+			else if (cal[i] == '/' || cal[i] == '\\' || cal[i] == '.') {
 				k = 0;
 				num++;
 			}
@@ -425,9 +431,15 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 
 			}
 			i++;
+
+
 		}
-		for (i = 0; i<3; i++)
+
+
+		for (i = 0; i<3; i++) {
 			dmy[i] = atoi(dat[i]);
+        }
+
 		curEvent.year = dmy[2];
 		curEvent.month = dmy[1];
 		curEvent.day = dmy[0];
@@ -439,7 +451,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	//deal with "at" in a command
 	posAt = caseInsensitiveFind(event, ":at"); 
 	if (posAt != -1){
-		i = posAt + 4;
+		i = posAt + 3;
 		k = 0;
 		j = 0;
 		char tm[10], apm[3];
