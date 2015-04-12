@@ -48,9 +48,6 @@ namespace IntegrationTestSuite {
 		TEST_METHOD(UndoAfterDone) {
 			MockStorage::initMockStorage(TaskStub::getLargeTaskList());
 
-		//	UIObject viewOutput = Controller::handleInput("view all");
-		//	TextUI::showOutput(viewOutput);
-
 			Controller::handleInput("done dummy T4");
 			UIObject output = Controller::handleInput("undo");
 
@@ -71,12 +68,6 @@ namespace IntegrationTestSuite {
 			UIObject garbageOutput = Controller::handleInput("done %&*#");
 			Assert::AreEqual(std::string("There is no matching task to be marked done."), garbageOutput.getHeaderText());
 			Assert::IsTrue(garbageOutput.getTaskList().empty());
-
-			UIObject viewOutput = Controller::handleInput("view all");
-			TextUI::showOutput(viewOutput);
-			UIObject outOfRange = Controller::handleInput("done 9");
-			Assert::AreEqual(std::string("There is no matching task to be marked done."), outOfRange.getHeaderText());
-			Assert::IsTrue(outOfRange.getTaskList().empty());
 
 			MockStorage::cleanMockStorage();
 		}

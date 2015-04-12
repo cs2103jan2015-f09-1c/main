@@ -15,8 +15,6 @@
 #include "History.h"
 #include "TaskNotFoundException.h"
 #include "InvalidInputException.h"
-//#include "HelpCmd.h"
-
 
 UIObject Controller::undoCommand(CommandType::Command cmdType) {
     switch (cmdType) { 
@@ -128,12 +126,7 @@ UIObject Controller::handleInput(std::string input) {
             int taskId = Interpreter::parseDoneCmd(filteredCmd);
 			doneCmdObj.prepareTaskId(taskId);
             return doneCmdObj.execute();
-        }/*
-		case CommandType::HELP: {
-            MCLogger::log("Controller.cpp: begin help command");
-            HelpCmd helpCmdObj;
-            return helpCmdObj.execute();
-        }*/
+        }
         case CommandType::EXIT_PROGRAM: {
             MCLogger::log("============= exit program ==============");
             Storage::resetInstance();

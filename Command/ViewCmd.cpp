@@ -48,9 +48,8 @@ time_t ViewCmd:: getDayPosition(int index){
 }
 
 TaskList::TList ViewCmd:: getSelectedTasks(){
-	
 	TaskList::TList selectedTasks;
-	//get current tasks
+	
     Storage* storage = Storage::getInstance();
     TaskList taskList = storage->getTaskList();
 	
@@ -127,11 +126,11 @@ UIObject ViewCmd::execute() {
     UIObject viewObj;
 	if(!selectedTasks.empty()){
 		viewObj.setTaskList(selectedTasks);
-	} else
+	}else
 	if(selectedTasks.empty() && ViewType == 11){
 		std::string help = getHelp();
 		viewObj.setHeaderText(help);
-	}else{
+	}else {
 		viewObj.setHeaderText(NO_TASK_MESSAGE);
 	}
 	return viewObj;
