@@ -23,14 +23,19 @@ std::string Interpreter::getEditHelp() {
 
 	std::string intro = "The edit command allows you to edit a previously added task \n\n"; 
 
-	std::string pt1 = "1. This command can be invoked by typing edit {:optional detail1} {:optional detail2} \n";
-	pt1 = pt1 + "Optional details:\n";
-    pt1 = pt1 + "EDITING TIME\t:time";
-	pt1 = pt1 + "     {:by time}]\n";
-	pt1 = pt1 + "DATE {:dateSpecifier}\n\n";
-	pt1 = pt1 + "Aliases: a \n\n";
-	pt1 = pt1 + "Example: add meeting :at 230pm \n";
-	pt1 = pt1 + "         a project due :tomorrow\n";
+	std::string pt1 = "1. This command can be invoked by typing edit <task number> {:optional detail}\n";
+    pt1 = pt1 + "2. Bring up the task number by using view or search.\n\n";
+	pt1 = pt1 + "Optional detail:\n";
+    pt1 = pt1 + ":time\tEdit time only.\n";
+	pt1 = pt1 + ":name\tEdit name of your task only\n\n";
+
+	pt1 = pt1 + "Example 1: view all\n";
+	pt1 = pt1 + "edit 3 :name\n";
+    pt1 = pt1 + "Input \"Your new task name\"\n\n";
+
+	pt1 = pt1 + "Example 2: search cs2102 project\n";
+	pt1 = pt1 + "edit 2\n";
+    pt1 = pt1 + "Input \"ST2334 project :tomorrow :at 3pm\"\n";
 
 	std::string help = title + intro + pt1;
 
@@ -209,8 +214,13 @@ Task Interpreter::parseEditCmd(std::string input) {
 			startt = 0;
 			endt = 0;
 		}
-		toEdit.setTaskBegin(startt);
-		toEdit.setTaskEnd(endt);
+
+        // if no time is entered, do not change the time
+        if (startt != 0) {
+            toEdit.setTaskBegin(startt);
+            toEdit.setTaskEnd(endt);
+        }
+
 		toEdit.setTaskName(EventOut.event);
 		a = toEdit;
 	}
