@@ -364,6 +364,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		strcpy_s(apm[0], "am");
 		strcpy_s(apm[1], "am");
 
+        bool toFound = false;
 		while (i<strlen(cal)) {
 			if (cal[i] >= '0' && cal[i] <= '9') {
 				tmch[num][k] = cal[i];
@@ -375,6 +376,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 				j++;
 			}
 			else if (cal[i] == 't' || cal[i] == 'T' || cal[i] == '-') { // check :to
+                toFound = true;
 				k = 0;
 				j = 0;
 				tim[num] = atoi(tmch[num]);
@@ -399,7 +401,59 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		curEvent.month = timeinfo.tm_mon + 1;
 		curEvent.day = timeinfo.tm_mday;
 		curEvent.time = tim[0];
-		curEvent.endtime = tim[1];
+        if (!toFound) {
+            curEvent.endtime = curEvent.time + 200;
+        } 
+        else {
+		    curEvent.endtime = tim[1];
+        }
+	}
+
+	//deal with "to" in a command
+    // if there's only "to" without "from"
+	int posTo = caseInsensitiveFind(event, ":to");
+	if (posTo != -1 && posFrom == -1 && cal[posTo+3] <= '9' && cal[posTo+3] >= '1'){
+		i = posTo + 3;
+		k = 0;
+		j = 0;
+		char tmch[2][10], apm[2][5];
+		int  tim[2];
+		int num = 0;
+		strcpy_s(apm[0], "am");
+		strcpy_s(apm[1], "am");
+
+        bool toFound = false;
+		while (i<strlen(cal)) {
+			if (cal[i] >= '0' && cal[i] <= '9') {
+				tmch[num][k] = cal[i];
+				k++;
+			}
+			else if (cal[i] == 'a' || cal[i] == 'A' || cal[i] == 'p' || cal[i] == 'P'||
+                cal[i] == 'm' || cal[i] == 'M') {
+				apm[num][j] = cal[i];
+				j++;
+			}
+
+			i++;
+		}
+		tim[num] = atoi(tmch[num]);
+		for (int ii = 0; ii<2; ii++) {
+			if (strcmp(apm[ii], "pm") == 0){  
+				if (tim[ii]>100) {
+					tim[ii] = tim[ii] + 1200;
+                } else {
+                    tim[ii] = tim[ii] + 12;
+                }
+			}
+			if (tim[ii]<100) {
+                tim[ii] = tim[ii] * 100;
+            }
+		}
+		curEvent.year = timeinfo.tm_year + 1900;
+		curEvent.month = timeinfo.tm_mon + 1;
+		curEvent.day = timeinfo.tm_mday;
+		curEvent.endtime = tim[0];
+        curEvent.time = curEvent.endtime - 200;
 	}
 
 	//deal with "on" in a command
