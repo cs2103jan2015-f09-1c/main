@@ -13,7 +13,7 @@
 const std::string DeleteCmd::NO_MATCHING_TASK =  "There is no matching task to be deleted.";
 const std::string DeleteCmd::NO_TASK_MESSAGE = "Task deleted successfully. No more tasks for that day!";
 const std::string DeleteCmd::REMAINING_TASK_MESSAGE = "Task deleted successfully. Remaining tasks for that day:";
-const std::string DeleteCmd::UNDO_MESSAGE = "Task added back to storage.";
+const std::string DeleteCmd::UNDO_MESSAGE = "Task added back to storage. Tasks for that day:";
 
 DeleteCmd::DeleteCmd(void) {
 }
@@ -88,6 +88,7 @@ UIObject DeleteCmd::undo() {
     UIObject undoMessage;
   
     TaskList::TList tasksThatDay;
+    tasksThatDay = taskList.getDay(task.getTaskBegin());
     tasksThatDay.push_back(task);
 
 	//return UIObject
