@@ -40,7 +40,8 @@ time_t ViewCmd:: getDayPosition(int index){
 	if(timeinfo->tm_wday > index && index != 0){
 		diff = 7 - timeinfo->tm_wday + index;
 		day = curTime + diff*86400;
-	}else{
+	}else 
+	if(timeinfo->tm_wday == index){
 		day = curTime;
 	}
 

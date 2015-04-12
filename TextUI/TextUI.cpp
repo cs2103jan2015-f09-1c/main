@@ -63,8 +63,8 @@ std::string TextUI::DEFAULT_DATE_BAR =
 std:: string TextUI:: TIME_PRINT=
 	"%1%. %2% %|30t|";
 std:: string TextUI:: DONE_PRINT= " (done)";
-std::string TextUI:: lastDate;
-std::string TextUI:: nowDate;
+std::string TextUI:: lastDate = "-1";
+std::string TextUI:: nowDate = "0";
 int TextUI:: counter;
 
 struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
@@ -199,6 +199,9 @@ void TextUI::printDateBar(const time_t &taskDate) {
 void TextUI::printTasks(TaskList::TList tasks) {
     TaskList::taskIt it;
 	counter = 1;
+
+	nowDate = "0";
+	lastDate = "-1";
 
 	for (it = tasks.begin(); it != tasks.end(); ++it){
 		prepareDatePrint(it);

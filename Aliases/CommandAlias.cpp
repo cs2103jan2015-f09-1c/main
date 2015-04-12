@@ -50,6 +50,6 @@ bool CommandAlias::isStorage(std::string cmd) {
 
 bool CommandAlias::isExit(std::string cmd) {
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
-	return cmd == "exit";// || cmd == "ex" || cmd == "x" || cmd == "quit" || cmd == "q";
+	return cmd == "exit" || cmd == "ex" || cmd == "x" || cmd == "quit" || cmd == "q";
 }
 
