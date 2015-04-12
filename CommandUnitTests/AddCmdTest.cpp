@@ -1,3 +1,4 @@
+//@Seow Yan Yi A0086626W
 #include "stdafx.h"
 #include "CppUnitTest.h"
 
@@ -37,29 +38,5 @@ namespace MyCalTestSuite {
 
             MockStorage::cleanMockStorage();
         }
-
-        /*
-        TEST_METHOD(TestDeleteEmpty) {
-            MockStorage::initMockStorage(TaskStub::getSampleTaskList());
-
-
-            MockStorage::cleanMockStorage();
-        }
-
-        TEST_METHOD(TestDeleteNotFound) {
-            MockStorage::initMockStorage(TaskStub::getSampleTaskList());
-
-
-            MockStorage::cleanMockStorage();
-        }
-
-        TEST_METHOD(TestDeleteUndo) {
-            MockStorage::initMockStorage(TaskStub::getSampleTaskList());
-
-
-            MockStorage::cleanMockStorage();
-        }*/
-	};
-
-
+    };
 }

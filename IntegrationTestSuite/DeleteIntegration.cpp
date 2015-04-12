@@ -63,7 +63,7 @@ namespace IntegrationTestSuite {
 			Controller::handleInput("delete dummy T4");
 			UIObject undoOutput = Controller::handleInput("undo");
 
-			Assert::AreEqual(std::string("Task added back to storage."), undoOutput.getHeaderText());
+			Assert::AreEqual(std::string("Task added back to storage. Tasks for that day:"), undoOutput.getHeaderText());
 
 			MockStorage::cleanMockStorage();
 		}
