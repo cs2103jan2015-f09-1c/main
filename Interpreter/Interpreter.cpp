@@ -307,8 +307,259 @@ Interpreter::~Interpreter(void) {
 
 
 
+
+int Interpreter::parseNext(string event, CalEvent *calEventOut)	//deal with "next" in a command
+{
+	char week[7][10] = { "Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat" };
+	int posNext, i, k;
+
+	time_t rawtime;
+	struct tm  timeinfo;
+	time(&rawtime);
+	localtime_s(&timeinfo, &rawtime);
+
+	const char *cal = event.c_str();
+	posNext = caseInsensitiveFind(event, ":next");
+	if (posNext != -1){
+		i = posNext + 5;
+		k = 0;
+		char weekx[10];
+		strcpy_s(weekx, "\0");
+		while (i<strlen(cal)){
+			if (cal[i] >= 'A' && cal[i] <= 'Z' || cal[i] >= 'a' && cal[i] <= 'z') {
+				weekx[k] = cal[i];
+				k++;
+			}
+			else if (cal[i] == ' ') {
+				if (k != 0) break;
+			}
+			else {
+				break;
+			}
+			i++;
+		}
+		string strweek;
+		strweek.assign(weekx, 0, strlen(weekx));
+		std::transform(strweek.begin(), strweek.end(), strweek.begin(), ::tolower);
+		bool foundDay = false;
+		for (i = 0; i<7; i++){
+			if (strweek.find(week[i], 0) != -1) {
+				foundDay = true;
+				break;
+			}	
+		}
+		if (foundDay == false) {
+			throw InvalidInputException("Unrecognized day. Please check your input.");
+		}
+		
+		int yday, year, wday, nextwday;
+		year = timeinfo.tm_year + 1900;
+		yday = timeinfo.tm_yday + 1;
+		wday = timeinfo.tm_wday;
+		nextwday = 6 - wday + i + 1;
+		if (yday <= 365 - nextwday){
+			int pMonth, pDay;
+			Monthday(year, yday + nextwday, &pMonth, &pDay);
+			calEventOut->year = year;
+			calEventOut->month = pMonth;
+			calEventOut->day = pDay;
+		} else{
+				int pMonth, pDay;
+				Monthday(year + 1, yday + nextwday - 365, &pMonth, &pDay);
+				calEventOut->year = year + 1;
+				calEventOut->month = pMonth;
+				calEventOut->day = pDay;
+		}
+	}
+
+	return 1;
+}
+
+int Interpreter::parseOn(string event, CalEvent *calEventOut)	//deal with "on" in a command
+{
+	int posOn, i, j, k;
+	const char *cal = event.c_str();
+	posOn = caseInsensitiveFind(event, ":on");
+	if (posOn != -1)	{
+		i = posOn + 3;
+		k = 0;
+		char dat[3][5];
+		int dmy[3];
+		int num = 0;
+
+		while (i<strlen(cal)) {
+			if (cal[i] >= '0' && cal[i] <= '9') {
+				dat[num][k] = cal[i];
+				k++;
+			}
+			else if (cal[i] == '/' || cal[i] == '\\' || cal[i] == '.') {
+				k = 0;
+				num++;
+			}
+			else {
+				if (num != 2) {
+					i++;
+					continue;
+				}
+				else {
+					break;
+				}
+			}
+			i++;
+		}
+		for (i = 0; i<3; i++) dmy[i] = atoi(dat[i]);
+		calEventOut->year = dmy[2];
+		calEventOut->month = dmy[1];
+		calEventOut->day = dmy[0];
+		if (calEventOut->month>12 || calEventOut->month <= 0 || calEventOut->day>31 || calEventOut->day <= 0) return -1;
+	}
+	return 1;
+}
+
+int Interpreter::parseFrom(string event, CalEvent *calEventOut)	//deal with "from" in a command
+{
+	int posFrom, i, j, k;
+	const char *cal = event.c_str();
+	posFrom = caseInsensitiveFind(event, ":from");
+	if (posFrom != -1){
+		i = posFrom + 5;
+		k = 0;
+		j = 0;
+		char tmch[2][10], apm[2][5];
+		int  tim[2];
+		int num = 0;
+		strcpy_s(apm[0], "am");
+		strcpy_s(apm[1], "am");
+		while (i<strlen(cal)) {
+			if (cal[i] >= '0' && cal[i] <= '9') {
+				tmch[num][k] = cal[i];
+				k++;
+			}
+			else if (cal[i] == 'a' || cal[i] == 'A' || cal[i] == 'p' || cal[i] == 'm') {
+				apm[num][j] = cal[i];
+				j++;
+			}
+			else if (cal[i] == 't' || cal[i] == 'T' || cal[i] == '-') {
+				k = 0;
+				j = 0;
+				tim[num] = atoi(tmch[num]);
+				num++;
+			}
+			else;
+			i++;
+		}
+		tim[num] = atoi(tmch[num]);
+		for (int ii = 0; ii<2; ii++) {
+			if (strcmp(apm[ii], "pm") == 0){
+				if (tim[ii]>100)
+					tim[ii] = tim[ii] + 1200;
+				else
+					tim[ii] = tim[ii] + 12;
+			}
+			if (tim[ii]<100) tim[ii] = tim[ii] * 100;
+		}
+		calEventOut->time = tim[0];
+		calEventOut->endtime = tim[1];
+	}
+	return 1;
+}
+
+int Interpreter::parseAt(string event, CalEvent *calEventOut)	//deal with "at" in a command
+{
+	int posAt, i, j, k;
+	const char *cal = event.c_str();
+	posAt = caseInsensitiveFind(event, ":at");
+	if (posAt != -1){
+		i = posAt + 3;
+		k = 0;
+		j = 0;
+		char tm[10], apm[3];
+		int tmm;
+		strcpy_s(apm, "am");
+		while (i<strlen(cal)) {
+			if (cal[i] >= '0' && cal[i] <= '9') {
+				tm[k] = cal[i];
+				k++;
+			}
+			else if (cal[i] == 'a' || cal[i] == 'p' || cal[i] == 'm') {
+				apm[j] = cal[i];
+				j++;
+			}
+			else if (j >= 2) break;
+			i++;
+		}
+
+		tmm = atoi(tm);
+		if (strcmp(apm, "pm") == 0){
+			if (tmm>100) tmm = tmm + 1200;
+			else tmm = tmm + 12;
+		}
+		if (tmm<100) tmm = tmm * 100;
+		calEventOut->time = tmm;
+		calEventOut->endtime = calEventOut->time + 200;
+		if (tmm>2400)  return -1;
+	}
+	return 1;
+}
+
+int Interpreter::parseTmr(string event, CalEvent *calEventOut)	//deal with "tomorrow"  or "tmr"in a command
+{
+	time_t rawtime;
+	struct tm  timeinfo;
+	time(&rawtime);
+	localtime_s(&timeinfo, &rawtime);
+	int posTmr1, posTmr2;
+
+	posTmr1 = event.find(":tmr", 0);
+	posTmr2 = event.find(":tomorrow", 0);
+	if (posTmr1 != -1 || posTmr2 != -1){
+		int yday, year;
+		year = timeinfo.tm_year + 1900;
+		yday = timeinfo.tm_yday + 1;
+		if (yday == 365){
+			calEventOut->year = year + 1;
+			calEventOut->month = 1;
+			calEventOut->day = 1;
+		}
+		else{
+			int pMonth, pDay;
+			Monthday(year, yday + 1, &pMonth, &pDay);
+			calEventOut->year = year;
+			calEventOut->month = pMonth;
+			calEventOut->day = pDay;
+		}
+	}
+	return 1;
+}
+
+
+void Interpreter::tmConvert(CalEvent Event, time_t *starttime, time_t *endtime)
+{
+	int yday = 0;
+	struct tm newtime;
+
+	for (int i = 1; i < Event.month; i++)
+		yday = yday + month_days(Event.year, i);
+	yday = yday + Event.day;
+	newtime.tm_year = Event.year - 1900;
+	newtime.tm_mon = Event.month - 1;
+	newtime.tm_mday = Event.day;
+	newtime.tm_hour = Event.time / 100;
+	newtime.tm_min = Event.time % 100;
+	newtime.tm_sec = 0;
+	newtime.tm_wday = Event.wday;
+	newtime.tm_yday = yday;
+	newtime.tm_isdst = -1;
+
+	*starttime = mktime(&newtime);
+	newtime.tm_hour = Event.endtime / 100;
+	newtime.tm_min = Event.endtime % 100;
+	*endtime = mktime(&newtime);
+
+}
+
 int Interpreter::parse(string event, CalEvent *calEventOut) {
-	char week[7][10] = { "sun", "mon", "tues", "wed", "thur", "fri", "sat" };
+
 	int posOn, posAt, posTmr1, posTmr2, posNext, posFrom, posEvent;
 	size_t i, j, k;
 	CalEvent curEvent;
@@ -335,335 +586,79 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	else
 		cureve.assign(cal, 0, strlen(cal));
 	const char *cheve = cureve.c_str();
-	curEvent.event = cureve;    
+	curEvent.event = cureve;
 
-    if (posEvent != -1) {
-        event.erase(std::remove(event.begin() + posEvent, event.end(), ' '), event.end());
-    }
-    
-    cal = event.c_str();
-
-	//deal with "next" in a command
-	posNext = caseInsensitiveFind(event, ":next");
-	if (posNext != -1){
-		i = posNext + 5;
-		k = 0;
-		char weekx[10]; 
-		strcpy_s(weekx, "\0");
-
-        while (i<strlen(cal)){
-			if (cal[i] >= 'A' && cal[i] <= 'Z' || cal[i] >= 'a' && cal[i] <= 'z') { 
-				weekx[k] = cal[i];
-				k++;
-			}
-			else if (cal[i] == ' ') { 
-				if (k != 0) break;
-			}
-			else {
-				break;
-			}
-			i++;
-		}
-		string strweek;
-		strweek.assign(weekx, 0, strlen(weekx)); 
-        std::transform(strweek.begin(), strweek.end(), strweek.begin(), ::tolower);
-        bool foundDay = false;
-		for (i = 0; i<7; i++){
-			if (strweek.find(week[i], 0) != -1) {
-                foundDay = true;
-                break;
-            }
-		}
-		if (foundDay == false) {
-            throw InvalidInputException("Unrecognized day. Please check your input.");
-        }
-
-		int yday, year, wday, nextwday;
-		year = timeinfo.tm_year + 1900;
-		yday = timeinfo.tm_yday + 1;
-		wday = timeinfo.tm_wday;
-		nextwday = 6 - wday + i + 1;
-		if (yday <= 365 - nextwday){
-			int pMonth, pDay;
-			Monthday(year, yday + nextwday, &pMonth, &pDay);
-			curEvent.year = year;
-			curEvent.month = pMonth;
-			curEvent.day = pDay;
-		}
-		else{
-			int pMonth, pDay;
-			Monthday(year + 1, yday + nextwday - 365, &pMonth, &pDay);
-            
-            curEvent.year = year + 1;			
-            curEvent.month = pMonth;
-            curEvent.day = pDay;            						
-		}
-	}
-
-	//deal with "from" in a command
-	posFrom = caseInsensitiveFind(event, ":from");
-	if (posFrom != -1){
-		i = posFrom + 5;
-		k = 0;
-		j = 0;
-		char tmch[2][10], apm[2][5];
-		int  tim[2];
-		int num = 0;
-		strcpy_s(apm[0], "am");
-		strcpy_s(apm[1], "am");
-
-        bool toFound = false;
-		while (i<strlen(cal)) {
-			if (cal[i] >= '0' && cal[i] <= '9') {
-				tmch[num][k] = cal[i];
-				k++;
-			}
-			else if (cal[i] == 'a' || cal[i] == 'A' || cal[i] == 'p' || cal[i] == 'P'||
-                cal[i] == 'm' || cal[i] == 'M') {
-				apm[num][j] = cal[i];
-				j++;
-			}
-			else if (cal[i] == 't' || cal[i] == 'T' || cal[i] == '-') { // check :to
-                toFound = true;
-				k = 0;
-				j = 0;
-				tim[num] = atoi(tmch[num]);
-				num++;
-			}
-			i++;
-		}
-		tim[num] = atoi(tmch[num]);
-		for (int ii = 0; ii<2; ii++) {
-			if (strcmp(apm[ii], "pm") == 0){  
-				if (tim[ii]>100) {
-					tim[ii] = tim[ii] + 1200;
-                } else {
-                    tim[ii] = tim[ii] + 12;
-                }
-			}
-			if (tim[ii]<100) {
-                tim[ii] = tim[ii] * 100;
-            }
-		}
+	posFrom = event.find(":from", 0);
+	posAt = event.find(":at", 0);
+	if (posFrom != -1 || posAt != -1)	{
 		curEvent.year = timeinfo.tm_year + 1900;
 		curEvent.month = timeinfo.tm_mon + 1;
 		curEvent.day = timeinfo.tm_mday;
-		curEvent.time = tim[0];
-        if (!toFound) {
-            curEvent.endtime = curEvent.time + 200;
-        } 
-        else {
-		    curEvent.endtime = tim[1];
-        }
 	}
 
-	//deal with "to" in a command
-    // if there's only "to" without "from"
-	int posTo = caseInsensitiveFind(event, ":to");
-	if (posTo != -1 && posFrom == -1 && cal[posTo+3] <= '9' && cal[posTo+3] >= '1'){
-		i = posTo + 3;
-		k = 0;
-		j = 0;
-		char tmch[2][10], apm[2][5];
-		int  tim[2];
-		int num = 0;
-		strcpy_s(apm[0], "am");
-		strcpy_s(apm[1], "am");
-
-        bool toFound = false;
-		while (i<strlen(cal)) {
-			if (cal[i] >= '0' && cal[i] <= '9') {
-				tmch[num][k] = cal[i];
-				k++;
-			}
-			else if (cal[i] == 'a' || cal[i] == 'A' || cal[i] == 'p' || cal[i] == 'P'||
-                cal[i] == 'm' || cal[i] == 'M') {
-				apm[num][j] = cal[i];
-				j++;
-			}
-
-			i++;
-		}
-		tim[num] = atoi(tmch[num]);
-		for (int ii = 0; ii<2; ii++) {
-			if (strcmp(apm[ii], "pm") == 0){  
-				if (tim[ii]>100) {
-					tim[ii] = tim[ii] + 1200;
-                } else {
-                    tim[ii] = tim[ii] + 12;
-                }
-			}
-			if (tim[ii]<100) {
-                tim[ii] = tim[ii] * 100;
-            }
-		}
-		curEvent.year = timeinfo.tm_year + 1900;
-		curEvent.month = timeinfo.tm_mon + 1;
-		curEvent.day = timeinfo.tm_mday;
-		curEvent.endtime = tim[0];
-        curEvent.time = curEvent.endtime - 200;
-	}
-
-	//deal with "on" in a command
-	posOn = caseInsensitiveFind(event, ":on"); 
-	if (posOn != -1)	{
-		i = posOn + 3;
-		k = 0;
-		char dat[3][5];
-		int dmy[3];
-		int num = 0;
-
-		while (i<strlen(cal)) {    
-            if (num == 2 && k == 0 && ((strlen(cal) - i) < 2 ||(strlen(cal) - i) == 3)) {
-                // year has 0, 1 or 3 digits
-                throw InvalidInputException("Unrecognized year. Please check your input.");
-            }        
-
-			if (cal[i] >= '0' && cal[i] <= '9') {
-				dat[num][k] = cal[i];
-				k++;
-			}
-			else if (cal[i] == '/' || cal[i] == '\\' || cal[i] == '.') {
-				k = 0;
-				num++;
-			}
-			else {
-				if (num != 2) {
-					i++;
-					continue;
-				}
-				else {
-					break;
-                }
-			}
-			i++;
-		}
-
-
-		for (i = 0; i<3; i++) {
-			dmy[i] = atoi(dat[i]);
-        }
-
-		curEvent.year = dmy[2];
-		curEvent.month = dmy[1];
-		curEvent.day = dmy[0];
-
-		if (curEvent.month>12 || curEvent.month <= 0 || curEvent.day>31 || curEvent.day <= 0)
-			return -1;
-	}
-
-	//deal with "at" in a command
-	posAt = caseInsensitiveFind(event, ":at"); 
-	if (posAt != -1 && posFrom == -1){
-		i = posAt + 3;
-		k = 0;
-		j = 0;
-		char tm[10], apm[3];
-		int tmm;
-		strcpy_s(apm, "am");
-		while (i<strlen(cal)) {
-			if (cal[i] >= '0' && cal[i] <= '9') {
-				tm[k] = cal[i];
-				k++;
-			}
-			else if (cal[i] == 'a' || cal[i] == 'p' || cal[i] == 'm') {
-				apm[j] = cal[i];
-				j++;
-			}
-			else
-			if (j >= 2) break;
-			i++;
-		}
-
-		tmm = atoi(tm);
-		if (strcmp(apm, "pm") == 0){
-			if (tmm>100)
-				tmm = tmm + 1200;
-			else
-				tmm = tmm + 12;
-		}
-		if (tmm<100) tmm = tmm * 100;
-		curEvent.time = tmm;
-		curEvent.endtime = curEvent.time + 200;
-		if (posOn == -1){
-			curEvent.year = timeinfo.tm_year + 1900;
-			curEvent.month = timeinfo.tm_mon + 1;
-			curEvent.day = timeinfo.tm_mday;
-		}
-		if (tmm>2400)  return -1;
-
-	}
-
-	//deal with "tomorrow" in a command
-	posTmr1 = caseInsensitiveFind(event, ":tmr"); 
-    if (posTmr1 == string::npos && posOn == -1) {
-        posTmr1 = caseInsensitiveFind(event, ":tom"); 
-    }
-	posTmr2 = caseInsensitiveFind(event, ":tomorrow"); 
-	if (posTmr1 != -1 || posTmr2 != -1 && posOn == -1){
-		int yday, year;
-		year = timeinfo.tm_year + 1900;
-		yday = timeinfo.tm_yday + 1;
-		if (yday == 365){
-			curEvent.year = year + 1;
-			curEvent.month = 1;
-			curEvent.day = 1;
-		}
-		else{
-			int pMonth, pDay;
-			Monthday(year, yday + 1, &pMonth, &pDay);
-			curEvent.year = year;
-			curEvent.month = pMonth;
-			curEvent.day = pDay;
-		}
-	}
+	if (parseFrom(event, &curEvent) == -1) return -1;
+	if (parseAt(event, &curEvent) == -1) return -1;
+	if (parseNext(event, &curEvent) == -1) return -1;
+	if (parseOn(event, &curEvent) == -1) return -1;
+	if (parseTmr(event, &curEvent) == -1) return -1;
 
 	wDaySearch(curEvent.year, curEvent.month, curEvent.day, &curEvent.wday);
 	*calEventOut = curEvent;
 	return 1;
+
+
+/*
+//deal with "to" in a command
+// if there's only "to" without "from"
+int posTo = caseInsensitiveFind(event, ":to");
+if (posTo != -1 && posFrom == -1 && cal[posTo + 3] <= '9' && cal[posTo + 3] >= '1'){
+	i = posTo + 3;
+	k = 0;
+	j = 0;
+	char tmch[2][10], apm[2][5];
+	int  tim[2];
+	int num = 0;
+	strcpy_s(apm[0], "am");
+	strcpy_s(apm[1], "am");
+
+	bool toFound = false;
+	while (i<strlen(cal)) {
+		if (cal[i] >= '0' && cal[i] <= '9') {
+			tmch[num][k] = cal[i];
+			k++;
+		}
+		else if (cal[i] == 'a' || cal[i] == 'A' || cal[i] == 'p' || cal[i] == 'P' ||
+			cal[i] == 'm' || cal[i] == 'M') {
+			apm[num][j] = cal[i];
+			j++;
+		}
+
+		i++;
+	}
+	tim[num] = atoi(tmch[num]);
+	for (int ii = 0; ii<2; ii++) {
+		if (strcmp(apm[ii], "pm") == 0){
+			if (tim[ii]>100) {
+				tim[ii] = tim[ii] + 1200;
+			}
+			else {
+				tim[ii] = tim[ii] + 12;
+			}
+		}
+		if (tim[ii]<100) {
+			tim[ii] = tim[ii] * 100;
+		}
+	}
+	curEvent.year = timeinfo.tm_year + 1900;
+	curEvent.month = timeinfo.tm_mon + 1;
+	curEvent.day = timeinfo.tm_mday;
+	curEvent.endtime = tim[0];
+	curEvent.time = curEvent.endtime - 200;
+}*/
+
 }
 
-void Interpreter::tmConvert(CalEvent Event, time_t *starttime, time_t *endtime) {
-	int year, mon, day, tim1, tim2;
-
-	year = Event.year;
-	mon = Event.month - 1;
-	day = Event.day;
-	tim1 = Event.time;
-	tim2 = Event.endtime;
-
-    if (year > 2200 || year < 1971) {
-        throw InvalidInputException("Sorry, the date you entered is out of range");
-    }
-
-    struct tm startTm;
-    startTm.tm_hour = tim1 / 100;
-    startTm.tm_min = tim1 % 100;
-    startTm.tm_sec = 0;
-    startTm.tm_mday = day;
-    startTm.tm_mon = mon;
-    startTm.tm_year = (year - 1900);
-    time_t start = mktime (&startTm);
-
-    struct tm endTm;
-    endTm.tm_hour = tim2 / 100;
-    endTm.tm_min = tim2 % 100;
-    endTm.tm_sec = 0;
-    endTm.tm_mday = day;
-    endTm.tm_mon = mon;
-    endTm.tm_year = (year - 1900);
-    time_t end = mktime (&endTm);
-
-
-    // if start time earlier than end time, shift end time forward by a day
-    if (start < end) {
-       end += 60 * 60 * 24;
-    }
-
-    *starttime = start;
-    *endtime = end;
- }
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int Interpreter::IsLeapYear(int year)
 {
 	if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
