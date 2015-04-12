@@ -22,7 +22,7 @@ private:
 	static const size_t NUM_CHARS_VIEW;
 	static const size_t NUM_CHARS_DONE;
 	static const size_t NUM_CHARS_DELETE;
-    
+    static std::string Interpreter::getEditHelp();    
     // searchs "input" for first occurence of the sequence "pattern"
     // When pos is specified, the search only includes characters at or after position pos, 
     // ignoring any possible occurrences that include characters before pos.

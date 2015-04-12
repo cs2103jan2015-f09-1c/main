@@ -18,6 +18,25 @@ using namespace std;
 const size_t Interpreter::NUM_CHARS_DONE = 4;
 const size_t Interpreter::NUM_CHARS_DELETE = 6;
 
+std::string Interpreter::getEditHelp() {
+	std::string title = "***************** COMMAND HELP: EDIT  *****************\n\n";
+
+	std::string intro = "The edit command allows you to edit a previously added task \n\n"; 
+
+	std::string pt1 = "1. This command can be invoked by typing edit {:optional detail1} {:optional detail2} \n";
+	pt1 = pt1 + "Optional details:\n";
+    pt1 = pt1 + "EDITING TIME\t:time";
+	pt1 = pt1 + "     {:by time}]\n";
+	pt1 = pt1 + "DATE {:dateSpecifier}\n\n";
+	pt1 = pt1 + "Aliases: a \n\n";
+	pt1 = pt1 + "Example: add meeting :at 230pm \n";
+	pt1 = pt1 + "         a project due :tomorrow\n";
+
+	std::string help = title + intro + pt1;
+
+	return help;
+}
+
 size_t Interpreter::caseInsensitiveFind(std::string input, std::string pattern, size_t pos) {
     std::transform(input.begin(), input.end(), input.begin(), ::tolower);
     std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
@@ -71,12 +90,27 @@ Task Interpreter::parseAddCmd(std::string detail) {
 }
 
 Task Interpreter::parseEditCmd(std::string input) {
-	Task a;
-	CalEvent EventOut;
+	int taskID; 
+    std::string filtered = CommandType::filterOutCmd(input);
+	if (DeleteAlias::isInteger(filtered) || !DeleteAlias::isHelp(filtered)){
+		taskID = gettingTaskID(filtered);
+	}
+	else if (DeleteAlias::isHelp(filtered)){
+		throw InvalidInputException(getEditHelp());
+	}
 
-	a.setTaskBegin(0);
-	a.setTaskEnd(0);
-	a.setTaskName("");
+    if (taskID == 0) {
+        throw InvalidInputException("No matching tasks found.");
+    }
+
+
+    Storage *storage = Storage::getInstance();
+    TaskList taskList = storage->getTaskList();
+    Task toEdit = taskList.findTask(taskID);
+
+
+	Task a = toEdit;
+	CalEvent EventOut;
 
 	cout << endl;
 	cout << input << endl;
@@ -99,65 +133,74 @@ Task Interpreter::parseEditCmd(std::string input) {
 		throw InvalidInputException("Invalid input, please check again");
 	}
 
-	//search for task
-	int findF = 0;
-	Storage *storage = Storage::getInstance();
-	TaskList tasklist = storage->getTaskList();
-	TaskList::TList list = tasklist.getAll();
-	TaskList::taskIt it;
-	int num = 0;
-	for (it = list.begin(); it != list.end(); ++it) {
-		num++;
-		if (/*it->getTaskID()*/num == recID){
-			findF = 1;
-			break;
-		}
-	}
-	if (findF == 0)	{
-        throw TaskNotFoundException("Can't find the record!");
-	}
 	char tempEvent[LENGTH];
 	string curStr;
 	int  posTime, posName;
 	posTime = input.find("time", 0);
 	posName = input.find("name", 0);
+
 	if (posTime != -1){
-		cout << "previous date:" << it->getDateStr() << endl;
-		cout << "        begin:" << it->getBeginStr() << endl;
-		cout << "          end:" << it->getEndStr() << endl << endl;
+        if (!toEdit.isFloating()) {
+		    cout << "previous date:" << toEdit.getDateStr() << endl;
+		    cout << "        begin:" << toEdit.getBeginStr() << endl;
+		    cout << "          end:" << toEdit.getEndStr() << endl << endl;
+        }
 		cout << "please input new time:" << endl;
 
 		cin.getline(tempEvent, LENGTH, '\n');
 		curStr.assign(tempEvent, 0, strlen(tempEvent));
+
+        std::string exitCheck = curStr;
+        exitCheck.erase(std::remove(exitCheck.begin(), exitCheck.end(), ' '), exitCheck.end());
+        if (caseInsensitiveFind(exitCheck, ":exit") != string::npos) {
+            throw InvalidInputException("Edit canceled.");
+        }
+
 		parse(curStr, &EventOut);
 		time_t startt, endt;
 		tmConvert(EventOut, &startt, &endt);
-		it->setTaskBegin(startt);
-		it->setTaskEnd(endt);
-		cout << "    new date:" << it->getDateStr() << endl;
-		cout << "       begin:" << it->getBeginStr() << endl;
-		cout << "         end:" << it->getEndStr() << endl << endl;
-		a = *it;
+		toEdit.setTaskBegin(startt);
+		toEdit.setTaskEnd(endt);
+		cout << "    new date:" << toEdit.getDateStr() << endl;
+		cout << "       begin:" << toEdit.getBeginStr() << endl;
+		cout << "         end:" << toEdit.getEndStr() << endl << endl;
+		a = toEdit;
 	}
 	else if (posName != -1) {
-		cout << "previous name:" << it->getTaskName() << endl;
+		cout << "previous name:" << toEdit.getTaskName() << endl;
 		cout << "please input new name:" << endl;
 
 		cin.getline(tempEvent, LENGTH, '\n');
 		curStr.assign(tempEvent, 0, strlen(tempEvent));
+
+        std::string exitCheck = curStr;
+        exitCheck.erase(std::remove(exitCheck.begin(), exitCheck.end(), ' '), exitCheck.end());
+        if (caseInsensitiveFind(exitCheck, ":exit") != string::npos) {
+            throw InvalidInputException("Edit canceled.");
+        }
+
 		cout << "    new name: " << curStr << endl;
-		it->setTaskName(curStr);
-		a = *it;
+		toEdit.setTaskName(curStr);
+		a = toEdit;
 	}
 	else{
-		cout << "previous event:" << it->getTaskName() << endl;
-		cout << "         date:" << it->getDateStr() << endl;
-		cout << "        begin:" << it->getBeginStr() << endl;
-		cout << "          end:" << it->getEndStr() << endl << endl;
+		cout << "previous event:" << toEdit.getTaskName() << endl;
+        if (!toEdit.isFloating()) {
+		    cout << "previous date:" << toEdit.getDateStr() << endl;
+		    cout << "        begin:" << toEdit.getBeginStr() << endl;
+		    cout << "          end:" << toEdit.getEndStr() << endl << endl;
+        }
 
 		cout << "please input new event:" << endl;
 		cin.getline(tempEvent, LENGTH, '\n');
 		curStr.assign(tempEvent, 0, strlen(tempEvent));
+
+        std::string exitCheck = curStr;
+        exitCheck.erase(std::remove(exitCheck.begin(), exitCheck.end(), ' '), exitCheck.end());
+        if (caseInsensitiveFind(exitCheck, ":exit") != string::npos) {
+            throw InvalidInputException("Edit canceled.");
+        }
+
 		parse(curStr, &EventOut);
 		time_t startt, endt;
 		if (EventOut.year!=-1)
@@ -166,17 +209,11 @@ Task Interpreter::parseEditCmd(std::string input) {
 			startt = 0;
 			endt = 0;
 		}
-		it->setTaskBegin(startt);
-		it->setTaskEnd(endt);
-		it->setTaskName(EventOut.event);
-		cout << "   new event:" << it->getTaskName() << endl;
-		cout << "        date:" << it->getDateStr() << endl;
-		cout << "       begin:" << it->getBeginStr() << endl;
-		cout << "         end:" << it->getEndStr() << endl << endl;
-		a = *it;
+		toEdit.setTaskBegin(startt);
+		toEdit.setTaskEnd(endt);
+		toEdit.setTaskName(EventOut.event);
+		a = toEdit;
 	}
-
-	storage->updateStorage(tasklist);
 
 	return a;
 }
@@ -346,9 +383,10 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		else{
 			int pMonth, pDay;
 			Monthday(year + 1, yday + nextwday - 365, &pMonth, &pDay);
-			curEvent.year = year + 1;
-			curEvent.month = pMonth;
-			curEvent.day = pDay;
+            
+            curEvent.year = year + 1;			
+            curEvent.month = pMonth;
+            curEvent.day = pDay;            						
 		}
 	}
 
@@ -506,7 +544,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 
 	//deal with "at" in a command
 	posAt = caseInsensitiveFind(event, ":at"); 
-	if (posAt != -1){
+	if (posAt != -1 && posFrom == -1){
 		i = posAt + 3;
 		k = 0;
 		j = 0;
@@ -548,11 +586,11 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 
 	//deal with "tomorrow" in a command
 	posTmr1 = caseInsensitiveFind(event, ":tmr"); 
-    if (posTmr1 == string::npos) {
+    if (posTmr1 == string::npos && posOn == -1) {
         posTmr1 = caseInsensitiveFind(event, ":tom"); 
     }
 	posTmr2 = caseInsensitiveFind(event, ":tomorrow"); 
-	if (posTmr1 != -1 || posTmr2 != -1){
+	if (posTmr1 != -1 || posTmr2 != -1 && posOn == -1){
 		int yday, year;
 		year = timeinfo.tm_year + 1900;
 		yday = timeinfo.tm_yday + 1;
@@ -775,5 +813,5 @@ int Interpreter::gettingTaskID(std::string input){
 	else if (ID !=0){
 		TaskId = ID;
 	}
-		return TaskId;
-	}
+	return TaskId;
+}
