@@ -18,18 +18,15 @@ void EditCmd::prepareTask(Task task) {
 }
 
 UIObject EditCmd::execute() {
-    UIObject edited;
-
     Storage* storage = Storage::getInstance();
     TaskList taskList = storage->getTaskList();
-
-     recordInHistory (_task);
+    Task originalTask = taskList.findTask(_task.getTaskID());
+    recordInHistory (originalTask);
 
 	//update the edited task
 	taskList.update(_task);
     storage->updateStorage(taskList);    
 
-	//return UI Object
     std::string headerText = "Successfuly Edited. ";
     headerText = headerText + "Updated event: \nName:" + _task.getTaskName() + "\n";
 
@@ -38,6 +35,7 @@ UIObject EditCmd::execute() {
         headerText = headerText + " End: " + _task.getEndStr();
     }
 
+    UIObject edited;
 	edited.setHeaderText(headerText);
     History *hist = History::getInstance();
     CommandType::Command prevCmd = hist->getPreviousCommand();
