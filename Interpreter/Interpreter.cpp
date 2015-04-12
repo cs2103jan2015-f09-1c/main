@@ -53,7 +53,7 @@ Task Interpreter::parseAddCmd(std::string detail) {
 	event.assign(cal);
 	flag = parse(event, &EventOut);
 	if (flag <= -1){
-		throw InvalidInputException("Unrecognized time or date. Please check the input.");
+		throw InvalidInputException("Unrecognized time or date. Please check your input.");
 	}
 	
 	time_t starttime, endtime;
@@ -363,9 +363,8 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		int num = 0;
 		strcpy_s(apm[0], "am");
 		strcpy_s(apm[1], "am");
-		while (i<strlen(cal)) {
-            //cal[i] gives ASCII code 
 
+		while (i<strlen(cal)) {
 			if (cal[i] >= '0' && cal[i] <= '9') {
 				tmch[num][k] = cal[i];
 				k++;
@@ -412,7 +411,12 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		int dmy[3];
 		int num = 0;
 
-		while (i<strlen(cal)) {
+		while (i<strlen(cal)) {    
+            if (num == 2 && k == 0 && ((strlen(cal) - i) < 2 ||(strlen(cal) - i) == 3)) {
+                // year has 0, 1 or 3 digits
+                throw InvalidInputException("Unrecognized year. Please check your input.");
+            }        
+
 			if (cal[i] >= '0' && cal[i] <= '9') {
 				dat[num][k] = cal[i];
 				k++;
@@ -426,13 +430,11 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 					i++;
 					continue;
 				}
-				else
+				else {
 					break;
-
+                }
 			}
 			i++;
-
-
 		}
 
 
@@ -519,24 +521,46 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	return 1;
 }
 
-void Interpreter::tmConvert(CalEvent Event, time_t *starttime, time_t *endtime)
-{
-
-	int year, mon, day, yday, tim1, tim2;
+void Interpreter::tmConvert(CalEvent Event, time_t *starttime, time_t *endtime) {
+	int year, mon, day, tim1, tim2;
 
 	year = Event.year;
-	mon = Event.month;
+	mon = Event.month - 1;
 	day = Event.day;
 	tim1 = Event.time;
 	tim2 = Event.endtime;
-	yday = 0;
-	for (int i = 1; i < Event.month; i++)
-		yday = yday + month_days(year, i);
-	yday = yday + day;
-	*starttime = (year - 1970) * 365 * 24 * 3600 + yday * 24 * 3600 + (tim1 / 100) * 3600 + (tim1 % 100) * 60 + 232 * 3600;
-	if (tim2 == -1) *endtime = *starttime;
-	else *endtime = (year - 1970) * 365 * 24 * 3600 + yday * 24 * 3600 + (tim2 / 100) * 3600 + (tim2 % 100) * 60 + 232 * 3600;
-}
+
+    if (year > 2200 || year < 1971) {
+        throw InvalidInputException("Sorry, the date you entered is out of range");
+    }
+
+    struct tm startTm;
+    startTm.tm_hour = tim1 / 100;
+    startTm.tm_min = tim1 % 100;
+    startTm.tm_sec = 0;
+    startTm.tm_mday = day;
+    startTm.tm_mon = mon;
+    startTm.tm_year = (year - 1900);
+    time_t start = mktime (&startTm);
+
+    struct tm endTm;
+    endTm.tm_hour = tim2 / 100;
+    endTm.tm_min = tim2 % 100;
+    endTm.tm_sec = 0;
+    endTm.tm_mday = day;
+    endTm.tm_mon = mon;
+    endTm.tm_year = (year - 1900);
+    time_t end = mktime (&endTm);
+
+
+    // if start time earlier than end time, shift end time forward by a day
+    if (start < end) {
+       end += 60 * 60 * 24;
+    }
+
+    *starttime = start;
+    *endtime = end;
+ }
 
 int Interpreter::IsLeapYear(int year)
 {
