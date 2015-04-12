@@ -35,5 +35,8 @@
     <ClCompile Include="InterpreterAddTestNegative.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="InterpreterSearchTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
