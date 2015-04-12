@@ -9,5 +9,7 @@ public:
     UIObject undo();
 
 private:
+    static const std::string UNDO_MESSAGE;
+    void recordInHistory(Task task);
     Task _task;
 };

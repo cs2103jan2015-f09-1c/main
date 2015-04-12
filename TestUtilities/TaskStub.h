@@ -39,7 +39,7 @@ public:
     static time_t getSampleTime();
 	// returns an arbitrary hard coded time 13/04/15 09:00 AM
 	static time_t getSampleTimeApr();
-	static time_t getCurrentTime();
+	static time_t getToday9AM();
     static std::string getCurrentDate();
     static std::string getTomorrowDate();
 

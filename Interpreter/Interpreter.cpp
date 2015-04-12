@@ -18,6 +18,30 @@ using namespace std;
 const size_t Interpreter::NUM_CHARS_DONE = 4;
 const size_t Interpreter::NUM_CHARS_DELETE = 6;
 
+std::string Interpreter::getEditHelp() {
+	std::string title = "***************** COMMAND HELP: EDIT  *****************\n\n";
+
+	std::string intro = "The edit command allows you to edit a previously added task \n\n"; 
+
+	std::string pt1 = "1. This command can be invoked by typing edit <task number> {:optional detail}\n";
+    pt1 = pt1 + "2. Bring up the task number by using view or search.\n\n";
+	pt1 = pt1 + "Optional detail:\n";
+    pt1 = pt1 + ":time\tEdit time only.\n";
+	pt1 = pt1 + ":name\tEdit name of your task only\n\n";
+
+	pt1 = pt1 + "Example 1: view all\n";
+	pt1 = pt1 + "edit 3 :name\n";
+    pt1 = pt1 + "Input \"Your new task name\"\n\n";
+
+	pt1 = pt1 + "Example 2: search cs2102 project\n";
+	pt1 = pt1 + "edit 2\n";
+    pt1 = pt1 + "Input \"ST2334 project :tomorrow :at 3pm\"\n";
+
+	std::string help = title + intro + pt1;
+
+	return help;
+}
+
 size_t Interpreter::caseInsensitiveFind(std::string input, std::string pattern, size_t pos) {
     std::transform(input.begin(), input.end(), input.begin(), ::tolower);
     std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
@@ -53,7 +77,7 @@ Task Interpreter::parseAddCmd(std::string detail) {
 	event.assign(cal);
 	flag = parse(event, &EventOut);
 	if (flag <= -1){
-		throw InvalidInputException("Unrecognized time or date. Please check the input.");
+		throw InvalidInputException("Unrecognized time or date. Please check your input.");
 	}
 	
 	time_t starttime, endtime;
@@ -71,12 +95,27 @@ Task Interpreter::parseAddCmd(std::string detail) {
 }
 
 Task Interpreter::parseEditCmd(std::string input) {
-	Task a;
-	CalEvent EventOut;
+	int taskID; 
+    std::string filtered = CommandType::filterOutCmd(input);
+	if (DeleteAlias::isInteger(filtered) || !DeleteAlias::isHelp(filtered)){
+		taskID = gettingTaskID(filtered);
+	}
+	else if (DeleteAlias::isHelp(filtered)){
+		throw InvalidInputException(getEditHelp());
+	}
 
-	a.setTaskBegin(0);
-	a.setTaskEnd(0);
-	a.setTaskName("");
+    if (taskID == 0) {
+        throw InvalidInputException("No matching tasks found.");
+    }
+
+
+    Storage *storage = Storage::getInstance();
+    TaskList taskList = storage->getTaskList();
+    Task toEdit = taskList.findTask(taskID);
+
+
+	Task a = toEdit;
+	CalEvent EventOut;
 
 	cout << endl;
 	cout << input << endl;
@@ -99,65 +138,74 @@ Task Interpreter::parseEditCmd(std::string input) {
 		throw InvalidInputException("Invalid input, please check again");
 	}
 
-	//search for task
-	int findF = 0;
-	Storage *storage = Storage::getInstance();
-	TaskList tasklist = storage->getTaskList();
-	TaskList::TList list = tasklist.getAll();
-	TaskList::taskIt it;
-	int num = 0;
-	for (it = list.begin(); it != list.end(); ++it) {
-		num++;
-		if (/*it->getTaskID()*/num == recID){
-			findF = 1;
-			break;
-		}
-	}
-	if (findF == 0)	{
-        throw TaskNotFoundException("Can't find the record!");
-	}
 	char tempEvent[LENGTH];
 	string curStr;
 	int  posTime, posName;
 	posTime = input.find("time", 0);
 	posName = input.find("name", 0);
+
 	if (posTime != -1){
-		cout << "previous date:" << it->getDateStr() << endl;
-		cout << "        begin:" << it->getBeginStr() << endl;
-		cout << "          end:" << it->getEndStr() << endl << endl;
+        if (!toEdit.isFloating()) {
+		    cout << "previous date:" << toEdit.getDateStr() << endl;
+		    cout << "        begin:" << toEdit.getBeginStr() << endl;
+		    cout << "          end:" << toEdit.getEndStr() << endl << endl;
+        }
 		cout << "please input new time:" << endl;
 
 		cin.getline(tempEvent, LENGTH, '\n');
 		curStr.assign(tempEvent, 0, strlen(tempEvent));
+
+        std::string exitCheck = curStr;
+        exitCheck.erase(std::remove(exitCheck.begin(), exitCheck.end(), ' '), exitCheck.end());
+        if (caseInsensitiveFind(exitCheck, ":exit") != string::npos) {
+            throw InvalidInputException("Edit canceled.");
+        }
+
 		parse(curStr, &EventOut);
 		time_t startt, endt;
 		tmConvert(EventOut, &startt, &endt);
-		it->setTaskBegin(startt);
-		it->setTaskEnd(endt);
-		cout << "    new date:" << it->getDateStr() << endl;
-		cout << "       begin:" << it->getBeginStr() << endl;
-		cout << "         end:" << it->getEndStr() << endl << endl;
-		a = *it;
+		toEdit.setTaskBegin(startt);
+		toEdit.setTaskEnd(endt);
+		cout << "    new date:" << toEdit.getDateStr() << endl;
+		cout << "       begin:" << toEdit.getBeginStr() << endl;
+		cout << "         end:" << toEdit.getEndStr() << endl << endl;
+		a = toEdit;
 	}
 	else if (posName != -1) {
-		cout << "previous name:" << it->getTaskName() << endl;
+		cout << "previous name:" << toEdit.getTaskName() << endl;
 		cout << "please input new name:" << endl;
 
 		cin.getline(tempEvent, LENGTH, '\n');
 		curStr.assign(tempEvent, 0, strlen(tempEvent));
+
+        std::string exitCheck = curStr;
+        exitCheck.erase(std::remove(exitCheck.begin(), exitCheck.end(), ' '), exitCheck.end());
+        if (caseInsensitiveFind(exitCheck, ":exit") != string::npos) {
+            throw InvalidInputException("Edit canceled.");
+        }
+
 		cout << "    new name: " << curStr << endl;
-		it->setTaskName(curStr);
-		a = *it;
+		toEdit.setTaskName(curStr);
+		a = toEdit;
 	}
 	else{
-		cout << "previous event:" << it->getTaskName() << endl;
-		cout << "         date:" << it->getDateStr() << endl;
-		cout << "        begin:" << it->getBeginStr() << endl;
-		cout << "          end:" << it->getEndStr() << endl << endl;
+		cout << "previous event:" << toEdit.getTaskName() << endl;
+        if (!toEdit.isFloating()) {
+		    cout << "previous date:" << toEdit.getDateStr() << endl;
+		    cout << "        begin:" << toEdit.getBeginStr() << endl;
+		    cout << "          end:" << toEdit.getEndStr() << endl << endl;
+        }
 
 		cout << "please input new event:" << endl;
 		cin.getline(tempEvent, LENGTH, '\n');
 		curStr.assign(tempEvent, 0, strlen(tempEvent));
+
+        std::string exitCheck = curStr;
+        exitCheck.erase(std::remove(exitCheck.begin(), exitCheck.end(), ' '), exitCheck.end());
+        if (caseInsensitiveFind(exitCheck, ":exit") != string::npos) {
+            throw InvalidInputException("Edit canceled.");
+        }
+
 		parse(curStr, &EventOut);
 		time_t startt, endt;
 		if (EventOut.year!=-1)
@@ -166,17 +214,16 @@ Task Interpreter::parseEditCmd(std::string input) {
 			startt = 0;
 			endt = 0;
 		}
-		it->setTaskBegin(startt);
-		it->setTaskEnd(endt);
-		it->setTaskName(EventOut.event);
-		cout << "   new event:" << it->getTaskName() << endl;
-		cout << "        date:" << it->getDateStr() << endl;
-		cout << "       begin:" << it->getBeginStr() << endl;
-		cout << "         end:" << it->getEndStr() << endl << endl;
-		a = *it;
-	}
 
-	storage->updateStorage(tasklist);
+        // if no time is entered, do not change the time
+        if (startt != 0) {
+            toEdit.setTaskBegin(startt);
+            toEdit.setTaskEnd(endt);
+        }
+
+		toEdit.setTaskName(EventOut.event);
+		a = toEdit;
+	}
 
 	return a;
 }
@@ -290,10 +337,16 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	const char *cheve = cureve.c_str();
 	curEvent.event = cureve;    
 
+    if (posEvent != -1) {
+        event.erase(std::remove(event.begin() + posEvent, event.end(), ' '), event.end());
+    }
+    
+    cal = event.c_str();
+
 	//deal with "next" in a command
 	posNext = caseInsensitiveFind(event, ":next");
 	if (posNext != -1){
-		i = posNext + 6;
+		i = posNext + 5;
 		k = 0;
 		char weekx[10]; 
 		strcpy_s(weekx, "\0");
@@ -340,16 +393,17 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		else{
 			int pMonth, pDay;
 			Monthday(year + 1, yday + nextwday - 365, &pMonth, &pDay);
-			curEvent.year = year + 1;
-			curEvent.month = pMonth;
-			curEvent.day = pDay;
+            
+            curEvent.year = year + 1;			
+            curEvent.month = pMonth;
+            curEvent.day = pDay;            						
 		}
 	}
 
 	//deal with "from" in a command
 	posFrom = caseInsensitiveFind(event, ":from");
 	if (posFrom != -1){
-		i = posFrom + 6;
+		i = posFrom + 5;
 		k = 0;
 		j = 0;
 		char tmch[2][10], apm[2][5];
@@ -357,9 +411,9 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		int num = 0;
 		strcpy_s(apm[0], "am");
 		strcpy_s(apm[1], "am");
-		while (i<strlen(cal)) {
-            //cal[i] gives ASCII code 
 
+        bool toFound = false;
+		while (i<strlen(cal)) {
 			if (cal[i] >= '0' && cal[i] <= '9') {
 				tmch[num][k] = cal[i];
 				k++;
@@ -370,6 +424,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 				j++;
 			}
 			else if (cal[i] == 't' || cal[i] == 'T' || cal[i] == '-') { // check :to
+                toFound = true;
 				k = 0;
 				j = 0;
 				tim[num] = atoi(tmch[num]);
@@ -394,24 +449,81 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		curEvent.month = timeinfo.tm_mon + 1;
 		curEvent.day = timeinfo.tm_mday;
 		curEvent.time = tim[0];
-		curEvent.endtime = tim[1];
+        if (!toFound) {
+            curEvent.endtime = curEvent.time + 200;
+        } 
+        else {
+		    curEvent.endtime = tim[1];
+        }
+	}
+
+	//deal with "to" in a command
+    // if there's only "to" without "from"
+	int posTo = caseInsensitiveFind(event, ":to");
+	if (posTo != -1 && posFrom == -1 && cal[posTo+3] <= '9' && cal[posTo+3] >= '1'){
+		i = posTo + 3;
+		k = 0;
+		j = 0;
+		char tmch[2][10], apm[2][5];
+		int  tim[2];
+		int num = 0;
+		strcpy_s(apm[0], "am");
+		strcpy_s(apm[1], "am");
+
+        bool toFound = false;
+		while (i<strlen(cal)) {
+			if (cal[i] >= '0' && cal[i] <= '9') {
+				tmch[num][k] = cal[i];
+				k++;
+			}
+			else if (cal[i] == 'a' || cal[i] == 'A' || cal[i] == 'p' || cal[i] == 'P'||
+                cal[i] == 'm' || cal[i] == 'M') {
+				apm[num][j] = cal[i];
+				j++;
+			}
+
+			i++;
+		}
+		tim[num] = atoi(tmch[num]);
+		for (int ii = 0; ii<2; ii++) {
+			if (strcmp(apm[ii], "pm") == 0){  
+				if (tim[ii]>100) {
+					tim[ii] = tim[ii] + 1200;
+                } else {
+                    tim[ii] = tim[ii] + 12;
+                }
+			}
+			if (tim[ii]<100) {
+                tim[ii] = tim[ii] * 100;
+            }
+		}
+		curEvent.year = timeinfo.tm_year + 1900;
+		curEvent.month = timeinfo.tm_mon + 1;
+		curEvent.day = timeinfo.tm_mday;
+		curEvent.endtime = tim[0];
+        curEvent.time = curEvent.endtime - 200;
 	}
 
 	//deal with "on" in a command
 	posOn = caseInsensitiveFind(event, ":on"); 
 	if (posOn != -1)	{
-		i = posOn + 4;
+		i = posOn + 3;
 		k = 0;
 		char dat[3][5];
 		int dmy[3];
 		int num = 0;
 
-		while (i<strlen(cal)) {
+		while (i<strlen(cal)) {    
+            if (num == 2 && k == 0 && ((strlen(cal) - i) < 2 ||(strlen(cal) - i) == 3)) {
+                // year has 0, 1 or 3 digits
+                throw InvalidInputException("Unrecognized year. Please check your input.");
+            }        
+
 			if (cal[i] >= '0' && cal[i] <= '9') {
 				dat[num][k] = cal[i];
 				k++;
 			}
-			else if (cal[i] == '/') {
+			else if (cal[i] == '/' || cal[i] == '\\' || cal[i] == '.') {
 				k = 0;
 				num++;
 			}
@@ -420,14 +532,18 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 					i++;
 					continue;
 				}
-				else
+				else {
 					break;
-
+                }
 			}
 			i++;
 		}
-		for (i = 0; i<3; i++)
+
+
+		for (i = 0; i<3; i++) {
 			dmy[i] = atoi(dat[i]);
+        }
+
 		curEvent.year = dmy[2];
 		curEvent.month = dmy[1];
 		curEvent.day = dmy[0];
@@ -438,8 +554,8 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 
 	//deal with "at" in a command
 	posAt = caseInsensitiveFind(event, ":at"); 
-	if (posAt != -1){
-		i = posAt + 4;
+	if (posAt != -1 && posFrom == -1){
+		i = posAt + 3;
 		k = 0;
 		j = 0;
 		char tm[10], apm[3];
@@ -480,11 +596,11 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 
 	//deal with "tomorrow" in a command
 	posTmr1 = caseInsensitiveFind(event, ":tmr"); 
-    if (posTmr1 == string::npos) {
+    if (posTmr1 == string::npos && posOn == -1) {
         posTmr1 = caseInsensitiveFind(event, ":tom"); 
     }
 	posTmr2 = caseInsensitiveFind(event, ":tomorrow"); 
-	if (posTmr1 != -1 || posTmr2 != -1){
+	if (posTmr1 != -1 || posTmr2 != -1 && posOn == -1){
 		int yday, year;
 		year = timeinfo.tm_year + 1900;
 		yday = timeinfo.tm_yday + 1;
@@ -507,24 +623,46 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 	return 1;
 }
 
-void Interpreter::tmConvert(CalEvent Event, time_t *starttime, time_t *endtime)
-{
-
-	int year, mon, day, yday, tim1, tim2;
+void Interpreter::tmConvert(CalEvent Event, time_t *starttime, time_t *endtime) {
+	int year, mon, day, tim1, tim2;
 
 	year = Event.year;
-	mon = Event.month;
+	mon = Event.month - 1;
 	day = Event.day;
 	tim1 = Event.time;
 	tim2 = Event.endtime;
-	yday = 0;
-	for (int i = 1; i < Event.month; i++)
-		yday = yday + month_days(year, i);
-	yday = yday + day;
-	*starttime = (year - 1970) * 365 * 24 * 3600 + yday * 24 * 3600 + (tim1 / 100) * 3600 + (tim1 % 100) * 60 + 232 * 3600;
-	if (tim2 == -1) *endtime = *starttime;
-	else *endtime = (year - 1970) * 365 * 24 * 3600 + yday * 24 * 3600 + (tim2 / 100) * 3600 + (tim2 % 100) * 60 + 232 * 3600;
-}
+
+    if (year > 2200 || year < 1971) {
+        throw InvalidInputException("Sorry, the date you entered is out of range");
+    }
+
+    struct tm startTm;
+    startTm.tm_hour = tim1 / 100;
+    startTm.tm_min = tim1 % 100;
+    startTm.tm_sec = 0;
+    startTm.tm_mday = day;
+    startTm.tm_mon = mon;
+    startTm.tm_year = (year - 1900);
+    time_t start = mktime (&startTm);
+
+    struct tm endTm;
+    endTm.tm_hour = tim2 / 100;
+    endTm.tm_min = tim2 % 100;
+    endTm.tm_sec = 0;
+    endTm.tm_mday = day;
+    endTm.tm_mon = mon;
+    endTm.tm_year = (year - 1900);
+    time_t end = mktime (&endTm);
+
+
+    // if start time earlier than end time, shift end time forward by a day
+    if (start < end) {
+       end += 60 * 60 * 24;
+    }
+
+    *starttime = start;
+    *endtime = end;
+ }
 
 int Interpreter::IsLeapYear(int year)
 {
@@ -685,5 +823,5 @@ int Interpreter::gettingTaskID(std::string input){
 	else if (ID !=0){
 		TaskId = ID;
 	}
-		return TaskId;
-	}
+	return TaskId;
+}

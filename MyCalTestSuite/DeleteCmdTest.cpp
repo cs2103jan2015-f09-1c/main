@@ -6,17 +6,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace MyCalTestSuite {
 	TEST_CLASS(DeleteCmdTest) {
-	public:
-        /*TEST_METHOD(TestDeleteByNum) {
-            unsigned idToDel = 3;
-            MockStorage::initMockStorage(TaskStub::getSampleTaskList());
-            Task taskToDel = TaskStub::getTaskWithID(idToDel);
-
-
-
-            MockStorage::cleanMockStorage();
-        }*/
-        
+	public:        
         TEST_METHOD(TestDeleteByName) {
             MockStorage::initMockStorage(TaskStub::getSmallTaskList());
             
@@ -47,28 +37,6 @@ namespace MyCalTestSuite {
 
             MockStorage::cleanMockStorage();
         }
-
-        /*
-        TEST_METHOD(TestDeleteEmpty) {
-            MockStorage::initMockStorage(TaskStub::getSampleTaskList());
-
-
-            MockStorage::cleanMockStorage();
-        }
-
-        TEST_METHOD(TestDeleteNotFound) {
-            MockStorage::initMockStorage(TaskStub::getSampleTaskList());
-
-
-            MockStorage::cleanMockStorage();
-        }
-
-        TEST_METHOD(TestDeleteUndo) {
-            MockStorage::initMockStorage(TaskStub::getSampleTaskList());
-
-
-            MockStorage::cleanMockStorage();
-        }*/
 	};
 
 

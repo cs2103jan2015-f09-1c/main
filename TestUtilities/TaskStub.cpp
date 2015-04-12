@@ -24,7 +24,7 @@ time_t TaskStub::_15Apr9AM = _14Apr9AM + _secsInADay;
 time_t TaskStub::_16Apr9AM = _15Apr9AM + _secsInADay;
 time_t TaskStub::_17Apr9AM = _16Apr9AM + _secsInADay;
 time_t TaskStub::_19Apr9AM = _17Apr9AM + 2*_secsInADay;
-time_t TaskStub::_Today9AM = getCurrentTime();
+time_t TaskStub::_Today9AM = getToday9AM();
 time_t TaskStub::_Tomorrow9AM = _Today9AM+ _secsInADay;
 
 std::string TaskStub::timetToString(time_t timing) {
@@ -77,14 +77,26 @@ time_t TaskStub::getSampleTimeApr() {
     return rawTime;
 }
 
-time_t TaskStub::getCurrentTime() {
-	time_t rawtime;
-	time(&rawtime);
-    return rawtime;
+time_t TaskStub::getToday9AM() {
+    time_t rawTime;
+    time_t curTime;
+
+    struct tm  *sampleTime;
+    time (&curTime);
+    sampleTime = localtime(&curTime);
+
+    sampleTime->tm_hour = 9;
+    sampleTime->tm_isdst = 0;
+    sampleTime->tm_min = 0;
+    sampleTime->tm_sec = 0;
+
+    rawTime = mktime(sampleTime);
+    
+    return rawTime;
 }
 
 std::string TaskStub::getCurrentDate() {
-    time_t curTime = getCurrentTime();
+    time_t curTime = getToday9AM();
     tm dateStruct;
     localtime_s(&dateStruct, &curTime);
     std::ostringstream beginOss;
@@ -93,7 +105,7 @@ std::string TaskStub::getCurrentDate() {
 }
 
 std::string TaskStub::getTomorrowDate() {
-    time_t curTime = getCurrentTime() + _secsInADay;
+    time_t curTime = getToday9AM() + _secsInADay;
     tm dateStruct;
     localtime_s(&dateStruct, &curTime);
     std::ostringstream beginOss;

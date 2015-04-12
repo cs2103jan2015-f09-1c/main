@@ -34,8 +34,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InterpreterUnitTests", "Int
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TaskMasterUnitTests", "TaskMasterUnitTests\TaskMasterUnitTests.vcxproj", "{A4B3A97D-D83A-4653-ACD0-4A7D1F63E2F6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HistoryUnitTests", "HistoryUnitTests\HistoryUnitTests.vcxproj", "{F7F73CAA-7FB7-4946-AF52-FE692C6EB91F}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Aliases", "Aliases\Aliases.vcxproj", "{FAAFB6E6-7D99-4F18-B733-AA97F51DBDE2}"
 EndProject
 Global
@@ -104,10 +102,6 @@ Global
 		{A4B3A97D-D83A-4653-ACD0-4A7D1F63E2F6}.Debug|Win32.Build.0 = Debug|Win32
 		{A4B3A97D-D83A-4653-ACD0-4A7D1F63E2F6}.Release|Win32.ActiveCfg = Release|Win32
 		{A4B3A97D-D83A-4653-ACD0-4A7D1F63E2F6}.Release|Win32.Build.0 = Release|Win32
-		{F7F73CAA-7FB7-4946-AF52-FE692C6EB91F}.Debug|Win32.ActiveCfg = Debug|Win32
-		{F7F73CAA-7FB7-4946-AF52-FE692C6EB91F}.Debug|Win32.Build.0 = Debug|Win32
-		{F7F73CAA-7FB7-4946-AF52-FE692C6EB91F}.Release|Win32.ActiveCfg = Release|Win32
-		{F7F73CAA-7FB7-4946-AF52-FE692C6EB91F}.Release|Win32.Build.0 = Release|Win32
 		{FAAFB6E6-7D99-4F18-B733-AA97F51DBDE2}.Debug|Win32.ActiveCfg = Debug|Win32
 		{FAAFB6E6-7D99-4F18-B733-AA97F51DBDE2}.Debug|Win32.Build.0 = Debug|Win32
 		{FAAFB6E6-7D99-4F18-B733-AA97F51DBDE2}.Release|Win32.ActiveCfg = Release|Win32

@@ -3,7 +3,7 @@
 #include "MCLogger.h"
 
 TaskNotFoundException::TaskNotFoundException(std::string msg) {
-	MCLogger::log("EXCEPTION: task not found");
+	MCLogger::log("EXCEPTION: " + msg);
     _message = msg;
 }
 
