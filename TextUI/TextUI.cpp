@@ -54,15 +54,18 @@ COORD homeCoords = { 0, 0 };
 const std::string TextUI::WELCOME_MSG = "Welcome to MyCal!"; 
 const std::string TextUI::ENTER_CMD = "Enter command: ";
 const std::string TextUI::UNSCHEDULED_DATE_BAR = 
-	"[Unscheduled Tasks]       Description";
+	"[Unscheduled Tasks]           Description";
 std::string TextUI::QUALIFIER_DATE_BAR = 
-	"[%1%, %2% %3% %4% %5%] %|25t| Description";
+	"[%1%, %2% %3% %4% %5%] %|29t| Description";
 
 std::string TextUI::DEFAULT_DATE_BAR = 
-	"[%1%, %2% %3% %4%] %|25t| Description";
+	"[%1%, %2% %3% %4%] %|29t| Description";
 std:: string TextUI:: TIME_PRINT=
-	"%1%. %2% %|26t|";
+	"%1%. %2% %|30t|";
 std:: string TextUI:: DONE_PRINT= " (done)";
+std::string TextUI:: lastDate;
+std::string TextUI:: nowDate;
+int TextUI:: counter;
 
 struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
     struct tm tmStruct;
@@ -143,8 +146,7 @@ std::string TextUI::getQualifierName(const time_t &taskDate) {
 		}else 
 		if(localTime.tm_yday == nowTime->tm_yday -1){
 			return "Yesterday";
-		}
-		else 
+		}else 
 		if(localTime.tm_yday == nowTime->tm_yday +1){
 			return "Tomorrow";
 		}
@@ -170,7 +172,7 @@ std::string TextUI::getQualifierName(const time_t &taskDate) {
 void TextUI::printDateBar(const time_t &taskDate) {
   
     if (isUnscheduled(taskDate)) {
-	    std::cout << UNSCHEDULED_DATE_BAR << std::endl << std::endl;
+	    std::cout << UNSCHEDULED_DATE_BAR << std::endl;
 	}else {
 
 		std::string qualifier = getQualifierName(taskDate);
@@ -196,13 +198,20 @@ void TextUI::printDateBar(const time_t &taskDate) {
 
 void TextUI::printTasks(TaskList::TList tasks) {
     TaskList::taskIt it;
-	 int counter = 1;
-	 char x = '.';
+	counter = 1;
 
-	std::string lastDate = "";
 	for (it = tasks.begin(); it != tasks.end(); ++it){
+		prepareDatePrint(it);
+		prepareDonePrint(it);
+		std::cout << std::endl;
+		counter++;
+	}
+
+	std::cout << std::endl;
+}
+
+void TextUI::prepareDatePrint(std::list<Task>::const_iterator it){
 	
-		std::string nowDate = "";
 		if(it->isFloating()){
 			nowDate = "0";
 		}else {
@@ -216,45 +225,52 @@ void TextUI::printTasks(TaskList::TList tasks) {
 		}
 
 		lastDate = nowDate;
-		std::string timeStart = "";
-		
+}
+
+std::string TextUI::prepareTimePrint(std::list<Task>::const_iterator it){
+		std::string timeStart= "";
+		std::string timeEnd= "";
+		std::string timePrint= "";
+	
 		if(!isUnscheduled(it->getTaskBegin())){
-			timeStart =  it->getBeginStr();
+			  timeStart = it->getBeginStr();
 		}
 		
-		std::string timeEnd = "";
 		if(!isUnscheduled(it->getTaskEnd())){
-			timeEnd = it->getEndStr();
+			 timeEnd = it->getEndStr();
 		}
 
-		std::string timePrint = "";
 		if(it->taskWithoutTime()){
-			timePrint = "-------------------";
+			timePrint = "------------------";
 		}
-		else if(timeEnd == ""){
-			timePrint = timeStart;
+		else 
+			if (it->isFloating()) {
+			timePrint = "------------------";
 		}else {
 			timePrint = timeStart+" - "+timeEnd;
 		}
 
-		if(it->isDone()){
+		return timePrint;
+}
+
+void TextUI::prepareDonePrint(std::list<Task>::const_iterator it){
+	std::string taskname;
+	std::string  timePrint = prepareTimePrint(it); 
+
+	if(it->isDone()){
 			hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
 			Color:: TextColor (8, 0 ,hStdOut);
 			std::cout << format(TIME_PRINT) %counter %timePrint;
-			std::cout << it->getTaskName();
+			taskname = it->getTaskName();
+			std::cout << taskname;
 			std::cout << DONE_PRINT;
-		} else {
+		}else {
 			hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
 			Color:: TextColor (15, 0 ,hStdOut);
 			std::cout << format(TIME_PRINT) %counter %timePrint;
-			std::cout << it->getTaskName();
+			taskname = it->getTaskName();
+			std::cout << taskname;
 		}
-
-		std::cout << std::endl;
-	    counter++;
-	}
-
-	std::cout << std::endl;
 }
 
 void TextUI:: mappingNumber(TaskList::TList tasks){

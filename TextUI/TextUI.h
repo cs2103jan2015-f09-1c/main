@@ -5,6 +5,10 @@
 class TextUI
 {
 private:
+	static std::string lastDate;
+	static std::string nowDate;
+	static int counter;
+
 	static const std::string WELCOME_MSG;
 	static const std::string ENTER_CMD;
 	static const std::string UNSCHEDULED_DATE_BAR;
@@ -30,7 +34,9 @@ public:
 	static std::string getInput();
 	static void showOutput(UIObject uiObj);
 	static void clearScreen();
-
+	static void prepareDatePrint(std::list<Task>::const_iterator taskIt);
+	static void prepareDonePrint(std::list<Task>::const_iterator taskIt);
+	static std::string prepareTimePrint(std::list<Task>::const_iterator taskIt);
 	TextUI(void);
 	~TextUI(void);
 };
