@@ -9,4 +9,6 @@
 
 #include "CppUnitTest.h"
 #include "Interpreter.h"
+#include "InvalidInputException.h"
+#include "TaskNotFoundException.h"
 #include "TaskStub.h"

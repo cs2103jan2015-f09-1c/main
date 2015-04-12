@@ -3,7 +3,7 @@
 #include "MCLogger.h"
 
 InvalidInputException::InvalidInputException(std::string msg) {
-	MCLogger::log("EXCEPTION: invalid input");
+	MCLogger::log("EXCEPTION: " + msg);
     _message = msg;
 }
 
