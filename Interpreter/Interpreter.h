@@ -30,14 +30,7 @@ private:
     static size_t caseInsensitiveFind(std::string input, std::string pattern, size_t pos = 0);
     // returns true if the substring is found
 	static bool searchSubStr(std::string keyword, Task task);
-	
-	static int parse(std::string event, CalEvent *calEventOut);//event:  input string£»calEventOut: output result
-	static int parseNext(std::string event, CalEvent *calEventOut);
-	static int parseFrom(std::string event, CalEvent *calEventOut);
-	static int parseAt(std::string event, CalEvent *calEventOut);
-	static int parseOn(std::string event, CalEvent *calEventOut);
-	static int parseTmr(std::string event, CalEvent *calEventOut);
-
+	static int parse(std::string event, CalEvent *calEventOut);
 	static int IsLeapYear(int year); //return = 1 means leap year
 	static int month_days(int year, int month); //return number of days in a particular month
 	static void wDaySearch(int year, int month, int day, int *wday); //output: wday:(0-6: Sun,Mon,....,Sat)
