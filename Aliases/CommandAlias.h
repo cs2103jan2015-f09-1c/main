@@ -16,7 +16,6 @@ public:
 	static bool isView(std::string cmd);
 	static bool isDone(std::string cmd);
 	static bool isStorage(std::string cmd);
-	static bool isHelp(std::string cmd);
 	static bool isExit(std::string cmd);
 };
 
