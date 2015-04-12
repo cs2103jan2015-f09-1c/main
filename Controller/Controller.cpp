@@ -27,7 +27,7 @@ UIObject Controller::undoCommand(CommandType::Command cmdType) {
             return delCmd.undo();
         }
         case CommandType::EDIT: {
-            StorageCmd editCmd;
+            EditCmd editCmd;
             return editCmd.undo();
         }
 		case CommandType::DONE: {
@@ -92,7 +92,6 @@ UIObject Controller::handleInput(std::string input) {
             MCLogger::log("Controller.cpp: begin undo command");
             History *hist = History::getInstance();
             CommandType::Command prevCmd = hist->getPreviousCommand();
-            
             UIObject feedback;
             feedback = undoCommand(prevCmd);
             return feedback;

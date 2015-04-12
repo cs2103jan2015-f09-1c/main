@@ -89,7 +89,6 @@ UIObject DeleteCmd::undo() {
   
     TaskList::TList tasksThatDay;
     tasksThatDay = taskList.getDay(task.getTaskBegin());
-    tasksThatDay.push_back(task);
 
 	//return UIObject
 	undoMessage.setHeaderText(UNDO_MESSAGE);

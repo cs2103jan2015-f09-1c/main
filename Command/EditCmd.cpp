@@ -3,7 +3,7 @@
 #include "TaskList.h"
 #include "History.h"
 #include <assert.h>
-
+#include "MCLogger.h"
 const std::string EditCmd::UNDO_MESSAGE = "Edit undo successful. Tasks for that day:";
 
 EditCmd::EditCmd(void) {
@@ -39,6 +39,8 @@ UIObject EditCmd::execute() {
     }
 
 	edited.setHeaderText(headerText);
+    History *hist = History::getInstance();
+    CommandType::Command prevCmd = hist->getPreviousCommand();
 
     return edited;
 }
@@ -62,7 +64,6 @@ UIObject EditCmd::undo() {
 
     TaskList::TList tasksThatDay;
     tasksThatDay = taskList.getDay(prevTask.getTaskBegin());
-    tasksThatDay.push_back(prevTask);
 
 	//return UIObject
 	undoMessage.setHeaderText(UNDO_MESSAGE);
