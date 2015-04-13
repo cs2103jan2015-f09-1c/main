@@ -73,7 +73,6 @@ Task Interpreter::parseAddCmd(std::string detail) {
 		int flag;
 
 		CalEvent EventOut;
-
 		string event;
 		const char *cal = detail.c_str();
 		event.assign(cal);
@@ -247,8 +246,7 @@ int Interpreter::parseDelCmd(std::string input){
 	int TaskId; 
 	if (DeleteAlias::isInteger(input) || !DeleteAlias::isHelp(input)){
 		TaskId = gettingTaskID(input);
-	}
-	else if (DeleteAlias::isHelp(input)){
+	} else if (DeleteAlias::isHelp(input)){
 		TaskId = -1;
 	}
 	return TaskId;
@@ -294,9 +292,9 @@ TaskList::TList Interpreter::parseSearchCmd (std::string input){
 		}
 	}
 	if (foundTaskList.empty()){
-			Task task;
-				task.setTaskID (0);
-				foundTaskList.push_back(task);
+		Task task;
+		task.setTaskID (0);
+		foundTaskList.push_back(task);
 	}
 	return foundTaskList;
 }
@@ -384,6 +382,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		year = timeinfo.tm_year + 1900;
 		yday = timeinfo.tm_yday + 1;
 		wday = timeinfo.tm_wday;
+		assert(wday >= 0);
 		nextwday = 6 - wday + i + 1;
 		if (yday <= 365 - nextwday){
 			int pMonth, pDay;
@@ -394,8 +393,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		}
 		else{
 			int pMonth, pDay;
-			Monthday(year + 1, yday + nextwday - 365, &pMonth, &pDay);
-            
+			Monthday(year + 1, yday + nextwday - 365, &pMonth, &pDay);     
             curEvent.year = year + 1;			
             curEvent.month = pMonth;
             curEvent.day = pDay;            						
@@ -413,6 +411,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		int num = 0;
 		strcpy_s(apm[0], "am");
 		strcpy_s(apm[1], "am");
+		assert(apm[1] != " ");
 
         bool toFound = false;
 		while (i<strlen(cal)) {
@@ -541,7 +540,6 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 			i++;
 		}
 
-
 		for (i = 0; i<3; i++) {
 			dmy[i] = atoi(dat[i]);
         }
@@ -572,8 +570,8 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 				apm[j] = cal[i];
 				j++;
 			}
-			else
-			if (j >= 2) break;
+			else if (j >= 2) 
+				break;
 			i++;
 		}
 
@@ -592,7 +590,8 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 			curEvent.month = timeinfo.tm_mon + 1;
 			curEvent.day = timeinfo.tm_mday;
 		}
-		if (tmm>2400)  return -1;
+		if (tmm>2400)  
+			return -1;
 
 	}
 
@@ -610,8 +609,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 			curEvent.year = year + 1;
 			curEvent.month = 1;
 			curEvent.day = 1;
-		}
-		else{
+		} else {
 			int pMonth, pDay;
 			Monthday(year, yday + 1, &pMonth, &pDay);
 			curEvent.year = year;
