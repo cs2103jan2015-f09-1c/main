@@ -1,4 +1,4 @@
-//@Ratnawati Kwanditanto A0113736J
+//@author A0113736J
 #include "ViewType.h"
 #include <sstream>
 #include <algorithm>

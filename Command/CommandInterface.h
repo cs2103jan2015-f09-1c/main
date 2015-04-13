@@ -1,4 +1,4 @@
-//@Seow Yan Yi A0086626W
+//@author A0086626W
 #pragma once
 #include "UIObject.h"
 #include "TextUI.h"

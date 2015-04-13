@@ -1,4 +1,4 @@
-//@Seow Yan Yi A0086626W
+//@author A0086626W
 #include "Storage.h"
 #include "MCLogger.h"
 #include <fstream>

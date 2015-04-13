@@ -1,4 +1,4 @@
-//@Seow Yan Yi A0086626W
+//@author A0086626W
 #include "StorageUtils.h"
 #include <sstream>
 StorageUtils::StorageUtils(void) {

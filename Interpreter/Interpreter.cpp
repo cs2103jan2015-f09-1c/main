@@ -18,7 +18,7 @@
 using namespace std; 
 const size_t Interpreter::NUM_CHARS_DONE = 4;
 const size_t Interpreter::NUM_CHARS_DELETE = 6;
-//@Seow Yan Yi A0086626W
+//@author A0086626W
 std::string Interpreter::getEditHelp() {
 	std::string title = "***************** COMMAND HELP: EDIT  *****************\n\n";
 
@@ -61,7 +61,7 @@ bool Interpreter::searchSubStr(std::string keyword, Task task) {
 	}
 }
 
-//Liu Dongdong A0113856A
+//@author A0113856A
 Task Interpreter::parseAddCmd(std::string detail) {
 	MCLogger::log("Interpreter.cpp: add command");
 	Task a;
@@ -228,7 +228,7 @@ Task Interpreter::parseEditCmd(std::string input) {
 	return a;
 }
 
-//@Seow Yan Yi A0086626W
+//@author A0086626W
 std::string Interpreter::parseStoreCmd(std::string input) {    
     if (StorageAlias::isGetLocation(input)) { 
         return "getLocation";
@@ -241,7 +241,7 @@ std::string Interpreter::parseStoreCmd(std::string input) {
     return input;
 }
 
-//@Pham Thi Hong A0113955A
+//@author A0113955A
 int Interpreter::parseDelCmd(std::string input){
 	int TaskId; 
 	if (DeleteAlias::isInteger(input) || !DeleteAlias::isHelp(input)){
@@ -251,7 +251,7 @@ int Interpreter::parseDelCmd(std::string input){
 	}
 	return TaskId;
 }
-//@Ratnawati Kwanditanto A0113736J
+//@author A0113736J
 int Interpreter::parseDoneCmd(std::string input){
 	int TaskId;
 
@@ -270,7 +270,7 @@ std::string Interpreter::parseViewCmd(std::string input){
 	return detail;
 }
 
-//@Pham Thi Hong A0113955A
+//@author A0113955A
 TaskList::TList Interpreter::parseSearchCmd (std::string input){
 	MCLogger::log("Interpreter.cpp: parse search command");
 	Storage *storage = Storage::getInstance();
@@ -306,7 +306,7 @@ Interpreter::~Interpreter(void) {
 }
 
 
-//Liu Dongdong A0113856A
+//@author A0113856A
 int Interpreter::parse(string event, CalEvent *calEventOut) {
 	char week[7][10] = { "sun", "mon", "tues", "wed", "thur", "fri", "sat" };
 	int posOn, posAt, posTmr1, posTmr2, posNext, posFrom, posEvent;
@@ -753,7 +753,7 @@ void Interpreter::Monthday(int year, int yearDay, int *pMonth, int *pDay)
 
 }
 
-//@Pham Thi Hong A0113955A
+//@author A0113955A
 Task Interpreter::prepareTask(std::string input) {
     //std::string taskToDel = input.substr(lengthCommand);
     Storage *storage = Storage::getInstance();
@@ -784,7 +784,7 @@ Task Interpreter::prepareTask(std::string input) {
 
 }
 
-//@Pham Thi Hong A0113955A
+//@author A0113955A
 int Interpreter::ConvertStrtoNum(std::string str){
 	int integer;
 	std::stringstream convert (str);
@@ -799,7 +799,7 @@ int Interpreter::ConvertStrtoNum(std::string str){
 	return integer;
 }
 
-//@Pham Thi Hong A0113955A
+//@author A0113955A
 int Interpreter::gettingTaskID(std::string input){
 	MappingNumber *mapping = MappingNumber::getInstance();
 	Task _task = prepareTask(input);
