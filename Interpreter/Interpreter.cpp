@@ -393,8 +393,7 @@ int Interpreter::parse(string event, CalEvent *calEventOut) {
 		}
 		else{
 			int pMonth, pDay;
-			Monthday(year + 1, yday + nextwday - 365, &pMonth, &pDay);
-            
+			Monthday(year + 1, yday + nextwday - 365, &pMonth, &pDay);     
             curEvent.year = year + 1;			
             curEvent.month = pMonth;
             curEvent.day = pDay;            						
