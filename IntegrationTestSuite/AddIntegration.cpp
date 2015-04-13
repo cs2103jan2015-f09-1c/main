@@ -19,19 +19,5 @@ namespace IntegrationTestSuite {
 
 			MockStorage::cleanMockStorage();
 		}
-		
-		TEST_METHOD(AddOnDate) {
-			MockStorage::initMockStorage(TaskStub::getSmallTaskList());
-
-			UIObject output = Controller::handleInput("add submit application :on 01/01/2017");
-			Assert::AreEqual(std::string("Task added"), output.getHeaderText());
-
-			TaskList taskList;
-			taskList.loadTaskList(output.getTaskList());
-			std::string expectedList = "6 submit application\nThu Jan 01 1970 08:00 AM - 08:00 AM\ndone: 0 float: 0\n";
-			Assert::AreEqual(expectedList, taskList.toString());
-
-			MockStorage::cleanMockStorage();
-		}
 	};
 }
