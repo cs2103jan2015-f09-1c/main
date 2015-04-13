@@ -1,3 +1,4 @@
+//@Ratnawati Kwanditanto A0113736J
 #include "MappingNumber.h"
 
 MappingNumber* MappingNumber::_instance = 0;
