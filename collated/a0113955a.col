@@ -1,0 +1,795 @@
+//@author: a0113955a
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\AddAlias.cpp
+	 */
+
+#include "AddAlias.h"
+#include <algorithm> //std::transform
+#include <sstream>
+
+void AddAlias::removeSpaces(std::string &input) {
+  input.erase(std::remove(input.begin(), input.end(), ' '), input.end());
+}
+
+AddAlias::AddAlias(void) {
+}
+
+AddAlias::~AddAlias(void) {
+}
+
+bool AddAlias::isHelp(std::string detail) {
+	removeSpaces(detail);
+	return detail == "";
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\AddAlias.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\AddAlias.h
+	 */
+
+#pragma once
+#include <string>
+
+class AddAlias {
+private:
+	static void removeSpaces(std::string &input);
+
+public:
+	AddAlias(void);
+	~AddAlias(void);
+	
+
+	// if there is nothing after the input command, it means
+	// the command is trying show help messages. Return true in this case.
+	static bool isHelp(std::string input);
+};
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\AddAlias.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\AddCmd.cpp
+	 */
+
+void AddCmd::recordInHistory(Task task) {
+    State prevState; 
+    prevState.recordTask (task);
+    History *hist = History::getInstance();
+    hist->saveState(prevState);
+    hist->saveCommand(CommandType::ADD);
+}
+
+
+UIObject AddCmd::execute() {
+	UIObject addObj;
+    //get current tasks
+    Storage* storage = Storage::getInstance();
+    TaskList taskList = storage->getTaskList();
+
+	if (_task.getTaskID() == -1){
+		addObj.setHeaderText (getHelp());
+	}
+	else if (_task.getTaskID() != -1){
+    //set the taskid
+    _task.setTaskID(storage->getNextID());
+
+    //add the task
+    taskList.add(_task);
+
+    //update storage
+    storage->updateStorage(taskList);    
+
+	recordInHistory (_task);
+
+    //returns the day's tasks
+    TaskList::TList tasksThatDay;
+    tasksThatDay = taskList.getDay(_task.getTaskBegin());
+
+    addObj.setHeaderText(ADD_MESSAGE);
+    addObj.setTaskList(tasksThatDay);
+	}
+
+    return addObj;
+}
+
+UIObject AddCmd::undo() {
+	History *hist = History::getInstance();
+
+	CommandType::Command prevCmd = hist->getPreviousCommand();
+    assert(prevCmd == CommandType::ADD);
+
+	State prevState = hist->getPreviousState();
+	Task task = prevState.getTask();
+
+	Storage* storage = Storage::getInstance();
+    TaskList taskList = storage->getTaskList();
+
+	//Removed the newly added task
+	taskList.remove(task.getTaskID());
+	storage->updateStorage(taskList);
+
+	hist->clearHistory();
+
+    UIObject undoMessage;
+
+	TaskList::TList tasksThatDay;
+    tasksThatDay.push_back (task);
+
+	undoMessage.setHeaderText(UNDO_MESSAGE);
+	undoMessage.setTaskList(tasksThatDay);
+
+    return undoMessage;
+}
+
+std::string AddCmd::getHelp() const{
+		std::string help;
+
+	std::string title = "***************** COMMAND HELP: ADD  *****************\n\n";
+
+	std::string intro = "The add command allows you to add a task \n\n"; 
+
+	std::string pt1 = "1. This command can be invoked by typing add [task name] {:optional detail1} {:optional detail2} \n";
+	pt1 = pt1 + "TIME {:at time}\n";
+    pt1 = pt1 + "     {:from startTime to endTime}\n";
+	pt1 = pt1 + "     {:by time}]\n";
+	pt1 = pt1 + "DATE {:dateSpecifier}\n\n";
+	pt1 = pt1 + "Aliases: a \n\n";
+	pt1 = pt1 + "Example: add meeting :at 230pm \n";
+	pt1 = pt1 + "         a project due :tomorrow\n";
+
+	help = title + intro + pt1;
+
+	return help;
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\AddCmd.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\DeleteAlias.cpp
+	 */
+
+#include "DeleteAlias.h"
+#include <algorithm> //std::transform
+#include <sstream>
+
+void DeleteAlias::removeSpaces(std::string &input) {
+  input.erase(std::remove(input.begin(), input.end(), ' '), input.end());
+}
+
+DeleteAlias::DeleteAlias(void) {
+}
+
+
+DeleteAlias::~DeleteAlias(void) {
+}
+
+bool DeleteAlias::isInteger(std::string detail) {
+	int integer;
+	std::stringstream convert (detail);
+	convert >> integer;
+
+	if (convert.fail()){
+		integer = 0;
+	}
+	else{
+		integer = 1 ;
+	}
+	return integer;
+}
+
+bool DeleteAlias::isHelp(std::string detail) {
+	removeSpaces(detail);
+	return detail == "";
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\DeleteAlias.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\DeleteAlias.h
+	 */
+
+#pragma once
+#include <string>
+
+class DeleteAlias {
+private:
+	static void removeSpaces(std::string &input);
+
+public:
+	DeleteAlias(void);
+	~DeleteAlias(void);
+	
+	static bool isInteger(std::string detail);
+
+	// if there is nothing after the input command, it means
+	// the command is trying show help messages. Return true in this case.
+	static bool isHelp(std::string alias);
+};
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\DeleteAlias.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\DeleteCmd.cpp
+	 */
+
+#include "DeleteCmd.h"
+#include "Storage.h"
+#include "TaskList.h"
+#include "MappingNumber.h"
+#include <iostream>
+#include <sstream>
+#include <assert.h>
+#include <time.h>
+#include "History.h"
+#include "State.h"
+#include "MCLogger.h"
+
+const std::string DeleteCmd::NO_MATCHING_TASK =  "There is no matching task to be deleted.";
+const std::string DeleteCmd::NO_TASK_MESSAGE = "Task deleted successfully. No more tasks for that day!";
+const std::string DeleteCmd::REMAINING_TASK_MESSAGE = "Task deleted successfully. Remaining tasks for that day:";
+const std::string DeleteCmd::UNDO_MESSAGE = "Task added back to storage. Tasks for that day:";
+
+DeleteCmd::DeleteCmd(void) {
+}
+
+DeleteCmd::~DeleteCmd(void) {
+}
+
+void DeleteCmd::prepareTaskId(int _TaskId) {
+    TaskId = _TaskId;
+}
+
+void DeleteCmd::recordInHistory(Task task) {
+    State prevState; 
+    prevState.recordTask (task);
+    History *hist = History::getInstance();
+    hist->saveState(prevState);
+    hist->saveCommand(CommandType::DEL);
+}
+
+UIObject DeleteCmd::execute() {
+  UIObject temp;
+  Storage* storage = Storage::getInstance();
+  TaskList taskList = storage->getTaskList();
+
+  if (TaskId == 0){
+	  temp.setHeaderText(NO_MATCHING_TASK);
+  }
+  else if (TaskId == -1){
+	  temp.setHeaderText(getHelp());
+  }
+  else{
+	  Task ActualTask = taskList.findTask(TaskId);
+	  recordInHistory (ActualTask);
+
+	  taskList.remove(TaskId);
+	  storage->updateStorage(taskList);
+
+	  TaskList::TList tasksThatDay;
+      tasksThatDay = taskList.getDay(ActualTask.getTaskBegin());
+      temp.setTaskList(tasksThatDay);
+	  
+	  if (tasksThatDay.empty()){
+		  temp.setHeaderText(NO_TASK_MESSAGE);
+	  }
+	  else{
+		  temp.setHeaderText(REMAINING_TASK_MESSAGE);
+	  }
+  }
+	 //return UI Object 
+	 return temp;
+}
+
+
+UIObject DeleteCmd::undo() {
+
+	History *hist = History::getInstance();
+
+	CommandType::Command prevCmd = hist->getPreviousCommand();
+    assert(prevCmd == CommandType::DEL);
+
+	State prevState = hist->getPreviousState();
+	Task task = prevState.getTask();
+
+	Storage* storage = Storage::getInstance();
+    TaskList taskList = storage->getTaskList();
+
+	taskList.add(task);
+	storage->updateStorage(taskList);    
+
+	hist->clearHistory();
+
+    UIObject undoMessage;
+  
+    TaskList::TList tasksThatDay;
+    tasksThatDay = taskList.getDay(task.getTaskBegin());
+
+	//return UIObject
+	undoMessage.setHeaderText(UNDO_MESSAGE);
+	undoMessage.setTaskList(tasksThatDay);
+
+    return undoMessage;
+}
+
+std::string DeleteCmd::getHelp() const{
+	std::string help;
+
+	std::string title = "***************** COMMAND HELP: DELETE  *****************\n\n";
+
+	std::string intro = "The delete command allows you to remove your task \n\n"; 
+
+	std::string pt1 = "1. This command can be invoked by typing delete [Task number/ Task name] \n";
+	pt1 = pt1 + "Aliases: del \n\n";
+	pt1 = pt1 + "Example: delete 1 \n";
+	pt1 = pt1 + "         del meet mum \n";
+
+	help = title + intro + pt1;
+
+	return help;
+}
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\DeleteCmd.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\DeleteCmd.h
+	 */
+
+#pragma once
+#include "commandinterface.h"
+class DeleteCmd : public CommandInterface {
+public:
+    DeleteCmd(void);
+    ~DeleteCmd(void);
+    void prepareTaskId(int _TaskId);
+	void recordInHistory(Task task);
+    UIObject execute();
+    UIObject undo();
+	std::string getHelp()const;
+
+	static const std::string NO_MATCHING_TASK;
+	static const std::string NO_TASK_MESSAGE;
+	static const std::string REMAINING_TASK_MESSAGE;
+	static const std::string UNDO_MESSAGE;
+private:
+    int TaskId;
+};
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\DeleteCmd.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+	 */
+
+int Interpreter::parseDelCmd(std::string input){
+	int TaskId; 
+	if (DeleteAlias::isInteger(input) || !DeleteAlias::isHelp(input)){
+		TaskId = gettingTaskID(input);
+	} else if (DeleteAlias::isHelp(input)){
+		TaskId = -1;
+	}
+	return TaskId;
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+	 */
+
+TaskList::TList Interpreter::parseSearchCmd (std::string input){
+	MCLogger::log("Interpreter.cpp: parse search command");
+	Storage *storage = Storage::getInstance();
+	TaskList tasklist = storage->getTaskList();
+	TaskList::TList list = tasklist.getAll();
+	TaskList::TList foundTaskList;
+	TaskList::taskIt it;
+
+	if (SearchAlias::isHelp(input)){
+		Task task;
+		task.setTaskID(-1);
+			foundTaskList.push_back(task);
+	} else{
+		for (it = list.begin(); it != list.end(); ++it) {
+			Task _task = *it;
+			if (searchSubStr(input, _task)) {
+				foundTaskList.push_back(_task);
+			}
+		}
+	}
+	if (foundTaskList.empty()){
+		Task task;
+		task.setTaskID (0);
+		foundTaskList.push_back(task);
+	}
+	return foundTaskList;
+}
+
+Interpreter::Interpreter(void) {
+}
+
+Interpreter::~Interpreter(void) {
+}
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+	 */
+
+Task Interpreter::prepareTask(std::string input) {
+    //std::string taskToDel = input.substr(lengthCommand);
+    Storage *storage = Storage::getInstance();
+    TaskList tasklist = storage->getTaskList();
+    TaskList::TList list = tasklist.getAll();
+    TaskList::taskIt it;
+
+	int _size = input.size();
+	for (int i=0; i<_size; i++){
+		if (isdigit(input[i])){
+				Task _task;
+				_task.setTaskName(input);
+				_task.setTaskID(0);
+				return _task;
+		}
+		else{
+    for (it = list.begin(); it != list.end(); ++it) {
+        Task task = *it;
+        if (searchSubStr(input, task)) {
+            return task;
+		}
+	}
+		}
+	}
+    //else, throw excpetion
+    Task a;
+    return a;
+
+}
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+	 */
+
+int Interpreter::ConvertStrtoNum(std::string str){
+	int integer;
+	std::stringstream convert (str);
+	convert >> integer;
+
+	if (convert.fail()){
+		integer = 0;
+	}
+	else{
+		convert >> integer;
+	}
+	return integer;
+}
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+	 */
+
+int Interpreter::gettingTaskID(std::string input){
+	MappingNumber *mapping = MappingNumber::getInstance();
+	Task _task = prepareTask(input);
+	std::string taskToDel = _task.getTaskName();
+	int TaskId;
+	int integer;
+	int ID = _task.getTaskID();
+	if (ID == 0){
+		integer = ConvertStrtoNum (taskToDel);
+		if (integer == 0){
+			TaskId = 0;
+		}
+		else{
+			int count = mapping->countNode ();
+			if(integer > count){
+				TaskId = 0;
+			}
+			else{
+				TaskId = mapping->getTaskID(integer);
+			}
+		}
+	}
+	else if (ID !=0){
+		TaskId = ID;
+	}
+	return TaskId;
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\InterpreterSearchTest.cpp
+	 */
+
+#include "stdafx.h"
+#include "CppUnitTest.h"
+#include "CommandType.h"
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace MyCalTestSuite {
+	TEST_CLASS(InterpreterAddPositiveTest) {
+	public:
+		bool check_substring(std::string sub_str, std::string str ){
+			if (str.find(sub_str) != std::string::npos){
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+
+		TEST_METHOD (TestParseSearchCmd){
+			std::string input = "search meeting";
+			TaskList::TList list;
+			std::string keyword = CommandType::filterOutCmd(input); 
+			list = Interpreter::parseSearchCmd(keyword);
+
+			for (int i=0; i<list.size(); i++){
+			    Task task = list.front();
+			    std::string taskName = task.getTaskName();
+			    int TaskId = task.getTaskID();
+			    if (TaskId > 0){
+			    Assert::IsTrue(check_substring(keyword, taskName));
+			    //Check if the task name contain the key word "meeting"
+			}
+			else if (TaskId <= 0 ){
+				//Check if the task name contain the key word "meeting"
+				Assert::IsFalse(check_substring(keyword, taskName));
+			}
+			list.pop_front();
+			}
+		}                
+	};
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\InterpreterSearchTest.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\SearchAlias.cpp
+	 */
+
+#include "SearchAlias.h"
+#include <algorithm> //std::transform
+#include <sstream>
+
+void SearchAlias::removeSpaces(std::string &input) {
+  input.erase(std::remove(input.begin(), input.end(), ' '), input.end());
+}
+
+SearchAlias::SearchAlias(void) {
+}
+
+
+SearchAlias::~SearchAlias(void) {
+}
+
+bool SearchAlias::isHelp(std::string detail) {
+	removeSpaces(detail);
+	return detail == "";
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\SearchAlias.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\SearchAlias.h
+	 */
+
+#pragma once
+#include <string>
+
+class SearchAlias {
+private:
+	static void removeSpaces(std::string &input);
+
+public:
+	SearchAlias(void);
+	~SearchAlias(void);
+
+	// if there is nothing after the input command, it means
+	// the command is trying show help messages. Return true in this case.
+	static bool isHelp(std::string alias);
+};
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\SearchAlias.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\SearchCmd.cpp
+	 */
+
+#include "SearchCmd.h"
+#include "Storage.h"
+#include "TaskList.h"
+
+
+const std::string SearchCmd::NO_MATCHING_TASK = "There are no matching results";
+const std::string SearchCmd::FOUND_TASK_MESSAGE = "Tasks found:";
+
+SearchCmd::SearchCmd(void) {
+}
+
+SearchCmd::~SearchCmd(void) {
+}
+
+void SearchCmd::prepareList (TaskList::TList _List){
+	List = _List;
+}
+
+UIObject SearchCmd::execute() {
+    UIObject temp;
+	Task task = List.front();
+	//Search
+	if (task.getTaskID() == 0){
+		temp.setHeaderText (NO_MATCHING_TASK);
+	}
+	else if (task.getTaskID() == -1){
+		temp.setHeaderText(getHelp());
+	}
+	else {
+		temp.setHeaderText (FOUND_TASK_MESSAGE);
+		temp.setTaskList (List);
+	}
+
+    //return UI Object 
+    return temp;
+}
+
+std::string SearchCmd::getHelp() const{
+	std::string help;
+
+	std::string title = "***************** COMMAND HELP: SEARCH  *****************\n\n";
+
+	std::string intro = "The search command allows you to look for a task \n\n"; 
+
+	std::string pt1 = "1. This command can be invoked by typing search [Key word] \n";
+	pt1 = pt1 + "Aliases: s, se \n\n";
+	pt1 = pt1 + "Example: search meeting \n";
+	pt1 = pt1 + "         s movies with John \n";
+	pt1 = pt1 + "         se John\n";
+
+	help = title + intro + pt1;
+
+	return help;
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\SearchCmd.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\SearchCmd.h
+	 */
+
+#pragma once
+#include "commandinterface.h"
+#include "TaskList.h"
+
+
+class SearchCmd : public CommandInterface {
+public:
+    SearchCmd(void);
+    ~SearchCmd(void);
+	void prepareList(TaskList::TList _List);
+    UIObject execute();
+	std::string getHelp()const;
+
+	static const std::string NO_MATCHING_TASK;
+	static const std::string FOUND_TASK_MESSAGE;
+
+private:
+	TaskList::TList List;
+};
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\SearchCmd.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\SearchIntegration.cpp
+	 */
+
+#include "stdafx.h"
+#include "CppUnitTest.h"
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace IntegrationTestSuite {		
+	TEST_CLASS(SearchIntegration) {
+	public:
+		TEST_METHOD(Search_found) {
+			MockStorage::initMockStorage(TaskStub::getLargeTaskList());
+
+			UIObject controllerOutput = Controller::handleInput("search dummy T4");
+
+			Assert::AreEqual(std::string("Tasks found:"), controllerOutput.getHeaderText());
+
+			TaskList::TList list = controllerOutput.getTaskList();
+			TaskList taskList;
+			taskList.loadTaskList(list);
+			std::string expectedList = "4 dummy T4\nTue Mar 10 2015 07:23 AM - 08:23 AM\ndone: 0 float: 0\n";
+			Assert::AreEqual(expectedList, taskList.toString());
+
+			MockStorage::cleanMockStorage();
+		}
+
+		TEST_METHOD(Search_notfound) {
+			MockStorage::initMockStorage(TaskStub::getLargeTaskList());
+			UIObject controllerOutput = Controller::handleInput("search meeting");
+			
+			Assert::AreEqual(std::string("There are no matching results"), controllerOutput.getHeaderText());
+
+			TaskList::TList list = controllerOutput.getTaskList();
+			Assert::IsTrue(list.empty());
+
+			MockStorage::cleanMockStorage();
+		}
+	};
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\SearchIntegration.cpp
+
+
+
+
+

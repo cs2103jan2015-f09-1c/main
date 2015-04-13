@@ -1,0 +1,1326 @@
+//@author: a0113736j
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Color.cpp
+	 */
+
+#include "Color.h"
+
+Color:: Color(void){
+}
+
+Color:: ~Color(void){
+}
+
+void Color:: TextColor(int fontcolor,int backgroundcolor,HANDLE screen)
+{
+   int color_attribute;
+   color_attribute = backgroundcolor;
+   color_attribute = _rotl(color_attribute,4) | fontcolor;
+   SetConsoleTextAttribute(screen,color_attribute);
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Color.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Color.h
+	 */
+
+#pragma once
+#include <windows.h>
+
+class Color{
+public:
+    enum ColorList{
+		BLACK, BLUE, GREEN, CYAN, RED, MAGENTA,
+		BROWN, LIGHTGREY, DARKGREY, LIGHTBLUE, LIGHTGREEN,
+		LIGHTCYAN, LIGHTRED, LIGHTMAGENTA, YELLOW, WHITE,
+		BLINK
+	};
+	Color(void);
+    ~Color(void);
+
+	static void TextColor(int fontcolor,int backgroundcolor,HANDLE 	hStdOut);
+	static HANDLE hStdOut;
+
+private:
+	int textColor;
+	int textBackground;
+};
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Color.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\DoneAlias.cpp
+	 */
+
+#include "DoneAlias.h"
+#include <algorithm> //std::transform
+#include <sstream>
+
+void DoneAlias::removeSpaces(std::string &input) {
+  input.erase(std::remove(input.begin(), input.end(), ' '), input.end());
+}
+
+DoneAlias::DoneAlias(void) {
+}
+
+
+DoneAlias::~DoneAlias(void) {
+}
+
+bool DoneAlias::isInteger(std::string detail) {
+	int integer;
+	std::stringstream convert (detail);
+	convert >> integer;
+
+	if (convert.fail()){
+		integer = 0;
+	}
+	else{
+		integer = 1 ;
+	}
+	return integer;
+}
+
+bool DoneAlias::isHelp(std::string detail) {
+	removeSpaces(detail);
+	return detail == "";
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\DoneAlias.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\DoneAlias.h
+	 */
+
+#pragma once
+#include <string>
+
+class DoneAlias {
+private:
+	static void removeSpaces(std::string &input);
+
+public:
+	DoneAlias(void);
+	~DoneAlias(void);
+	
+	static bool isInteger(std::string detail);
+
+	// if there is nothing after the input command, it means
+	// the command is trying show help messages. Return true in this case.
+	static bool isHelp(std::string alias);
+};
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\DoneAlias.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\DoneCmd.cpp
+	 */
+
+#include "DoneCmd.h"
+#include "Storage.h"
+#include "TaskList.h"
+#include "MappingNumber.h"
+#include <iostream>
+#include <time.h>
+#include <assert.h>
+#include "History.h"
+#include "State.h"
+#include "MCLogger.h"
+
+const std::string DoneCmd:: NO_MATCHING_TASK = "There is no matching task to be marked done.";
+const std::string DoneCmd:: DONE_MESSAGE = "Done: "; 
+const std::string DoneCmd:: UNDO_DONE_MESSAGE = " has been marked undone!";
+
+DoneCmd::DoneCmd(void) {
+}
+
+DoneCmd::~DoneCmd(void) {
+}
+
+void DoneCmd::prepareTaskId(int _taskId) {
+    taskId = _taskId;
+}
+
+
+UIObject DoneCmd:: execute(){
+	UIObject doneObj;
+	
+	if (taskId == 0){
+		doneObj.setHeaderText(NO_MATCHING_TASK);
+	 }else 
+	 if (taskId == -1){
+		 std::string help = getHelp();
+		 doneObj.setHeaderText(help);
+	}else {
+	//get current tasks
+    Storage* storage = Storage::getInstance();
+    TaskList taskList = storage->getTaskList();
+
+	Task ActualTask = taskList.findTask(taskId);
+	recordInHistory (ActualTask);
+
+	taskList.markDone(taskId);
+	storage->updateStorage(taskList);
+
+	TaskList::TList tasksThatDay;
+    tasksThatDay = taskList.getDay(ActualTask.getTaskBegin());
+	
+	doneObj.setHeaderText(DONE_MESSAGE + ActualTask.getTaskName());
+	doneObj.setTaskList(tasksThatDay);
+	}
+    return doneObj;
+}
+
+void DoneCmd::recordInHistory(Task task) {
+    State prevState; 
+    prevState.recordTask (task);
+    History *hist = History::getInstance();
+    hist->saveState(prevState);
+    hist->saveCommand(CommandType::DONE);
+}
+
+
+UIObject DoneCmd:: undo(){
+	History *hist = History::getInstance();
+
+	CommandType::Command prevCmd = hist->getPreviousCommand();
+    assert(prevCmd == CommandType::DONE);
+
+	State prevState = hist->getPreviousState();
+	Task task = prevState.getTask();
+
+	Storage* storage = Storage::getInstance();
+    TaskList taskList = storage->getTaskList();
+
+	//Removed the newly added task
+	taskList.markUndone(task.getTaskID());
+	storage->updateStorage(taskList);
+
+	hist->clearHistory();
+
+    UIObject undoMessage;
+	TaskList::TList tasksThatDay;
+	tasksThatDay = taskList.getDay(task.getTaskBegin());
+
+	undoMessage.setHeaderText(task.getTaskName() + UNDO_DONE_MESSAGE );
+	undoMessage.setTaskList(tasksThatDay);
+
+    return undoMessage;
+}
+
+
+
+std::string DoneCmd::getHelp() const {
+	std::string help;
+
+	std::string title = "***************** COMMAND HELP: DONE  *****************\n\n";
+
+	std::string intro = "The done command allows you to mark done your task \n\n"; 
+
+	std::string pt1 = "1. This command can be invoked by typing done [task number / task name] \n";
+	pt1 = pt1 + "Example: done 1 \n";
+	pt1 = pt1 + "         done meet mum \n";
+
+	help = title + intro + pt1;
+
+	return help;
+}
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\DoneCmd.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\DoneCmd.h
+	 */
+
+#pragma once
+#include "commandinterface.h"
+class DoneCmd : public CommandInterface {
+public:
+    DoneCmd(void);
+	~DoneCmd(void);
+	void prepareTaskId(int _TaskId);
+	void recordInHistory(Task task);
+	void verifyIndex();
+	std:: string markDone();
+    UIObject execute();
+	UIObject undo();
+	std::string getHelp()const;
+	static const std::string NO_MATCHING_TASK;
+	static const std::string DONE_MESSAGE;
+	static const std::string UNDO_DONE_MESSAGE;
+
+
+private:
+	int taskId;
+};
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\DoneCmd.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\DoneIntegration.cpp
+	 */
+
+#include "stdafx.h"
+#include "CppUnitTest.h"
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace IntegrationTestSuite {		
+	TEST_CLASS(DoneIntegration) {
+	public:
+		TEST_METHOD(DoneByName) {
+			MockStorage::initMockStorage(TaskStub::getLargeTaskList());
+
+			UIObject output = Controller::handleInput("done dummy T2");
+
+			Assert::AreEqual(std::string("Done: dummy T2"), output.getHeaderText());
+			
+			TaskList taskList;
+			taskList.loadTaskList(output.getTaskList());
+			std::string expectedList =	"1 dummy T1\nMon Mar 09 2015 07:23 AM - 08:23 AM\ndone: 0 float: 0\n"
+				+ std::string("2 dummy T2\nMon Mar 09 2015 07:23 AM - 07:23 PM\ndone: 1 float: 0\n")
+				+ std::string("3 dummy T3\nMon Mar 09 2015 07:23 PM - 08:23 PM\ndone: 0 float: 0\n");
+			Assert::AreEqual(expectedList, taskList.toString());
+			
+
+		}
+
+
+		TEST_METHOD(DoneByNumber) {
+			MockStorage::initMockStorage(TaskStub::getLargeTaskList());
+
+			UIObject viewOutput = Controller::handleInput("view all");
+			TextUI::showOutput(viewOutput);
+
+			UIObject output = Controller::handleInput("done 3");
+
+			std::string expectedHeader = "Done: dummy T3";
+			Assert::AreEqual(expectedHeader, output.getHeaderText());
+
+			TaskList taskList;
+			taskList.loadTaskList(output.getTaskList());
+			std::string expectedList =	"1 dummy T1\nMon Mar 09 2015 07:23 AM - 08:23 AM\ndone: 0 float: 0\n"
+				+ std::string("2 dummy T2\nMon Mar 09 2015 07:23 AM - 07:23 PM\ndone: 1 float: 0\n")
+				+ std::string("3 dummy T3\nMon Mar 09 2015 07:23 PM - 08:23 PM\ndone: 1 float: 0\n");
+			Assert::AreEqual(expectedList, taskList.toString());
+
+			MockStorage::cleanMockStorage();
+		}
+
+		TEST_METHOD(UndoAfterDone) {
+			MockStorage::initMockStorage(TaskStub::getLargeTaskList());
+
+			Controller::handleInput("done dummy T4");
+			UIObject output = Controller::handleInput("undo");
+
+			Assert::AreEqual(std::string("dummy T4 has been marked undone!"), output.getHeaderText());
+
+			TaskList taskList;
+			taskList.loadTaskList(output.getTaskList());
+			std::string expectedList =	"4 dummy T4\nTue Mar 10 2015 07:23 AM - 08:23 AM\ndone: 0 float: 0\n"
+				+ std::string("5 dummy T5\nTue Mar 10 2015 07:23 PM - 08:23 PM\ndone: 0 float: 0\n");
+
+			Assert::AreEqual(expectedList, taskList.toString());
+			MockStorage::cleanMockStorage();
+		}
+
+		TEST_METHOD(InvalidDone) {
+			MockStorage::initMockStorage(TaskStub::getSmallTaskList());
+			
+			UIObject garbageOutput = Controller::handleInput("done %&*#");
+			Assert::AreEqual(std::string("There is no matching task to be marked done."), garbageOutput.getHeaderText());
+			Assert::IsTrue(garbageOutput.getTaskList().empty());
+
+			MockStorage::cleanMockStorage();
+		}
+
+		
+		TEST_METHOD(DoneHelp) {
+			UIObject noSpecifier = Controller::handleInput("done"); // THIS CRASHES !!
+			std::string help;
+
+			std::string title = "***************** COMMAND HELP: DONE  *****************\n\n";
+
+			std::string intro = "The done command allows you to mark done your task \n\n"; 
+
+			std::string pt1 = "1. This command can be invoked by typing done [task number / task name] \n";
+			pt1 = pt1 + "Example: done 1 \n";
+			pt1 = pt1 + "         done meet mum \n";
+
+			help = title + intro + pt1;
+
+			Assert::AreEqual(std::string(help), noSpecifier.getHeaderText());
+			Assert::IsTrue(noSpecifier.getTaskList().empty());
+		}
+		
+	};
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\DoneIntegration.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+	 */
+
+int Interpreter::parseDoneCmd(std::string input){
+	int TaskId;
+
+	 if (DoneAlias::isInteger(input) || !DoneAlias::isHelp(input) ) { 
+		TaskId = gettingTaskID(input);
+    } else if (DoneAlias::isHelp(input)) {
+		TaskId = -1;
+	}
+	return TaskId;
+}
+
+
+std::string Interpreter::parseViewCmd(std::string input){
+	std:: string detail;
+	detail = input;
+	return detail;
+}
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\MappingNumber.cpp
+	 */
+
+#include "MappingNumber.h"
+
+MappingNumber* MappingNumber::_instance = 0;
+
+MappingNumber* MappingNumber::getInstance() {
+    if (_instance == 0) {
+        _instance = new MappingNumber;
+    }
+    return _instance;
+}
+
+void MappingNumber::resetInstance() {
+    delete _instance;
+    _instance = NULL;
+}
+void MappingNumber:: addNode(NODE node){
+	_displayMapping.push_back(node);
+}
+
+void MappingNumber:: clearMappingNumber(){
+	_displayMapping.clear();
+}
+int MappingNumber:: countNode (){
+	const_node_iterator iter;
+	int count = 1;
+	for(iter=_displayMapping.begin();  iter != _displayMapping.end(); ++iter){
+		count++;
+	}
+	return count;
+}
+unsigned MappingNumber:: getTaskID(unsigned num) const{
+	const_node_iterator iter;
+	for(iter=_displayMapping.begin();  iter != _displayMapping.end(); ++iter){
+		if(num == iter->displayNum){
+			return iter->taskID;
+		}
+	}
+	return 0;
+}
+
+
+MappingNumber::MappingNumber(void){
+}
+
+MappingNumber::~MappingNumber(void){
+}
+
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\MappingNumber.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\MappingNumber.h
+	 */
+
+#pragma once
+#include <list>
+
+class MappingNumber{
+public:
+	MappingNumber(void);
+	~MappingNumber(void);
+
+	struct NODE {
+		unsigned taskID;
+		unsigned displayNum;
+	};
+	typedef std::list<NODE> node;
+	typedef std::list<NODE>::iterator node_iterator;
+    typedef std::list<NODE>::const_iterator const_node_iterator;
+
+	static MappingNumber* getInstance();
+    static void resetInstance(); 
+	void addNode(NODE node);
+	int countNode();
+	void clearMappingNumber(); // everytime a fresh set of tasks is displayed on textUI, and we want to add a fresh set of nodes, we should clear everything in the vector. If not will have duplicates
+	unsigned getTaskID(unsigned num) const;// pass in a number on screen,
+	//should return corresponding taskID
+
+private:
+	node _displayMapping;
+	static MappingNumber* _instance;
+	
+};
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\MappingNumber.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\TextUI.cpp
+	 */
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <vector>
+#include <iostream>
+#include <stdio.h>
+#include <time.h>
+#include <iomanip>
+#include <stdlib.h>
+#include <windows.h>
+#include "TextUI.h"
+#include "Color.h"
+#include "boost/format.hpp"
+#include "MappingNumber.h"
+
+using boost::format;
+
+HANDLE hStdOut;
+CONSOLE_SCREEN_BUFFER_INFO csbi;
+DWORD count;
+DWORD cellCount;
+DWORD coord;
+COORD homeCoords = { 0, 0 };
+
+const std::string TextUI::WELCOME_MSG = "Welcome to MyCal!"; 
+const std::string TextUI::ENTER_CMD = "Enter command: ";
+const std::string TextUI::UNSCHEDULED_DATE_BAR = 
+	"[Unscheduled Tasks]           Description";
+std::string TextUI::QUALIFIER_DATE_BAR = 
+	"[%1%, %2% %3% %4% %5%] %|29t| Description";
+
+std::string TextUI::DEFAULT_DATE_BAR = 
+	"[%1%, %2% %3% %4%] %|29t| Description";
+std:: string TextUI:: TIME_PRINT=
+	"%1%. %2% %|30t|";
+std:: string TextUI:: DONE_PRINT= " (done)";
+std::string TextUI:: lastDate = "-1";
+std::string TextUI:: nowDate = "0";
+int TextUI:: counter;
+
+struct tm TextUI::convertToLocalTime(const time_t &taskDate) {
+    struct tm tmStruct;
+    localtime_s(&tmStruct, &taskDate);
+    return (tmStruct);
+}
+
+bool TextUI::isUnscheduled(const time_t &taskDate) {
+	return taskDate == 0;
+}
+
+std::string TextUI::getWkDayName(const time_t &taskDate) {
+    struct tm localTime = convertToLocalTime(taskDate);
+	switch(localTime.tm_wday) {
+		case 0:
+			return "Sun";
+		case 1:
+			return "Mon";
+		case 2:
+			return "Tue";
+		case 3:
+			return "Wed";
+		case 4:
+			return "Thu";
+		case 5:
+			return "Fri";
+		case 6:
+			return "Sat";
+        default:
+            return "Err";
+	}
+}
+
+std::string TextUI::getMonthName(const time_t &taskDate) {
+    struct tm localTime = convertToLocalTime(taskDate);
+	switch(localTime.tm_mon) {
+		case 0:
+			return "Jan";
+		case 1:
+			return "Feb";
+		case 2:
+			return "Mar";
+		case 3:
+			return "Apr";
+		case 4:
+			return "May";
+		case 5:
+			return "Jun";
+		case 6:
+			return "Jul";
+		case 7:
+			return "Aug";
+		case 8:
+			return "Sep";
+		case 9:
+			return "Oct";
+		case 10:
+			return "Nov";
+		case 11:
+			return "Dec";
+        default:
+            return "Err"; //throw exception?
+	}
+}
+
+
+std::string TextUI::getQualifierName(const time_t &taskDate) {
+    struct tm localTime = convertToLocalTime(taskDate);
+	
+	time_t currentTime;
+    time(&currentTime);
+    struct tm * nowTime;
+    nowTime = localtime (&currentTime);
+
+	if(localTime.tm_year == nowTime->tm_year) { //if the year is same
+		if (localTime.tm_yday == nowTime->tm_yday){
+			return "Today";
+		}else 
+		if(localTime.tm_yday == nowTime->tm_yday -1){
+			return "Yesterday";
+		}else 
+		if(localTime.tm_yday == nowTime->tm_yday +1){
+			return "Tomorrow";
+		}
+	}//if year is different
+	else {
+		//to check if yesterday, check whether localTime's is 31 Dec and nowTime is 1 Jan and localTime's year is nowTime's year - 1
+		if(localTime.tm_year == nowTime->tm_year - 1 
+			&& localTime.tm_mday == 31 && localTime.tm_mon == 11 
+			&&  nowTime->tm_mday == 1 && nowTime->tm_mon == 0) {
+			return "Yesterday";
+		}
+
+		//to check if tomorrow, check whether localTime's is 1 Jan and nowTime is 31 Dec and localTime's year is nowTime's year + 1
+		if(localTime.tm_year == nowTime->tm_year + 1 
+			&& localTime.tm_mday == 1 && localTime.tm_mon == 0 
+			&&  nowTime->tm_mday == 31 && nowTime->tm_mon == 11) {
+			return "Tomorrow";
+		}
+	}
+	return "";
+}
+
+void TextUI::printDateBar(const time_t &taskDate) {
+  
+    if (isUnscheduled(taskDate)) {
+	    std::cout << UNSCHEDULED_DATE_BAR << std::endl;
+	}else {
+
+		std::string qualifier = getQualifierName(taskDate);
+	    std::string wkdayName = getWkDayName(taskDate);
+	    std::string monthName = getMonthName(taskDate);
+        struct tm localTime = convertToLocalTime(taskDate);
+	    std::string day = std::to_string(localTime.tm_mday);
+
+		hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+		Color:: TextColor (11, 0 ,hStdOut);
+
+		std:: string year = std::to_string(localTime.tm_year + 1900);
+
+		if(qualifier == ""){
+			std::cout << format(DEFAULT_DATE_BAR) % wkdayName % monthName % day %year;
+		}else {
+			std::cout << format(QUALIFIER_DATE_BAR) % qualifier % wkdayName % monthName % day %year;
+		}
+
+	    std::cout << std::endl;
+    }
+}
+
+void TextUI::printTasks(TaskList::TList tasks) {
+    TaskList::taskIt it;
+	counter = 1;
+
+	nowDate = "0";
+	lastDate = "-1";
+
+	for (it = tasks.begin(); it != tasks.end(); ++it){
+		prepareDatePrint(it);
+		prepareDonePrint(it);
+		std::cout << std::endl;
+		counter++;
+	}
+
+	std::cout << std::endl;
+}
+
+void TextUI::prepareDatePrint(std::list<Task>::const_iterator it){
+	
+		if(it->isFloating()){
+			nowDate = "0";
+		}else {
+			nowDate = it->getDateStr();
+		}
+
+		//if different date then print date bar
+		if(lastDate != nowDate){
+			std::cout << std::endl;
+			printDateBar(it->getTaskBegin());
+		}
+
+		lastDate = nowDate;
+}
+
+std::string TextUI::prepareTimePrint(std::list<Task>::const_iterator it){
+		std::string timeStart= "";
+		std::string timeEnd= "";
+		std::string timePrint= "";
+	
+		if(!isUnscheduled(it->getTaskBegin())){
+			  timeStart = it->getBeginStr();
+		}
+		
+		if(!isUnscheduled(it->getTaskEnd())){
+			 timeEnd = it->getEndStr();
+		}
+
+		if(it->taskWithoutTime()){
+			timePrint = "------------------";
+		}
+		else 
+			if (it->isFloating()) {
+			timePrint = "------------------";
+		}else {
+			timePrint = timeStart+" - "+timeEnd;
+		}
+
+		return timePrint;
+}
+
+void TextUI::prepareDonePrint(std::list<Task>::const_iterator it){
+	std::string taskname;
+	std::string  timePrint = prepareTimePrint(it); 
+
+	if(it->isDone()){
+			hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+			Color:: TextColor (8, 0 ,hStdOut);
+			std::cout << format(TIME_PRINT) %counter %timePrint;
+			taskname = it->getTaskName();
+			std::cout << taskname;
+			std::cout << DONE_PRINT;
+		}else {
+			hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+			Color:: TextColor (15, 0 ,hStdOut);
+			std::cout << format(TIME_PRINT) %counter %timePrint;
+			taskname = it->getTaskName();
+			std::cout << taskname;
+		}
+}
+
+void TextUI:: mappingNumber(TaskList::TList tasks){
+	TaskList::taskIt it;
+	MappingNumber* mapping = MappingNumber::getInstance();
+	MappingNumber:: NODE node;
+	
+	int counter = 1;
+    
+	for (it = tasks.begin(); it != tasks.end(); ++it){
+		node.displayNum = counter;
+		node.taskID = it->getTaskID();
+		mapping->addNode(node);
+		counter++;
+	}
+}
+
+void TextUI::printWelcomeMsg() {
+	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+	Color:: TextColor (11, 0 ,hStdOut);
+	FillConsoleOutputAttribute(hStdOut, _rotl(0,11) , 80 * 50,homeCoords , &count);
+	std::cout << WELCOME_MSG << std::endl << std:: endl;
+}
+
+void TextUI::printEnterCommand() {
+	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+	Color:: TextColor (14, 0 ,hStdOut);
+	std::cout << ENTER_CMD;
+}
+
+std::string TextUI::getInput() {
+	std::string userInput;
+	Color:: TextColor (14, 0 ,hStdOut);
+	std::getline(std::cin, userInput);
+	return userInput;
+}
+
+
+void TextUI::showOutput(UIObject uiObj) {
+	
+    MappingNumber* mapping = MappingNumber::getInstance();
+
+	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+	Color:: TextColor (11, 0 ,hStdOut);
+	std::cout << uiObj.getHeaderText() << std::endl;
+	
+	mapping->clearMappingNumber();
+	printTasks(uiObj.getTaskList());
+	mappingNumber(uiObj.getTaskList());
+}
+
+void TextUI:: clearScreen(){
+
+  hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+  if (hStdOut == INVALID_HANDLE_VALUE){
+	  return;
+  }
+
+  // Get the number of cells in the current buffer 
+  if (!GetConsoleScreenBufferInfo( hStdOut, &csbi )){
+	  return;
+  }
+  
+  cellCount = csbi.dwSize.X *csbi.dwSize.Y;
+
+  // Fill the entire buffer with spaces
+  if (!FillConsoleOutputCharacter(
+    hStdOut,
+    (TCHAR) ' ',
+    cellCount,
+    homeCoords,
+    &count
+    )){
+		return;
+  }
+  // Fill the entire buffer with the current colors and attributes
+  if (!FillConsoleOutputAttribute(
+    hStdOut,
+    csbi.wAttributes,
+    cellCount,
+    homeCoords,
+    &count
+    )){
+		return;
+  }
+
+  // Move the cursor home
+  SetConsoleCursorPosition( hStdOut, homeCoords );
+  
+}
+
+
+TextUI::TextUI(void) {
+}
+
+
+TextUI::~TextUI(void) {
+}
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\TextUI.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\TextUI.h
+	 */
+
+#pragma once
+#include <string>
+#include "UIObject.h"
+
+class TextUI
+{
+private:
+	static std::string lastDate;
+	static std::string nowDate;
+	static int counter;
+
+	static const std::string WELCOME_MSG;
+	static const std::string ENTER_CMD;
+	static const std::string UNSCHEDULED_DATE_BAR;
+	static std::string QUALIFIER_DATE_BAR;
+	static std::string DEFAULT_DATE_BAR;
+	static std:: string NO_SCHEDULE;
+	static std:: string TIME_PRINT;
+	static std:: string DONE_PRINT;
+
+    static struct tm convertToLocalTime(const time_t &taskDate); 
+	static bool isUnscheduled(const time_t &taskDate);
+	static std::string getWkDayName(const time_t &taskDate);
+	static std::string getMonthName(const time_t &taskDate);
+    static std::string getTimeName(const time_t &taskDate);
+	static std::string getQualifierName(const time_t &taskDate);
+	static void printDateBar(const time_t &taskDate);
+	static void printTasks(TaskList::TList tasks);
+	static void mappingNumber(TaskList::TList tasks);
+
+public:
+	static void printWelcomeMsg();
+	static void printEnterCommand();
+	static std::string getInput();
+	static void showOutput(UIObject uiObj);
+	static void clearScreen();
+	static void prepareDatePrint(std::list<Task>::const_iterator taskIt);
+	static void prepareDonePrint(std::list<Task>::const_iterator taskIt);
+	static std::string prepareTimePrint(std::list<Task>::const_iterator taskIt);
+	TextUI(void);
+	~TextUI(void);
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\TextUI.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\ViewCmd.cpp
+	 */
+
+#define _CRT_SECURE_NO_WARNINGS
+#include "ViewCmd.h"
+#include "Storage.h"
+#include "TaskList.h"
+#include <iostream>
+#include <sstream>
+#include "ViewType.h"
+#include "MCLogger.h"
+#include <time.h>
+
+const std::string ViewCmd:: NO_TASK_MESSAGE = "There is no task. Start writing one now!"; 
+
+ViewCmd::ViewCmd(void) {
+}
+
+ViewCmd::~ViewCmd(void) {
+}
+
+void ViewCmd:: prepareDetail(std::string detail){
+    _detail = detail;
+}
+
+time_t ViewCmd:: getDayPosition(int index){
+	time_t curTime;
+	time_t day;
+	struct tm * timeinfo;
+	int diff = 0;
+
+	time (&curTime);
+	timeinfo = localtime(&curTime);
+
+	if(timeinfo->tm_wday < index){
+		diff = index - timeinfo->tm_wday;
+		day = curTime + diff*86400;
+	}else 
+	if(timeinfo->tm_wday > index && index == 0){
+		diff = 7 - timeinfo->tm_wday;
+		day = curTime + diff*86400;
+	}else
+	if(timeinfo->tm_wday > index && index != 0){
+		diff = 7 - timeinfo->tm_wday + index;
+		day = curTime + diff*86400;
+	}else 
+	if(timeinfo->tm_wday == index){
+		day = curTime;
+	}
+
+	return day;
+}
+
+TaskList::TList ViewCmd:: getSelectedTasks(){
+	TaskList::TList selectedTasks;
+	
+    Storage* storage = Storage::getInstance();
+    TaskList taskList = storage->getTaskList();
+	
+	 ViewType = ViewType::determineViewType(_detail);  
+	 std::string filteredCmd = ViewType::filterOutCmd(_detail);
+
+	 switch (ViewType) {
+        case ViewType::SUNDAY: {
+			time_t day = getDayPosition(0);
+			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
+		}
+		case ViewType::MONDAY: {
+			time_t day = getDayPosition(1);
+			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
+        }
+		case ViewType::TUESDAY: {
+			time_t day = getDayPosition(2);
+			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
+        }
+		case ViewType::WEDNESDAY: {
+			time_t day = getDayPosition(3);
+			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
+        }
+		case ViewType::THURSDAY: {
+			time_t day = getDayPosition(4);
+			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
+        }
+		case ViewType::FRIDAY: {
+			time_t day = getDayPosition(5);
+			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
+        }
+		case ViewType::SATURDAY: {
+			time_t day = getDayPosition(6);
+			selectedTasks = taskList.getDay(day);
+			return selectedTasks;
+        }
+		case ViewType::ALL: {
+			selectedTasks = taskList.getAll();
+			return selectedTasks;
+        }
+		case ViewType::TODAY: {
+			selectedTasks = taskList.getToday();
+			return selectedTasks;
+        }
+		case ViewType::TOMORROW: {
+			selectedTasks = taskList.getTomorrow();
+			return selectedTasks;
+        }
+		case ViewType::WEEKLY: {
+			selectedTasks = taskList.getWeekly();
+			return selectedTasks;
+        }
+		case ViewType::INVALID: {
+			return selectedTasks;
+        }
+		default :{
+			return selectedTasks;
+		 }
+	 }
+}
+
+
+UIObject ViewCmd::execute() {
+	std:: string header;
+	TaskList::TList selectedTasks;
+	selectedTasks = getSelectedTasks();
+   
+    UIObject viewObj;
+	if(!selectedTasks.empty()){
+		viewObj.setTaskList(selectedTasks);
+	}else
+	if(selectedTasks.empty() && ViewType == 11){
+		std::string help = getHelp();
+		viewObj.setHeaderText(help);
+	}else {
+		viewObj.setHeaderText(NO_TASK_MESSAGE);
+	}
+	return viewObj;
+}
+
+std::string ViewCmd::getHelp() const {
+	std::string help;
+
+	std::string title = "***************** COMMAND HELP: VIEW  *****************\n\n";
+
+	std::string intro = "The view command allows you to view your tasklist on daily and weekly basis \n\n"; 
+
+	std::string pt1 = "1. This command can be invoked by typing view [today/tomorrow/weekly/ \n";
+	pt1 = pt1 + "   monday-sunday]\n";
+	pt1 = pt1 + "Example: view today \n";
+
+	help = title + intro + pt1;
+
+	return help;
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\ViewCmd.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\ViewCmd.h
+	 */
+
+#pragma once
+#include "commandinterface.h"
+#include "ViewType.h"
+
+class ViewCmd : public CommandInterface {
+public:
+    ViewCmd(void);
+	~ViewCmd(void);
+	void prepareDetail (std::string detail);
+	TaskList::TList getSelectedTasks();
+    UIObject execute();
+	static const std::string NO_TASK_MESSAGE;
+	std::string getHelp()const;
+
+private:
+	std::string _detail;
+	time_t getDayPosition(int index);
+	ViewType :: View ViewType;
+};
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\ViewCmd.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\ViewIntegration.cpp
+	 */
+
+#include "stdafx.h"
+#include "CppUnitTest.h"
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace IntegrationTestSuite {		
+	TEST_CLASS(ViewIntegration) {
+	public:
+		TEST_METHOD(ViewAll) {
+			MockStorage::initMockStorage(TaskStub::getAprTaskList());
+
+			UIObject controllerOutput = Controller::handleInput("view all");
+
+			TaskList::TList list = controllerOutput.getTaskList();
+			TaskList taskList;
+			taskList.loadTaskList(list);
+			std::string expectedList = "9 dummy T9\nMon Apr 06 2015 09:00 AM - 10:00 AM\ndone: 0 float: 0\n"
+				+ std::string("10 dummy T10\nTue Apr 07 2015 09:00 AM - 09:00 PM\ndone: 0 float: 0\n")
+				+ std::string("11 dummy T11\nWed Apr 08 2015 09:00 AM - 09:00 PM\ndone: 0 float: 0\n")
+				+ std::string("12 dummy T12\nThu Apr 09 2015 09:00 AM - 10:00 AM\ndone: 0 float: 0\n")
+				+ std::string("13 dummy T13\nFri Apr 10 2015 09:00 AM - 09:00 PM\ndone: 0 float: 0\n")
+				+ std::string("14 dummy T14\nFri Apr 10 2015 09:00 AM - 10:00 AM\ndone: 0 float: 0\n")
+				+ std::string("15 dummy T15\nSun Apr 12 2015 09:00 AM - 09:00 PM\ndone: 0 float: 0\n")
+				+ std::string("16 dummy T16\nMon Apr 13 2015 09:00 AM - 10:00 AM\ndone: 0 float: 0\n")
+				+ std::string("17 dummy T17\nTue Apr 14 2015 09:00 AM - 09:00 PM\ndone: 0 float: 0\n")
+				+ std::string("18 dummy T18\nWed Apr 15 2015 09:00 AM - 09:00 PM\ndone: 0 float: 0\n")
+				+ std::string("19 dummy T19\nThu Apr 16 2015 09:00 AM - 10:00 AM\ndone: 0 float: 0\n")
+				+ std::string("20 dummy T20\nThu Apr 16 2015 09:00 AM - 09:00 PM\ndone: 0 float: 0\n")
+				+ std::string("21 dummy T21\nFri Apr 17 2015 09:00 AM - 10:00 AM\ndone: 0 float: 0\n")
+				+ std::string("22 dummy T22\nSun Apr 19 2015 09:00 AM - 09:00 PM\ndone: 0 float: 0\n");
+		
+
+			Assert::AreEqual(expectedList, taskList.toString());
+
+			MockStorage::cleanMockStorage();
+		}
+
+		TEST_METHOD(ViewToday) {
+			MockStorage::initMockStorage(TaskStub::getCurrentTaskList());
+
+			UIObject controllerOutput = Controller::handleInput("view today");
+
+			TaskList::TList list = controllerOutput.getTaskList();
+			TaskList taskList;
+			taskList.loadTaskList(list);
+			std::string expectedList = "23 dummy T23\n09:00 AM - 09:00 PM\ndone: 0 float: 0\n";
+
+			Assert::AreEqual(expectedList, taskList.toStringWithoutDate());
+
+			MockStorage::cleanMockStorage();
+		}
+
+		TEST_METHOD(ViewTomorrow) {
+			MockStorage::initMockStorage(TaskStub::getCurrentTaskList());
+
+			UIObject controllerOutput = Controller::handleInput("view tomorrow");
+
+			TaskList::TList list = controllerOutput.getTaskList();
+			TaskList taskList;
+			taskList.loadTaskList(list);
+			std::string expectedList = "24 dummy T24\n09:00 AM - 09:00 PM\ndone: 0 float: 0\n";
+
+
+			Assert::AreEqual(expectedList, taskList.toStringWithoutDate());
+
+			MockStorage::cleanMockStorage();
+		}
+
+
+        TEST_METHOD(ViewHelp) {
+            UIObject noSpecifier = Controller::handleInput("view"); 
+            std::string help;
+
+            std::string title = "***************** COMMAND HELP: VIEW  *****************\n\n";
+
+            std::string intro = "The view command allows you to view your tasklist on daily and weekly basis \n\n"; 
+
+            std::string pt1 = "1. This command can be invoked by typing view [today/tomorrow/weekly/ \n";
+            pt1 = pt1 + "   monday-sunday]\n";
+            pt1 = pt1 + "Example: view today \n";
+
+            help = title + intro + pt1;
+
+
+            Assert::AreEqual(std::string(help), noSpecifier.getHeaderText());
+            Assert::IsTrue(noSpecifier.getTaskList().empty());
+        }
+		
+	};
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\ViewIntegration.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\ViewType.cpp
+	 */
+
+#include "ViewType.h"
+#include <sstream>
+#include <algorithm>
+
+ViewType::ViewType(void) {
+}
+
+ViewType::~ViewType(void) {
+}
+
+ViewType::View ViewType::determineViewType(std::string _detail){
+	
+	std::transform(_detail.begin(), _detail.end(), _detail.begin(), ::tolower);
+	_detail.erase(std::remove(_detail.begin(), _detail.end(), ' '), _detail.end());
+    
+	if (_detail == "sunday" || _detail == "sun") {
+		return ViewType::SUNDAY;
+	} else
+	if (_detail == "monday" || _detail == "mon") {
+		return ViewType::MONDAY;
+	} else
+	if (_detail == "tuesday" || _detail == "tue") {
+		return ViewType::TUESDAY;
+	} else
+	if (_detail == "wednesday" || _detail == "wed") {
+		return ViewType::WEDNESDAY;
+	} else
+	if (_detail == "thursday" || _detail == "thu") {
+		return ViewType::THURSDAY;
+	} else
+	if (_detail == "friday" || _detail == "fri") {
+		return ViewType::FRIDAY;
+	} else 
+	if (_detail == "saturday" || _detail == "sat") {
+		return ViewType::SATURDAY;
+	} else
+	if(_detail == "all" || _detail == "a"){
+		return ViewType::ALL;
+	}else
+    if (_detail == "today" || _detail == "t") {
+		return ViewType::TODAY;
+	} else 
+	if (_detail == "tomorrow" || _detail == "tom" || _detail == "tmr") {
+		return ViewType::TOMORROW;
+	}else 
+	if (_detail == "weekly" || _detail == "week"){
+		return ViewType::WEEKLY;
+	} 
+	else {
+		return ViewType::INVALID;
+	}
+}
+
+std::string ViewType::filterOutCmd(std::string input) {
+	size_t firstWordLength = getFirstWord(input).length();
+
+	if (input.length() > firstWordLength) {
+		return input.substr(firstWordLength + 1);
+	}
+
+	// only one word in input string.
+	return "";
+}
+
+std::string ViewType::getFirstWord(std::string input) {
+	std::istringstream iss(input);
+	std::string firstWord;
+	iss >> firstWord;
+	return firstWord;
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\ViewType.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\ViewType.h
+	 */
+
+#pragma once
+#include <string>
+
+class ViewType {
+public:
+    enum View{
+	    SUNDAY, MONDAY, TUESDAY, WEDNESDAY,
+		THURSDAY, FRIDAY, SATURDAY, ALL, TODAY, TOMORROW,
+		WEEKLY, INVALID
+    };
+
+    ViewType(void);
+    ~ViewType(void);
+
+    static View determineViewType(std::string _detail);
+	static std::string filterOutCmd(std::string input);
+
+private:
+	 static std::string getFirstWord(std::string input);
+
+};
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\ViewType.h
+
+
+
+
+

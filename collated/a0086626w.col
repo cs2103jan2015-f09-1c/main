@@ -1,0 +1,3688 @@
+//@author: a0086626w
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\AddCmd.h
+	 */
+
+#pragma once
+#include "commandinterface.h"
+class AddCmd : public CommandInterface {
+public:
+    AddCmd(void);
+    ~AddCmd(void);
+    void prepareTask(Task task);
+	void recordInHistory (Task task);
+    UIObject execute();
+    UIObject undo();
+
+	std::string getHelp() const;
+	static const std::string ADD_MESSAGE;
+	static const std::string UNDO_MESSAGE;
+private:
+    Task _task;
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\AddCmd.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\AddCmdTest.cpp
+	 */
+
+#include "stdafx.h"
+#include "CppUnitTest.h"
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+
+namespace MyCalTestSuite {
+	TEST_CLASS(DeleteCmdTest) {
+	public:       
+        TEST_METHOD(TestAddFloating) {
+            MockStorage::initMockStorage(TaskStub::getSmallTaskList());
+            
+            // TEST FOR ONE TASK REMAINING
+            DeleteCmd delCmdObj;
+            delCmdObj.prepareTaskId((unsigned) 3);
+            UIObject oneRemaining = delCmdObj.execute();
+
+            Assert::AreEqual(std::string("Task deleted successfully. Remaining tasks for that day:"), oneRemaining.getHeaderText());
+
+            TaskList actualTaskList;
+            actualTaskList.loadTaskList(oneRemaining.getTaskList());
+            Assert::AreEqual(TaskStub::getSampleTask1().toString() + "\n", actualTaskList.toString());
+
+            // TEST FOR NO TASKS REMAINING
+            delCmdObj.prepareTaskId((unsigned) 1);
+            UIObject noneRemaining = delCmdObj.execute();
+
+            Assert::AreEqual(std::string("Task deleted successfully. No more tasks for that day!"), noneRemaining.getHeaderText());
+
+            TaskList actualTaskList2;
+            actualTaskList2.loadTaskList(noneRemaining.getTaskList());
+            Assert::AreEqual(0, actualTaskList2.totalTasks());
+
+            // check remaining tasks in storage
+            Assert::AreEqual(std::string("5\ndummy T5\n1425986625\n1425990225\n0\n"), 
+				StorageUtils::readFile("tasklist.txt"));
+
+            MockStorage::cleanMockStorage();
+        }
+    };
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\AddCmdTest.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\CommandAlias.cpp
+	 */
+
+#include "CommandAlias.h"
+#include <algorithm> //std::transform
+
+CommandAlias::CommandAlias(void) {
+}
+
+
+CommandAlias::~CommandAlias(void) {
+}
+
+bool CommandAlias::isAdd(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "add"|| cmd == "a";
+}
+
+bool CommandAlias::isDel(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "delete" || cmd == "del";
+}
+
+bool CommandAlias::isEdit(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "edit" || cmd == "ed" || cmd == "e";
+}
+
+bool CommandAlias::isUndo(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "undo" || cmd == "un" || cmd == "u";
+}
+
+bool CommandAlias::isSearch(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "search" || cmd == "se" || cmd == "s";
+}
+
+bool CommandAlias::isView(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "view" || cmd == "v";
+}
+
+bool CommandAlias::isDone(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "done" || cmd == "d" || cmd == "mark" || cmd == "m";
+}
+
+bool CommandAlias::isStorage(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "storage" || cmd == "store";
+}
+
+bool CommandAlias::isExit(std::string cmd) {
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+	return cmd == "exit" || cmd == "ex" || cmd == "x" || cmd == "quit" || cmd == "q";
+}
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\CommandAlias.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\CommandAlias.h
+	 */
+
+#pragma once
+#include <string>
+
+class CommandAlias {
+public:
+	CommandAlias(void);
+	~CommandAlias(void);
+
+	// the following isAdd, isDel ... isExit methods returns true if "cmd" matches 
+	// one of the allowed aliases for the corresponding command
+	static bool isAdd(std::string cmd);
+	static bool isDel(std::string cmd);
+	static bool isEdit(std::string cmd);
+	static bool isUndo(std::string cmd);
+	static bool isSearch(std::string cmd);
+	static bool isView(std::string cmd);
+	static bool isDone(std::string cmd);
+	static bool isStorage(std::string cmd);
+	static bool isExit(std::string cmd);
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\CommandAlias.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\CommandInterface.cpp
+	 */
+
+
+#include "CommandInterface.h"
+
+CommandInterface::CommandInterface(void) {
+}
+
+
+CommandInterface::~CommandInterface(void) {
+}
+
+UIObject CommandInterface::undo() {
+    UIObject noUndo;
+    noUndo.setHeaderText("No more actions to undo.");
+    return noUndo;
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\CommandInterface.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\CommandInterface.h
+	 */
+
+#pragma once
+#include "UIObject.h"
+#include "TextUI.h"
+
+class CommandInterface {
+public:
+    CommandInterface(void);
+    virtual ~CommandInterface(void);
+    virtual UIObject execute() = 0; 
+
+    // Undo the previous command
+    //
+    // General flow is as follows:
+    // Before a Command object performs the relevant action, save the current
+    // "state" in History. This could be a task object which is going to be updated, or
+    // a storage location which is going to be changed, for example.
+    // Only after saving the previous state do we proceed to perform the action
+    // When undo() is called, retrieve the old state from History and reverse what is
+    // changed to its previous state.
+    //
+    // Currently only the most recent undo-able command can be undone.
+    // Below are some examples in pseudo code:
+    //
+    // action: ADD task x
+    // - state to store: newly created task x
+    // - undo implementation: retrieve taskID of newly created task and
+    // call delete using the taskID 
+    //
+    // action: EDIT task x
+    // - state to store: task before edit
+    // - undo implementation: call edit again and pass in the previous task. 
+    //
+    // action: DELETE task x
+    // - state to store: task before delete
+    // - undo implementation: call add and pass in copy of task
+    //
+    // action: change STORAGE location from x to y
+    // - state to store: previous storage location, x.
+    // - undo implementation: call change storage again, this time changing from y to x.
+    //
+    // History should be cleared after undoing. If user types "undo" again, he will not
+    // "undo" the undo - which is a confusing behavior to have.
+
+
+    virtual UIObject undo(); 
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\CommandInterface.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\CommandType.cpp
+	 */
+
+#include "CommandType.h"
+#include "CommandAlias.h"
+#include <iostream>
+CommandType::CommandType(void) {
+}
+
+CommandType::~CommandType(void) {
+}
+
+CommandType::Command CommandType::determineCmdType(std::string userCmd) {
+    std::string cmdString = getFirstWord(userCmd);
+
+	if (CommandAlias::isAdd(cmdString)) {
+		return CommandType::ADD;
+	} else
+	if (CommandAlias::isDel(cmdString)) {
+		return CommandType::DEL;
+	} else
+	if (CommandAlias::isEdit(cmdString)) {
+		return CommandType::EDIT;
+	} else
+	if (CommandAlias::isUndo(cmdString)) {
+		return CommandType::UNDO;
+	} else
+	if (CommandAlias::isSearch(cmdString)) {
+		return CommandType::SEARCH;
+	} else
+	if (CommandAlias::isView(cmdString)) {
+		return CommandType::VIEW;
+	} else 
+	if(CommandAlias::isDone(cmdString)){
+		return CommandType::DONE;
+	}else
+    if (CommandAlias::isStorage(cmdString)) {
+		return CommandType::STORAGE;
+	} else 
+	if (CommandAlias::isExit(cmdString)) {
+		return CommandType::EXIT_PROGRAM;
+	} else {
+		return CommandType::INVALID;
+	}
+}
+
+std::string CommandType::filterOutCmd(std::string input) {
+	size_t firstWordLength = getFirstWord(input).length();
+
+	if (input.length() > firstWordLength) {
+		return input.substr(firstWordLength + 1);
+	}
+
+	// only one word in input string.
+	return "";
+}
+
+int CommandType::getNumOfChars(std::string userCmd) {
+	std::string cmdString = getFirstWord(userCmd);
+	return cmdString.length();
+}
+
+std::string CommandType::cmdToString(Command cmdType) {
+	if (cmdType == ADD) {
+		return "CommandType::ADD";
+	} else
+	if (cmdType == DEL) {
+		return "CommandType::DEL";
+	} else
+	if (cmdType == EDIT) {
+		return "CommandType::EDIT";
+	} else
+	if (cmdType == UNDO) {
+		return "CommandType::UNDO";
+	} else
+	if (cmdType == SEARCH) {
+		return "CommandType::SEARCH";
+	} else
+	if (cmdType == VIEW) {
+		return "CommandType::VIEW";
+	} else 
+	if(cmdType == DONE){
+		return "CommandType::DONE";
+	}else
+    if (cmdType == STORAGE) {
+		return "CommandType::STORAGE";
+	} else 
+	if (cmdType == EXIT_PROGRAM) {
+		return "CommandType::EXIT_PROGRAM";
+	} else {
+		return "CommandType::INVALID";
+	}
+}
+
+std::string CommandType::getFirstWord(std::string input) {
+	std::istringstream iss(input);
+	std::string firstWord;
+	iss >> firstWord;
+	return firstWord;
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\CommandType.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\CommandType.h
+	 */
+
+#pragma once
+#include <string>
+#include <sstream>
+
+class CommandType {
+public:
+    enum Command {
+	    ADD, DEL, EDIT, UNDO, 
+	    SEARCH, VIEW, DONE,
+	    STORAGE,
+	    EXIT_PROGRAM, INVALID
+    };
+
+    CommandType(void);
+    ~CommandType(void);
+
+    static Command determineCmdType(std::string userCmd);
+
+	// returns the details of the command without the actual command itself
+	static std::string filterOutCmd(std::string input);
+
+	// returns the number of characters the command has. This is used by the 
+	// interpreter for parsing the subsequent details of the command.
+	static int getNumOfChars(std::string userCmd);
+
+	// given a command type, cmdToString returns a string representation
+	// of the command. Used for logging/debugging purposes.
+	static std::string cmdToString(Command cmdType);
+
+private:
+    static std::string getFirstWord(std::string input);
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\CommandType.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Controller.cpp
+	 */
+
+#include <sstream>
+#include <assert.h>
+#include "Controller.h"
+#include "Interpreter.h"
+#include "Storage.h"
+#include "MCLogger.h"
+#include "AddCmd.h"
+#include "EditCmd.h"
+#include "StorageCmd.h"
+#include "DeleteCmd.h"
+#include "SearchCmd.h"
+#include "DoneCmd.h"
+#include "ViewCmd.h"
+#include "History.h"
+#include "TaskNotFoundException.h"
+#include "InvalidInputException.h"
+
+UIObject Controller::undoCommand(CommandType::Command cmdType) {
+    switch (cmdType) { 
+        case CommandType::ADD: {
+            AddCmd addCmd;
+            return addCmd.undo();
+        }
+        case CommandType::DEL: {
+            DeleteCmd delCmd;
+            return delCmd.undo();
+        }
+        case CommandType::EDIT: {
+            EditCmd editCmd;
+            return editCmd.undo();
+        }
+		case CommandType::DONE: {
+            DoneCmd doneCmd;
+            return doneCmd.undo();
+        }
+        case CommandType::STORAGE: {
+            StorageCmd storageCmd;
+            return storageCmd.undo();
+        }
+        default:
+            UIObject noUndo;
+            noUndo.setHeaderText("No more actions to undo.");
+            return noUndo;
+    }
+}
+
+UIObject Controller::handleInput(std::string input) {
+    CommandType::Command cmdType = CommandType::determineCmdType(input);  
+	std::string filteredCmd = CommandType::filterOutCmd(input);
+
+    switch (cmdType) {
+        case CommandType::ADD: {
+            MCLogger::log("Controller.cpp: begin add command");
+            try {
+                Task task = Interpreter::parseAddCmd(filteredCmd);
+                AddCmd addCmdObj;
+                addCmdObj.prepareTask(task);
+                return addCmdObj.execute();
+            } catch(InvalidInputException &e) {
+                UIObject invalidInput;
+                invalidInput.setHeaderText(e.what());
+                return invalidInput;
+            }
+        }
+        case CommandType::DEL: {
+            MCLogger::log("Controller.cpp: begin delete command");
+
+            DeleteCmd delCmdObj;
+            int TaskId = Interpreter::parseDelCmd(filteredCmd);
+            delCmdObj.prepareTaskId(TaskId);
+            return delCmdObj.execute();
+        }
+        case CommandType::EDIT: {
+            MCLogger::log("Controller.cpp: begin edit command");
+            try {
+                EditCmd editCmdObj;
+                Task task = Interpreter::parseEditCmd(input);
+                editCmdObj.prepareTask(task);
+                return editCmdObj.execute();
+            } catch (TaskNotFoundException &e) {
+                UIObject notFound;
+                notFound.setHeaderText(e.what());
+                return notFound;
+            } catch (InvalidInputException &e) {
+                UIObject invalidInput;
+                invalidInput.setHeaderText(e.what());
+                return invalidInput;
+            }
+        }
+        case CommandType::UNDO: {
+            MCLogger::log("Controller.cpp: begin undo command");
+            History *hist = History::getInstance();
+            CommandType::Command prevCmd = hist->getPreviousCommand();
+            UIObject feedback;
+            feedback = undoCommand(prevCmd);
+            return feedback;
+        }
+        case CommandType::SEARCH: {
+            MCLogger::log("Controller.cpp: begin search command");
+
+			SearchCmd SearchCmdObj;
+			TaskList::TList List = Interpreter::parseSearchCmd(filteredCmd);
+			SearchCmdObj.prepareList(List);
+			return SearchCmdObj.execute();
+        }
+        case CommandType::VIEW: {
+            MCLogger::log("Controller.cpp: begin view command");
+			ViewCmd ViewObj;
+			std::string detail = Interpreter::parseViewCmd(filteredCmd);
+			ViewObj.prepareDetail(detail);
+			return ViewObj.execute();
+        }
+        case CommandType::STORAGE: {
+            MCLogger::log("Controller.cpp: begin storage command");
+            std::string parsedCmd = Interpreter::parseStoreCmd(filteredCmd);
+			StorageCmd storageCmdObj;
+            storageCmdObj.cmdType(parsedCmd);
+            return storageCmdObj.execute();
+        }    
+		case CommandType::DONE: {
+            MCLogger::log("Controller.cpp: begin done command");
+            DoneCmd doneCmdObj;
+			int noOfChars = CommandType:: getNumOfChars(input);
+            int taskId = Interpreter::parseDoneCmd(filteredCmd);
+			doneCmdObj.prepareTaskId(taskId);
+            return doneCmdObj.execute();
+        }
+        case CommandType::EXIT_PROGRAM: {
+            MCLogger::log("============= exit program ==============");
+            Storage::resetInstance();
+			MappingNumber::resetInstance();
+			History::resetInstance();
+
+            exit(EXIT_SUCCESS);
+        }
+        case CommandType::INVALID: {
+            MCLogger::log("Controller.cpp: invalid command");
+            UIObject invalidCmd;
+            invalidCmd.setHeaderText("The command entered \"" + input + "\" is invalid.");
+            return invalidCmd;
+        }
+        default: {
+			MCLogger::log("ERROR: UNRECOGNIZED COMMAND TYPE");
+            assert(false);
+            UIObject invalidCmd;
+            invalidCmd.setHeaderText("The command entered is invalid.");
+            return invalidCmd;
+        }
+    }
+}
+
+Controller::Controller(void) {
+}
+
+
+Controller::~Controller(void) {
+}
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Controller.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Controller.h
+	 */
+
+#pragma once
+#include <string>
+#include "UIObject.h"
+#include "CommandType.h"
+
+class Controller {
+private:
+    static UIObject undoCommand(CommandType::Command cmdType);
+	static const size_t NUM_CHARS_DONE;
+	static const size_t NUM_CHARS_DELETE;
+
+public:
+    static UIObject handleInput(std::string input);
+    
+    Controller(void);
+    ~Controller(void);
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Controller.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\DeleteCmdTest.cpp
+	 */
+
+#include "stdafx.h"
+#include "CppUnitTest.h"
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+
+namespace MyCalTestSuite {
+	TEST_CLASS(DeleteCmdTest) {
+	public:        
+        TEST_METHOD(TestDeleteByName) {
+            MockStorage::initMockStorage(TaskStub::getSmallTaskList());
+            
+            // TEST FOR ONE TASK REMAINING
+            DeleteCmd delCmdObj;
+            delCmdObj.prepareTaskId((unsigned) 3);
+            UIObject oneRemaining = delCmdObj.execute();
+
+            Assert::AreEqual(std::string("Task deleted successfully. Remaining tasks for that day:"), oneRemaining.getHeaderText());
+
+            TaskList actualTaskList;
+            actualTaskList.loadTaskList(oneRemaining.getTaskList());
+            Assert::AreEqual(TaskStub::getSampleTask1().toString() + "\n", actualTaskList.toString());
+
+            // TEST FOR NO TASKS REMAINING
+            delCmdObj.prepareTaskId((unsigned) 1);
+            UIObject noneRemaining = delCmdObj.execute();
+
+            Assert::AreEqual(std::string("Task deleted successfully. No more tasks for that day!"), noneRemaining.getHeaderText());
+
+            TaskList actualTaskList2;
+            actualTaskList2.loadTaskList(noneRemaining.getTaskList());
+            Assert::AreEqual(0, actualTaskList2.totalTasks());
+
+            // check remaining tasks in storage
+            Assert::AreEqual(std::string("5\ndummy T5\n1425986625\n1425990225\n0\n"), 
+				StorageUtils::readFile("tasklist.txt"));
+
+            MockStorage::cleanMockStorage();
+        }
+	};
+
+
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\DeleteCmdTest.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\DeleteIntegration.cpp
+	 */
+
+#include "stdafx.h"
+#include "CppUnitTest.h"
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace IntegrationTestSuite {		
+	TEST_CLASS(DeleteIntegration) {
+	public:
+		TEST_METHOD(DeleteByName) {
+			MockStorage::initMockStorage(TaskStub::getLargeTaskList());
+
+			UIObject controllerOutput = Controller::handleInput("delete T5");
+
+			Assert::AreEqual(std::string("Task deleted successfully. Remaining tasks for that day:"), controllerOutput.getHeaderText());
+
+			TaskList::TList list = controllerOutput.getTaskList();
+			TaskList taskList;
+			taskList.loadTaskList(list);
+			std::string expectedList = "4 dummy T4\nTue Mar 10 2015 07:23 AM - 08:23 AM\ndone: 0 float: 0\n";
+			Assert::AreEqual(expectedList, taskList.toString());
+
+			MockStorage::cleanMockStorage();
+		}
+
+		TEST_METHOD(DeleteTillEmpty) {
+			MockStorage::initMockStorage(TaskStub::getLargeTaskList());
+			Controller::handleInput("delete dummy T5");
+			UIObject controllerOutput = Controller::handleInput("delete dummy T4");
+			
+			Assert::AreEqual(std::string("Task deleted successfully. No more tasks for that day!"), controllerOutput.getHeaderText());
+
+			TaskList::TList list = controllerOutput.getTaskList();
+			Assert::IsTrue(list.empty());
+
+			MockStorage::cleanMockStorage();
+		}
+
+		TEST_METHOD(DeleteByNumber) {
+			MockStorage::initMockStorage(TaskStub::getLargeTaskList());
+
+			UIObject viewOutput = Controller::handleInput("view all");
+			TextUI::showOutput(viewOutput);
+
+			UIObject del2Output = Controller::handleInput("delete 2");
+
+			std::string expectedHeader = "Task deleted successfully. Remaining tasks for that day:";
+			Assert::AreEqual(expectedHeader, del2Output.getHeaderText());
+
+			TaskList::TList list = del2Output.getTaskList();
+			TaskList taskList;
+			taskList.loadTaskList(list);
+			std::string expectedList = "1 dummy T1\nMon Mar 09 2015 07:23 AM - 08:23 AM\ndone: 0 float: 0\n"
+				+ std::string("3 dummy T3\nMon Mar 09 2015 07:23 PM - 08:23 PM\ndone: 0 float: 0\n");
+			Assert::AreEqual(expectedList, taskList.toString());
+
+			MockStorage::cleanMockStorage();
+		}
+
+		TEST_METHOD(UndoAfterDel) {
+			MockStorage::initMockStorage(TaskStub::getLargeTaskList());
+
+			Controller::handleInput("delete dummy T5");
+			Controller::handleInput("delete dummy T4");
+			UIObject undoOutput = Controller::handleInput("undo");
+
+			Assert::AreEqual(std::string("Task added back to storage. Tasks for that day:"), undoOutput.getHeaderText());
+
+			MockStorage::cleanMockStorage();
+		}
+
+		TEST_METHOD(InvalidDelete) {
+			MockStorage::initMockStorage(TaskStub::getSmallTaskList());
+			
+			UIObject garbageOutput = Controller::handleInput("delete %&*#");
+			Assert::AreEqual(std::string("There is no matching task to be deleted."), garbageOutput.getHeaderText());
+			Assert::IsTrue(garbageOutput.getTaskList().empty());
+
+			UIObject viewOutput = Controller::handleInput("view all");
+			TextUI::showOutput(viewOutput);
+			UIObject outOfRange = Controller::handleInput("delete 9");
+			Assert::AreEqual(std::string("There is no matching task to be deleted."), outOfRange.getHeaderText());
+			Assert::IsTrue(outOfRange.getTaskList().empty());
+
+			MockStorage::cleanMockStorage();
+		}
+
+		/*TEST_METHOD(DeleteHelp) {
+			UIObject noSpecifier = Controller::handleInput("delete");
+			Assert::AreEqual(std::string("Delete command help goes here"), noSpecifier.getHeaderText());
+			Assert::IsTrue(noSpecifier.getTaskList().empty());
+		}*/
+	};
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\DeleteIntegration.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\EditCmd.cpp
+	 */
+
+#include "EditCmd.h"
+#include "Storage.h"
+#include "TaskList.h"
+#include "History.h"
+#include <assert.h>
+#include "MCLogger.h"
+const std::string EditCmd::UNDO_MESSAGE = "Edit undo successful. Tasks for that day:";
+
+EditCmd::EditCmd(void) {
+}
+
+
+EditCmd::~EditCmd(void) {
+}
+
+void EditCmd::prepareTask(Task task) {
+    _task = task;
+}
+
+UIObject EditCmd::execute() {
+    Storage* storage = Storage::getInstance();
+    TaskList taskList = storage->getTaskList();
+    Task originalTask = taskList.findTask(_task.getTaskID());
+    recordInHistory (originalTask);
+
+	//update the edited task
+	taskList.update(_task);
+    storage->updateStorage(taskList);    
+
+    std::string headerText = "Successfuly Edited. ";
+    headerText = headerText + "Updated event: \nName:" + _task.getTaskName() + "\n";
+
+    if (!_task.isFloating()) {
+        headerText = headerText + "Date: " + _task.getDateStr() + "\nBegin:" + _task.getBeginStr();
+        headerText = headerText + " End: " + _task.getEndStr();
+    }
+
+    UIObject edited;
+	edited.setHeaderText(headerText);
+    History *hist = History::getInstance();
+    CommandType::Command prevCmd = hist->getPreviousCommand();
+
+    return edited;
+}
+
+UIObject EditCmd::undo() {
+    UIObject undoMessage;
+	History *hist = History::getInstance();
+
+	CommandType::Command prevCmd = hist->getPreviousCommand();
+    assert(prevCmd == CommandType::EDIT);
+
+	State prevState = hist->getPreviousState();
+	Task prevTask = prevState.getTask();
+	Storage* storage = Storage::getInstance();
+    TaskList taskList = storage->getTaskList();
+    
+    taskList.update(prevTask);
+    storage->updateStorage(taskList);    
+
+    hist->clearHistory();
+
+    TaskList::TList tasksThatDay;
+    tasksThatDay = taskList.getDay(prevTask.getTaskBegin());
+
+	//return UIObject
+	undoMessage.setHeaderText(UNDO_MESSAGE);
+	undoMessage.setTaskList(tasksThatDay);
+
+    return undoMessage;
+}
+
+void EditCmd::recordInHistory(Task task) {
+    State prevState; 
+    prevState.recordTask (task);
+    History *hist = History::getInstance();
+    hist->saveState(prevState);
+    hist->saveCommand(CommandType::EDIT);
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\EditCmd.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\EditCmd.h
+	 */
+
+#pragma once
+#include "commandinterface.h"
+class EditCmd : public CommandInterface {
+public:
+    EditCmd(void);
+    ~EditCmd(void);
+    void prepareTask(Task task);
+    UIObject execute();
+    UIObject undo();
+
+private:
+    static const std::string UNDO_MESSAGE;
+    void recordInHistory(Task task);
+    Task _task;
+};
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\EditCmd.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\History.cpp
+	 */
+
+#include "History.h"
+#include "MCLogger.h"
+History* History::_instance = 0;
+
+History* History::getInstance() {
+    if (_instance == 0) {
+        _instance = new History;
+    }
+    return _instance;
+}
+
+void History::resetInstance() {
+    delete _instance;
+    _instance = NULL;
+}
+
+CommandType::Command History::getPreviousCommand() const {
+    return _previousCommand;
+}
+
+void History::saveCommand(CommandType::Command cmd) {
+    _previousCommand = cmd;
+}
+
+State History::getPreviousState() const {
+    return _previousState;
+}
+
+void History::saveState(State state) {
+	MCLogger::log("History.cpp: save state " + state.toString());
+    _previousState = state;
+}
+
+void History::clearHistory() {
+	MCLogger::log("History.cpp: clear history");
+    _previousCommand = CommandType::INVALID;
+}
+
+History::History(void): 
+    _previousCommand(CommandType::INVALID) {
+}
+
+
+History::~History(void) {
+}
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\History.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\History.h
+	 */
+
+#pragma once
+#include "CommandType.h"
+#include "State.h"
+
+// In charge of storing the previous State and the Command associated with
+// the most recent state change. This class facilitates the undoing of commands. 
+// It is meant to be used inside the appropriate Command class if the Command 
+// is "undoable". Undoable commands are those which modify the overall tasks
+// a user has, for example add, edit, delete, change of storage location.
+// Commands like view and search are not undoable because they do not change 
+// the user's task list.
+//
+// Sample usage in AddCmd.cpp:
+// CommandType::Command cmdType = CommandType::ADD;
+// Task taskToAdd;
+// // *initalize taskToAdd here*
+// // *update storage with the new task here*
+// State state;
+// prevState->recordTask(taskToAdd);
+// History* hist = History::getInstance();
+// hist->saveCommand(CommandType::ADD);
+// hist->saveState(state);
+// 
+// Note that in the above example, the task added is saved as part of the History. 
+// The undo command can then getlastState() from History and perform a "undo"
+// by deleting the task with the taskID of the newly added task.
+// 
+// getLastCommand() is used by the Controller so it knows which Command object's undo() function
+// it should call - be it addCmdObj.undo() or editCmdObj.undo() etc...
+
+class History {
+public:
+    static History* getInstance();
+    static void resetInstance(); 
+
+    CommandType::Command getPreviousCommand() const;
+    void saveCommand(CommandType::Command cmd);
+    State getPreviousState() const;
+    void saveState(State state);
+    void clearHistory();
+
+private:
+    History(void);
+    ~History(void);
+    static History* _instance;
+    CommandType::Command _previousCommand;
+    State _previousState;
+
+
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\History.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+	 */
+
+std::string Interpreter::getEditHelp() {
+	std::string title = "***************** COMMAND HELP: EDIT  *****************\n\n";
+
+	std::string intro = "The edit command allows you to edit a previously added task \n\n"; 
+
+	std::string pt1 = "1. This command can be invoked by typing edit <task number> {:optional detail}\n";
+    pt1 = pt1 + "2. Bring up the task number by using view or search.\n\n";
+	pt1 = pt1 + "Optional detail:\n";
+    pt1 = pt1 + ":time\tEdit time only.\n";
+	pt1 = pt1 + ":name\tEdit name of your task only\n\n";
+
+	pt1 = pt1 + "Example 1: view all\n";
+	pt1 = pt1 + "edit 3 :name\n";
+    pt1 = pt1 + "Input \"Your new task name\"\n\n";
+
+	pt1 = pt1 + "Example 2: search cs2102 project\n";
+	pt1 = pt1 + "edit 2\n";
+    pt1 = pt1 + "Input \"ST2334 project :tomorrow :at 3pm\"\n";
+
+	std::string help = title + intro + pt1;
+
+	return help;
+}
+
+size_t Interpreter::caseInsensitiveFind(std::string input, std::string pattern, size_t pos) {
+    std::transform(input.begin(), input.end(), input.begin(), ::tolower);
+    std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
+    return input.find(pattern, pos);
+}
+
+bool Interpreter::searchSubStr(std::string keyword, Task task) {
+    std::transform(keyword.begin(), keyword.end(), keyword.begin(), ::tolower);
+	std::string line = task.getTaskName();
+    std::transform(line.begin(), line.end(), line.begin(), ::tolower);
+
+	if (line.find(keyword) != std::string::npos){
+		return true;
+	} else {
+		return false;
+	}
+}
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+	 */
+
+std::string Interpreter::parseStoreCmd(std::string input) {    
+    if (StorageAlias::isGetLocation(input)) { 
+        return "getLocation";
+    } else if (StorageAlias::isHelp(input)) {
+		return "help";
+	}
+
+	// take the entire original input as new storage location to be changed
+	// if it is neither "getLocation" nor "help".
+    return input;
+}
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Interpreter.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\InterpreterAddTestNegative.cpp
+	 */
+
+#include "stdafx.h"
+#include "CppUnitTest.h"
+#include "CommandType.h"
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace MyCalTestSuite {
+	TEST_CLASS(InterpreterAddNegativeTest) {
+	public:
+        TEST_METHOD(TestInvalidTime) {
+            bool correctException = false;
+
+            try {
+                Interpreter::parseAddCmd("project meeting :at 1260pm");
+                std::wstring msg( L"No exception has been thrown" );
+                const wchar_t* failMsg = msg.c_str();
+                Assert::Fail(failMsg);
+            } 
+            catch(InvalidInputException &e) {
+                correctException = true;
+            } 
+
+            Assert::IsTrue(correctException);
+        }
+
+        TEST_METHOD(TestDayOutOfRange) {
+            bool correctException = false;
+
+            try {
+                Interpreter::parseAddCmd("project meeting :on 32/01/2015");
+                std::wstring msg( L"No exception has been thrown" );
+                const wchar_t* failMsg = msg.c_str();
+                Assert::Fail(failMsg);
+            } 
+            catch(InvalidInputException &e) {
+                correctException = true;
+            } 
+
+            Assert::IsTrue(correctException);
+        }
+
+        TEST_METHOD(TestMonthOutOfRange) {
+            bool correctException = false;
+
+            try {
+                Interpreter::parseAddCmd("project meeting :on 01/13/2015");
+                std::wstring msg( L"No exception has been thrown" );
+                const wchar_t* failMsg = msg.c_str();
+                Assert::Fail(failMsg);
+            } 
+            catch(InvalidInputException &e) {
+                correctException = true;
+            } 
+
+            Assert::IsTrue(correctException);
+        }
+
+        TEST_METHOD(TestYearUpperLimit) {
+            bool correctException = false;
+
+            try {
+                Interpreter::parseAddCmd("project meeting :on 01/13/2201");
+                std::wstring msg( L"No exception has been thrown" );
+                const wchar_t* failMsg = msg.c_str();
+                Assert::Fail(failMsg);
+            } 
+            catch(InvalidInputException &e) {
+                correctException = true;
+            } 
+
+            Assert::IsTrue(correctException);
+        }
+
+        TEST_METHOD(TestYearLowerLimit) {
+            bool correctException = false;
+
+            try {
+                Interpreter::parseAddCmd("project meeting :on 01/13/1970");
+                std::wstring msg( L"No exception has been thrown" );
+                const wchar_t* failMsg = msg.c_str();
+                Assert::Fail(failMsg);
+            } 
+            catch(InvalidInputException &e) {
+                correctException = true;
+            } 
+
+            Assert::IsTrue(correctException);
+        }
+
+
+		
+	};
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\InterpreterAddTestNegative.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\InterpreterAddTestPositive.cpp
+	 */
+
+#include "stdafx.h"
+#include "CppUnitTest.h"
+#include "CommandType.h"
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace MyCalTestSuite {
+	TEST_CLASS(InterpreterAddPositiveTest) {
+	public:
+        // Equivalence partioning according to the different input formats entered.
+		TEST_METHOD(TestFloating) {
+            Task floatingTask = Interpreter::parseAddCmd("CS2103 tutorial");
+            Assert::AreEqual(std::string("CS2103 tutorial"), floatingTask.getTaskName());
+            Assert::IsTrue(floatingTask.isFloating()); 
+        }
+
+		TEST_METHOD(Test12HrsFormat) {
+            Task task = Interpreter::parseAddCmd("project meeting :at 531 pm");
+
+            Assert::AreEqual(std::string("project meeting "), task.getTaskName());
+            Assert::IsFalse(task.isFloating()); 
+            Assert::AreEqual(std::string("05:31 PM"), task.getBeginStr());
+            Assert::AreEqual(std::string("07:31 PM"), task.getEndStr());
+            Assert::AreEqual(TaskStub::getCurrentDate(), task.getDateStr());
+        }
+
+		TEST_METHOD(Test24HrsFormat) {
+            Task task = Interpreter::parseAddCmd("project meeting :at 1731");
+
+            Assert::AreEqual(std::string("project meeting "), task.getTaskName());
+            Assert::IsFalse(task.isFloating()); 
+            Assert::AreEqual(std::string("05:31 PM"), task.getBeginStr());
+            Assert::AreEqual(std::string("07:31 PM"), task.getEndStr());
+            Assert::AreEqual(TaskStub::getCurrentDate(), task.getDateStr());
+        }
+
+		TEST_METHOD(TestDateSeparatorFormats) {
+            Task task = Interpreter::parseAddCmd("project :on 11.12.2014");
+
+            Assert::AreEqual(std::string("project "), task.getTaskName());
+            Assert::IsFalse(task.isFloating()); 
+            Assert::AreEqual(std::string("08:00 AM"), task.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), task.getEndStr());
+            Assert::AreEqual(std::string("Thu Dec 11 2014"), task.getDateStr());
+
+            Task task2 = Interpreter::parseAddCmd("project :on 11/12/2014");
+            Assert::AreEqual(std::string("Thu Dec 11 2014"), task2.getDateStr());
+
+            Task task3 = Interpreter::parseAddCmd("project :on 11\\12.2014");
+            Assert::AreEqual(std::string("Thu Dec 11 2014"), task3.getDateStr());
+        }
+
+		TEST_METHOD(TestFromOptionOnly) {
+            Task task = Interpreter::parseAddCmd("project meeting :from 309am");
+
+            Assert::AreEqual(std::string("project meeting "), task.getTaskName());
+            Assert::IsFalse(task.isFloating()); 
+            Assert::AreEqual(std::string("03:09 AM"), task.getBeginStr());
+            Assert::AreEqual(std::string("05:09 AM"), task.getEndStr());
+            Assert::AreEqual(TaskStub::getCurrentDate(), task.getDateStr());
+        }
+
+
+		TEST_METHOD(TestToOptionOnly) {
+            Task task = Interpreter::parseAddCmd("project meeting :to 309am");
+
+            Assert::AreEqual(std::string("project meeting "), task.getTaskName());
+            Assert::IsFalse(task.isFloating()); 
+            Assert::AreEqual(std::string("01:09 AM"), task.getBeginStr());
+            Assert::AreEqual(std::string("03:09 AM"), task.getEndStr());
+            Assert::AreEqual(TaskStub::getCurrentDate(), task.getDateStr());
+        }
+
+		TEST_METHOD(TestFromToOption) {
+            Task task = Interpreter::parseAddCmd("project meeting :from 1021am :to 1pm");
+
+            Assert::AreEqual(std::string("project meeting "), task.getTaskName());
+            Assert::IsFalse(task.isFloating()); 
+            Assert::AreEqual(std::string("10:21 AM"), task.getBeginStr());
+            Assert::AreEqual(std::string("01:00 PM"), task.getEndStr());
+            Assert::AreEqual(TaskStub::getCurrentDate(), task.getDateStr());
+        }
+
+
+		TEST_METHOD(TestFromToAlternateFormat) {
+            Task task = Interpreter::parseAddCmd("project meeting :from 1021am-1pm");
+
+            Assert::AreEqual(std::string("project meeting "), task.getTaskName());
+            Assert::IsFalse(task.isFloating()); 
+            Assert::AreEqual(std::string("10:21 AM"), task.getBeginStr());
+            Assert::AreEqual(std::string("01:00 PM"), task.getEndStr());
+            Assert::AreEqual(TaskStub::getCurrentDate(), task.getDateStr());
+        }
+
+		TEST_METHOD(TestCaseInsensitivity) {
+            Task task = Interpreter::parseAddCmd("project meeting :oN 13/08/2015 :FRoM 1021am :To 1pm");
+
+            Assert::AreEqual(std::string("project meeting "), task.getTaskName());
+            Assert::IsFalse(task.isFloating()); 
+            Assert::AreEqual(std::string("10:21 AM"), task.getBeginStr());
+            Assert::AreEqual(std::string("01:00 PM"), task.getEndStr());
+            Assert::AreEqual(std::string("Thu Aug 13 2015"), task.getDateStr());
+        }
+
+		TEST_METHOD(TestSpaceInsensitivity) {
+            Task task = Interpreter::parseAddCmd("project : o n  1 3 / 0  8 /  2  0 15    : f r om  1 02 1 a m   :to   1p  m");
+
+            Assert::AreEqual(std::string("project "), task.getTaskName());
+            Assert::IsFalse(task.isFloating()); 
+            Assert::AreEqual(std::string("10:21 AM"), task.getBeginStr());
+            Assert::AreEqual(std::string("01:00 PM"), task.getEndStr());
+            Assert::AreEqual(std::string("Thu Aug 13 2015"), task.getDateStr());
+        }
+
+		TEST_METHOD(TestWithoutTime) {
+            Task task = Interpreter::parseAddCmd("project meeting :on 30/07/2014");
+
+            Assert::AreEqual(std::string("project meeting "), task.getTaskName());
+            Assert::IsFalse(task.isFloating()); 
+            Assert::AreEqual(std::string("Wed Jul 30 2014"), task.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), task.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), task.getEndStr());
+        }
+
+		TEST_METHOD(TestTomorrowOption) {
+            Task task = Interpreter::parseAddCmd("project meeting :tomorrow");
+
+            Assert::AreEqual(std::string("project meeting "), task.getTaskName());
+            Assert::IsFalse(task.isFloating()); 
+            Assert::AreEqual(TaskStub::getTomorrowDate(), task.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), task.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), task.getEndStr());
+        }
+
+		TEST_METHOD(TestTomorrowFromToOption) {
+            Task task = Interpreter::parseAddCmd("blah :tomorrow :from 7am :to 932pm");
+
+            Assert::AreEqual(std::string("blah "), task.getTaskName());
+            Assert::IsFalse(task.isFloating()); 
+            Assert::AreEqual(TaskStub::getTomorrowDate(), task.getDateStr());
+            Assert::AreEqual(std::string("07:00 AM"), task.getBeginStr());
+            Assert::AreEqual(std::string("09:32 PM"), task.getEndStr());
+        }       
+        
+        // Boundary value analysis by date boundaries
+        // Test boundary of dates, e.g. last day, first day of months 
+        TEST_METHOD(TestJanBoundary) {
+            Task taskFirstDay = Interpreter::parseAddCmd("blah :on 01/01/2015");
+            Assert::AreEqual(std::string("blah "), taskFirstDay.getTaskName());
+            Assert::IsFalse(taskFirstDay.isFloating()); 
+            Assert::AreEqual(std::string("Thu Jan 01 2015"), taskFirstDay.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), taskFirstDay.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), taskFirstDay.getEndStr());
+
+            Task tasklastDay = Interpreter::parseAddCmd("blah :on 31/01/2015");
+            Assert::AreEqual(std::string("blah "), tasklastDay.getTaskName());
+            Assert::IsFalse(tasklastDay.isFloating()); 
+            Assert::AreEqual(std::string("Sat Jan 31 2015"), tasklastDay.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), tasklastDay.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), tasklastDay.getEndStr());
+        }
+
+        TEST_METHOD(TestFebBoundary) {
+            Task taskFirstDay = Interpreter::parseAddCmd("blah :on 01/02/2015");
+            Assert::AreEqual(std::string("blah "), taskFirstDay.getTaskName());
+            Assert::IsFalse(taskFirstDay.isFloating()); 
+            Assert::AreEqual(std::string("Sun Feb 01 2015"), taskFirstDay.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), taskFirstDay.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), taskFirstDay.getEndStr());
+
+            Task tasklastDay = Interpreter::parseAddCmd("blah :on 28/02/2015");
+            Assert::AreEqual(std::string("blah "), tasklastDay.getTaskName());
+            Assert::IsFalse(tasklastDay.isFloating()); 
+            Assert::AreEqual(std::string("Sat Feb 28 2015"), tasklastDay.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), tasklastDay.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), tasklastDay.getEndStr());
+        }
+
+        TEST_METHOD(TestJuneBoundary) {
+            Task taskFirstDay = Interpreter::parseAddCmd("blah :on 01/06/2015");
+            Assert::AreEqual(std::string("blah "), taskFirstDay.getTaskName());
+            Assert::IsFalse(taskFirstDay.isFloating()); 
+            Assert::AreEqual(std::string("Mon Jun 01 2015"), taskFirstDay.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), taskFirstDay.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), taskFirstDay.getEndStr());
+
+            Task tasklastDay = Interpreter::parseAddCmd("blah :on 30/06/2015");
+            Assert::AreEqual(std::string("blah "), tasklastDay.getTaskName());
+            Assert::IsFalse(tasklastDay.isFloating()); 
+            Assert::AreEqual(std::string("Tue Jun 30 2015"), tasklastDay.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), tasklastDay.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), tasklastDay.getEndStr());
+        }
+
+        TEST_METHOD(TestDecBoundary) {
+            Task taskFirstDay = Interpreter::parseAddCmd("blah :on 01/12/2015");
+            Assert::AreEqual(std::string("blah "), taskFirstDay.getTaskName());
+            Assert::IsFalse(taskFirstDay.isFloating()); 
+            Assert::AreEqual(std::string("Tue Dec 01 2015"), taskFirstDay.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), taskFirstDay.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), taskFirstDay.getEndStr());
+
+            Task tasklastDay = Interpreter::parseAddCmd("blah :on 31/12/2015");
+            Assert::AreEqual(std::string("blah "), tasklastDay.getTaskName());
+            Assert::IsFalse(tasklastDay.isFloating()); 
+            Assert::AreEqual(std::string("Thu Dec 31 2015"), tasklastDay.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), tasklastDay.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), tasklastDay.getEndStr());
+        }
+
+        TEST_METHOD(TestLeapDay) {
+            Task tasklastDay = Interpreter::parseAddCmd("blah :on 29/02/2016");
+            Assert::AreEqual(std::string("blah "), tasklastDay.getTaskName());
+            Assert::IsFalse(tasklastDay.isFloating()); 
+            Assert::AreEqual(std::string("Mon Feb 29 2016"), tasklastDay.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), tasklastDay.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), tasklastDay.getEndStr());
+        }
+
+        TEST_METHOD(TestPastDate) {
+            Task taskFirstDay = Interpreter::parseAddCmd("blah :on 01/01/1971");
+            Assert::AreEqual(std::string("blah "), taskFirstDay.getTaskName());
+            Assert::IsFalse(taskFirstDay.isFloating()); 
+            Assert::AreEqual(std::string("Fri Jan 01 1971"), taskFirstDay.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), taskFirstDay.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), taskFirstDay.getEndStr());
+
+            Task tasklastDay = Interpreter::parseAddCmd("blah :on 31/12/1971");
+            Assert::AreEqual(std::string("blah "), tasklastDay.getTaskName());
+            Assert::IsFalse(tasklastDay.isFloating()); 
+            Assert::AreEqual(std::string("Fri Dec 31 1971"), tasklastDay.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), tasklastDay.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), tasklastDay.getEndStr());
+        }
+
+        TEST_METHOD(TestFutureDate) {
+            Task taskFirstDay = Interpreter::parseAddCmd("blah :on 01/01/2200");
+            Assert::AreEqual(std::string("blah "), taskFirstDay.getTaskName());
+            Assert::IsFalse(taskFirstDay.isFloating()); 
+            Assert::AreEqual(std::string("Wed Jan 01 2200"), taskFirstDay.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), taskFirstDay.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), taskFirstDay.getEndStr());
+
+            Task tasklastDay = Interpreter::parseAddCmd("blah :on 31/12/2200");
+            Assert::AreEqual(std::string("blah "), tasklastDay.getTaskName());
+            Assert::IsFalse(tasklastDay.isFloating()); 
+            Assert::AreEqual(std::string("Wed Dec 31 2200"), tasklastDay.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), tasklastDay.getBeginStr());
+            Assert::AreEqual(std::string("10:00 AM"), tasklastDay.getEndStr());
+        }
+
+        TEST_METHOD(TestColonInTaskName) {
+            Task task = Interpreter::parseAddCmd("project me:eting :on 30/07/2014 :from 1145pm to 2359");
+
+            Assert::AreEqual(std::string("project me"), task.getTaskName());
+            Assert::IsFalse(task.isFloating()); 
+            Assert::AreEqual(std::string("Wed Jul 30 2014"), task.getDateStr());
+            Assert::AreEqual(std::string("11:45 PM"), task.getBeginStr());
+            Assert::AreEqual(std::string("11:59 PM"), task.getEndStr());
+        }
+        
+        // If an unrecognized option is entered, task will default to floating
+        TEST_METHOD(TestUnrecognizedOption) {        
+            Task task = Interpreter::parseAddCmd("project meeting :zzz 05/01/2015");
+
+            Assert::AreEqual(std::string("project meeting "), task.getTaskName());
+            Assert::IsTrue(task.isFloating());     
+        }
+	};
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\InterpreterAddTestPositive.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\InvalidFilePathException.cpp
+	 */
+
+#include "InvalidFilePathException.h"
+#include "MCLogger.h"
+
+InvalidFilePathException::InvalidFilePathException(std::string msg) {
+	MCLogger::log("EXCEPTION: invalid file path");
+    _message = msg;
+}
+
+InvalidFilePathException::~InvalidFilePathException(void) {
+}
+
+const char* InvalidFilePathException::what() const throw() {
+     return _message.c_str();
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\InvalidFilePathException.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\InvalidFilePathException.h
+	 */
+
+#pragma once
+#include <exception>
+#include <string>
+
+class InvalidFilePathException : public std::exception {
+private:
+    std::string _message;
+
+public:
+    InvalidFilePathException(std::string msg);    
+    ~InvalidFilePathException(void);
+    virtual const char* what() const throw();
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\InvalidFilePathException.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\InvalidInputException.cpp
+	 */
+
+#include "InvalidInputException.h"
+#include "MCLogger.h"
+
+InvalidInputException::InvalidInputException(std::string msg) {
+	MCLogger::log("EXCEPTION: " + msg);
+    _message = msg;
+}
+
+InvalidInputException::~InvalidInputException(void) {
+}
+
+const char* InvalidInputException::what() const throw() {
+     return _message.c_str();
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\InvalidInputException.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\InvalidInputException.h
+	 */
+
+#pragma once
+#include <exception>
+#include <string>
+
+class InvalidInputException : public std::exception {
+private:
+    std::string _message;
+
+public:
+    InvalidInputException(std::string msg);    
+    ~InvalidInputException(void);
+    virtual const char* what() const throw();
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\InvalidInputException.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\main.cpp
+	 */
+
+#include "Controller.h"
+#include "UIObject.h"
+#include "TextUI.h"
+#include "Storage.h"
+#include "MCLogger.h"
+
+void printTasksToday() {
+    Storage *storage = Storage::getInstance();
+    TaskList tasklist = storage->getTaskList();
+    TaskList::TList today = tasklist.getToday();
+
+    UIObject tasksToday;
+
+    if (today.empty()) {
+        tasksToday.setHeaderText("No tasks for today.");
+
+    } else {
+        tasksToday.setHeaderText("Your tasks today:");
+        tasksToday.setTaskList(today);
+    }
+
+    TextUI::showOutput(tasksToday);
+}
+
+int main(int argc, char *argv[]) {
+    MCLogger::log("============= start program =============");
+
+	TextUI::clearScreen();
+	TextUI::printWelcomeMsg();
+	printTasksToday();
+
+	while (true) {        
+		TextUI::printEnterCommand();
+		std::string userInput;
+		userInput = TextUI::getInput();
+		
+		MCLogger::log("User input: " + userInput);
+		UIObject controllerOutput = Controller::handleInput(userInput);
+
+		TextUI::clearScreen();
+		TextUI::showOutput(controllerOutput);
+	}
+
+	return 0;
+}
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\main.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\MCLogger.cpp
+	 */
+
+#include "MCLogger.h"
+#include <ctime>
+#include <fstream>
+#include <sstream>
+#include <iomanip> //put_time
+
+void MCLogger::writeToLog(std::string msg) {
+	std::ofstream writeFile("MyCalLog.txt", std::ios::app);
+	writeFile << msg << std::endl;
+	writeFile.close();
+}
+
+std::string MCLogger::getDateTime() {
+    time_t curTime;
+    time(&curTime); 
+    tm tmstruct;
+    localtime_s(&tmstruct, &curTime);
+    std::ostringstream oss;
+    oss << std::put_time(&tmstruct, "[%d/%m/%y %I:%M:%S %p]   ");
+
+    return oss.str();
+}
+
+void MCLogger::log(std::string msg) {
+    std::string curTime = getDateTime();
+    msg = curTime + msg;
+    writeToLog(msg);
+}
+
+MCLogger::MCLogger(void) {
+}
+
+
+MCLogger::~MCLogger(void) {
+}
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\MCLogger.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\MCLogger.h
+	 */
+
+#pragma once
+#include <string>
+
+class MCLogger {
+private:
+    static void writeToLog(std::string msg);
+    static std::string getDateTime();
+public:
+    static void log(std::string msg);
+    MCLogger(void);
+    ~MCLogger(void);
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\MCLogger.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\MockStorage.cpp
+	 */
+
+#include "MockStorage.h"
+#include "MCLogger.h"
+
+MockStorage::MockStorage(void) {
+}
+
+
+MockStorage::~MockStorage(void) {
+}
+
+void MockStorage::initMockStorage(TaskList taskList, std::string taskListLoc) {
+	MCLogger::log("MockStorage.cpp: initializing mock storage");
+    StorageUtils::backupExistingFiles();
+    StorageUtils::createSettingsFile(taskListLoc);
+    Storage *storage = Storage::getInstance();
+    storage->updateStorage(taskList);
+}
+
+void MockStorage::cleanMockStorage(std::string taskListLoc) {
+	MCLogger::log("MockStorage.cpp: Clean mock storage");
+    StorageUtils::removeTaskListFile(taskListLoc);
+    StorageUtils::removeSettingsFile();
+    StorageUtils::restoreExistingFiles();
+    Storage::resetInstance();
+}
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\MockStorage.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\MockStorage.h
+	 */
+
+#pragma once
+#include "Storage.h"
+#include "StorageUtils.h"
+#include "TaskStub.h"
+
+class MockStorage {
+public:
+    MockStorage(void);
+    ~MockStorage(void);
+
+    // sets up storage with same location as the executable 
+    // and loaded with the task list passed in
+    // original storage files are backed up; they will be restored when
+    // cleanMockStorage() is called.
+    static void initMockStorage(TaskList taskList, std::string taskListLoc = "");
+
+    // to be used at the end of the test method
+    // removes files created during initMockStorage and restores 
+    // original storage files
+    static void cleanMockStorage(std::string taskListLoc = "");
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\MockStorage.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\State.cpp
+	 */
+
+#include "State.h"
+
+State::State(void) {
+}
+
+State::~State(void) {
+}
+
+void State::recordTask(Task task) {
+    _task = task;
+}
+
+Task State::getTask() const {
+    return _task;
+}
+
+void State::recordStorageLoc(std::string loc) {
+    _storageLoc = loc;
+}
+
+std::string State::getStorageLoc() const {
+    return _storageLoc;
+}
+
+std::string State::toString() const {
+	if (_storageLoc != "") {
+		return _storageLoc;
+	}
+
+	return "\n" + _task.toString();
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\State.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\State.h
+	 */
+
+#pragma once
+#include <string>
+#include "Task.h"
+
+class State {
+public:
+    State(void);
+    ~State(void);
+    void recordTask(Task task);
+    Task getTask() const;
+    void recordStorageLoc(std::string loc);
+    std::string getStorageLoc() const;
+	std::string toString() const;
+
+private:
+    Task _task;
+    std::string _storageLoc;
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\State.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Storage.cpp
+	 */
+
+#include "Storage.h"
+#include "MCLogger.h"
+#include <fstream>
+#include <sstream>
+#include <stdio.h>
+#include <windows.h>
+#include <assert.h>
+
+const std::string Storage::SETTINGS_FILENAME = "settings.txt";
+const std::string Storage::TASKLIST_FILENAME = "tasklist.txt";
+
+Storage* Storage::_instance = 0;
+
+Storage* Storage::getInstance() {
+    if (_instance == 0) {
+        _instance = new Storage;
+    }
+    return _instance;
+}
+
+void Storage::resetInstance() {
+    delete _instance;
+    _instance = NULL;
+}
+
+TaskList Storage::getTaskList() const {
+    return _sessionStore;
+}
+
+void Storage::updateStorage(TaskList taskList) {
+    _sessionStore = taskList;
+    writeTaskListTxt(_sessionStore.getAll(), _taskListLoc);
+	std::string log = "Storage.cpp: storage updated with " 
+		+ std::to_string(taskList.totalTasks()) + std::string(" tasks.");
+    MCLogger::log(log);
+}
+
+void Storage::setStorageLoc(std::string newLoc) {
+    std::string logInfo = "Storage.cpp: Set storage location to " + newLoc;
+    MCLogger::log(logInfo);
+
+    moveTaskList(_taskListLoc, newLoc);
+    _taskListLoc = newLoc;
+    writeSettingsTxt(_taskListLoc);
+}
+
+std::string Storage::getStorageLoc() const {
+    std::string path = _taskListLoc;
+
+    if (path == "") {
+        path = getExePath() + "\\";
+    } 
+
+	MCLogger::log("Storage.cpp: Getting storage location of " + path);
+
+    assert(path != "");
+
+    return path;
+}
+
+unsigned Storage::getNextID() const {	
+    return findMaxID(_sessionStore) + 1;
+}
+
+Storage::Storage(void) {
+    loadTaskListLoc();
+    initSessionStore();
+}
+
+
+Storage::~Storage(void) {
+}
+
+unsigned Storage::findMaxID(TaskList list) const {
+	TaskList::constTaskIt constIt;
+	TaskList::TList tList = list.getAll();
+	unsigned maxID = 0;
+
+	for (constIt = tList.begin(); constIt != tList.end(); constIt++) {
+		if (constIt->getTaskID() > maxID) {
+			maxID = constIt->getTaskID();
+		}
+	}
+
+	return maxID;
+}
+
+std::string Storage::getExeFileName() const {
+  char buffer[MAX_PATH];
+  GetModuleFileName( NULL, buffer, MAX_PATH );
+  return std::string(buffer);
+}
+
+std::string Storage::getExePath() const {
+  std::string f = getExeFileName();
+  return f.substr(0, f.find_last_of( "\\/" ));
+}
+
+void Storage::loadTaskListLoc() {
+    std::ifstream settingsFile(SETTINGS_FILENAME);
+    std::string line;
+ 
+    std::getline(settingsFile, line);
+    _taskListLoc = line;
+}
+
+void Storage::initSessionStore() {
+    std::string filepath = _taskListLoc + TASKLIST_FILENAME;
+    std::ifstream readFile(filepath);  
+
+    Task *curTask = NULL;
+    std::string line;
+    int c = 0;
+
+    while (std::getline(readFile, line)) {
+        c++;
+        unsigned id;
+        time_t begin;
+        time_t end;
+
+        switch(c) {
+        case 1:
+            curTask = new Task;
+            id = std::stoul(line);
+            curTask->setTaskID(id);
+            break;
+        case 2:
+            curTask->setTaskName(line);
+            break;
+        case 3:
+            begin = std::stoul(line);
+            curTask->setTaskBegin(begin);
+            break;
+        case 4:
+            end = std::stoul(line);
+            curTask->setTaskEnd(end);
+            break;
+        case 5:
+            if (line == "1") {
+                curTask->markDone();
+            } 
+
+            c = 0;
+            _sessionStore.add(*curTask);
+            delete curTask;
+        }
+    }
+}
+
+void Storage::overwriteFile(std::string fileName, std::string contents, std::string loc="") {
+    std::string filepath = loc + fileName;
+	std::ofstream writeFile(filepath);
+	writeFile << contents;
+	writeFile.close();
+}
+
+void Storage::moveTaskList(std::string oldLoc, std::string newLoc) {
+    std::string oldpath = oldLoc + TASKLIST_FILENAME;
+    std::string newpath = newLoc + TASKLIST_FILENAME;
+
+    rename(oldpath.c_str(), newpath.c_str());
+}
+
+void Storage::writeSettingsTxt(std::string contents) {
+    overwriteFile(SETTINGS_FILENAME, contents);
+}
+
+
+void Storage::writeTaskListTxt(TaskList::TList listToWrite, std::string writeLoc) {
+    TaskList::taskIt it;
+    std::ostringstream oss;
+    for (it = listToWrite.begin(); it != listToWrite.end(); ++it) {
+        oss << it->getTaskID() << std::endl;
+        oss << it->getTaskName() << std::endl;
+        oss << it->getTaskBegin() << std::endl;
+        oss << it->getTaskEnd() << std::endl;
+        oss << it->isDone() << std::endl;
+    }
+
+    overwriteFile(TASKLIST_FILENAME, oss.str(), writeLoc); 
+ }
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Storage.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Storage.h
+	 */
+
+#pragma once
+#include <string>
+#include "TaskList.h"
+
+class Storage {
+public:
+    static Storage* getInstance();
+    static void resetInstance(); 
+    TaskList getTaskList() const;
+    void updateStorage(TaskList taskList);
+    void setStorageLoc(std::string newLoc);
+    std::string getStorageLoc() const;
+    unsigned getNextID() const;
+
+private:
+    static const std::string SETTINGS_FILENAME;
+    static const std::string TASKLIST_FILENAME;
+
+    Storage(void);
+	~Storage(void);
+	
+	unsigned findMaxID(TaskList list) const;
+    std::string getExeFileName() const;
+    std::string getExePath() const;
+    void loadTaskListLoc();
+    void initSessionStore();
+    void overwriteFile(std::string file, std::string contents, std::string loc);
+    void moveTaskList(std::string oldLoc, std::string newLoc);
+
+	//writeSettingsTxt overwrites the exisiting file
+	//save to settings.txt in the following format:
+	//<contents>
+    void writeSettingsTxt(std::string contents);
+
+	//writeTaskListTxt overwrites the exisiting file
+	//save to tasklist.txt in the following format:
+	// <taskid>
+	// <taskname>
+	// <taskbegin>
+	// <taskend>
+	// <isDone>
+    void writeTaskListTxt(TaskList::TList listToWrite, std::string writeLoc);
+    
+    static Storage* _instance;
+    TaskList _sessionStore;
+	std::string _taskListLoc; //tastList.txt's location
+};
+
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Storage.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\StorageAlias.cpp
+	 */
+
+#include "StorageAlias.h"
+#include <algorithm> //std::transform
+
+void StorageAlias::removeSpaces(std::string &input) {
+  input.erase(std::remove(input.begin(), input.end(), ' '), input.end());
+}
+
+StorageAlias::StorageAlias(void) {
+}
+
+
+StorageAlias::~StorageAlias(void) {
+}
+
+bool StorageAlias::isGetLocation(std::string alias) {
+	std::transform(alias.begin(), alias.end(), alias.begin(), ::tolower);
+	return alias == "location" || alias == "loc";
+}
+
+bool StorageAlias::isHelp(std::string alias) {
+	removeSpaces(alias);
+	return alias == "";
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\StorageAlias.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\StorageAlias.h
+	 */
+
+#pragma once
+#include <string>
+
+class StorageAlias {
+private:
+	static void removeSpaces(std::string &input);
+
+public:
+	StorageAlias(void);
+	~StorageAlias(void);
+	
+	static bool isGetLocation(std::string alias);
+
+	// if there is nothing after the input command, it means
+	// the command is trying show help messages. Return true in this case.
+	static bool isHelp(std::string alias);
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\StorageAlias.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\StorageCmd.cpp
+	 */
+
+#include <assert.h>
+#include "StorageCmd.h"
+#include "Storage.h"
+#include "InvalidFilePathException.h"
+#include "Shlwapi.h" // PathFileExists
+#include "History.h"
+#include "State.h"
+#include "MCLogger.h"
+#include "TextUI.h"
+
+bool StorageCmd::isGetLoc() const {
+	return _cmdDetail == "getLocation";
+}
+
+bool StorageCmd::isHelp() const {
+	return _cmdDetail == "help";
+}
+
+void StorageCmd::changeStorageLoc(std::string newStorageLoc) {
+	verifyFilePath(newStorageLoc);  
+	Storage *storage = Storage::getInstance();
+	storage->setStorageLoc(newStorageLoc);
+}
+
+
+std::string StorageCmd::readStorageLoc() {
+    Storage *storage = Storage::getInstance();
+    std::string storageLoc = storage->getStorageLoc();
+    std::string statusText = "Your todo list data is currently saved at " + 
+    storageLoc + "\n";
+
+    return statusText;
+}
+
+UIObject StorageCmd::getHelp() const {
+	std::string title = "***************** COMMAND HELP: STORAGE  *****************\n\n";
+
+	std::string intro = "The storage command allows you to view the current storage"; 
+	intro = intro + " location\nof your saved tasks and also to change this storage location.\n\n";
+
+	std::string pt1 = "1. This command can be invoked by typing \"storage\".\n";
+	pt1 = pt1 + "Aliases: store\n\n";
+
+	std::string pt2 = "2. To view the current storage location, type \"location\" after the command.\n";
+	pt2 = pt2 + "Aliases: loc\nExample: storage location\n\n";
+
+	std::string pt3 = "3. To change the location, enter a valid folder location after the command.\n";
+	pt3 = pt3 + "Example: storage C:/Users/Jim/Desktop/\n\n";
+
+
+	UIObject helpObj;
+	helpObj.setHeaderText(title + intro + pt1 + pt2 + pt3);
+	return helpObj;
+}
+
+UIObject StorageCmd::getLocation() {
+	std::string location = readStorageLoc();    
+	UIObject locationUI;
+	locationUI.setHeaderText(location);
+	return locationUI;
+}
+
+UIObject StorageCmd::changeLocation() {
+	// save the previous location before it is changed
+	Storage *storage = Storage::getInstance();
+	std::string prevLoc = storage->getStorageLoc();
+
+	std::string newStorageLoc = _cmdDetail;
+	if (missingSlash(newStorageLoc)) {
+		appendSlash(newStorageLoc);
+	}
+
+	std::string statusText;
+	try {
+		changeStorageLoc(newStorageLoc);
+		// only record after location successfully changed
+		recordInHistory(prevLoc);
+		statusText = "Your todo list data storage location has been changed to:\n" +
+			newStorageLoc + "\n" + 
+			"The file at the previous location has been moved to the new location.";
+	}  catch (InvalidFilePathException& e) {
+		statusText = e.what();
+	}
+
+	UIObject locChanged;
+	locChanged.setHeaderText(statusText);
+	return locChanged;
+}
+
+void StorageCmd::restorePreviousLoc(std::string prevLoc) {
+    changeStorageLoc(prevLoc);
+}
+
+void StorageCmd::verifyFilePath(std::string filePath) {
+  int retVal = PathFileExists(filePath.c_str());
+    if (retVal != 1) {
+        throw InvalidFilePathException("Invalid file path. Please try again.");
+    }
+}
+
+bool StorageCmd::missingSlash(std::string newStorageLoc) {
+    if (_cmdDetail.back() != '\\' && _cmdDetail.back() != '/') {
+        return true;
+    }
+
+    return false;
+}
+
+void StorageCmd::appendSlash(std::string &str) {
+    str = str + '\\';
+}
+
+void StorageCmd::recordInHistory(std::string prevLoc) {
+    State prevState; 
+    prevState.recordStorageLoc(prevLoc);
+    History *hist = History::getInstance();
+    hist->saveState(prevState);
+    hist->saveCommand(CommandType::STORAGE);
+}
+
+StorageCmd::StorageCmd(void) {
+}
+
+
+StorageCmd::~StorageCmd(void) {
+}
+
+void StorageCmd::cmdType(std::string detail) {
+	_cmdDetail = detail;
+}
+
+UIObject StorageCmd::execute() {
+	if (_cmdDetail == "help") {
+		return getHelp();
+	} 
+	
+	if (_cmdDetail == "getLocation") {
+		return getLocation();
+	}
+
+	return changeLocation();
+}
+
+UIObject StorageCmd::undo() {
+    History *hist = History::getInstance();
+    CommandType::Command prevCmd = hist->getPreviousCommand();
+    assert(prevCmd == CommandType::STORAGE);
+    
+    State prevState = hist->getPreviousState();
+    std::string prevLoc = prevState.getStorageLoc();
+    restorePreviousLoc(prevLoc);
+
+    hist->clearHistory();
+
+    UIObject undoMessage;
+    std::string headerText = "Storage location changed back to " + 
+        prevLoc;
+    undoMessage.setHeaderText(headerText);
+   
+    return undoMessage;
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\StorageCmd.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\StorageCmd.h
+	 */
+
+#pragma once
+#include "CommandInterface.h"
+
+class StorageCmd : public CommandInterface {
+private:
+    std::string _cmdDetail;
+
+	// based on the private attribute _cmdDetail, isGetLoc() returns
+	// true if the storage command should get the current storage location.
+	bool isGetLoc() const;
+	bool isHelp() const;
+
+	void changeStorageLoc(std::string newStorageLoc);
+	std::string readStorageLoc();
+
+	UIObject getHelp() const;
+	UIObject getLocation();
+	UIObject changeLocation();
+
+    void restorePreviousLoc(std::string prevLoc);
+
+    // checks whether file path entered is a valid windows location
+    void verifyFilePath(std::string filePath);
+
+    // checks whether filepath ends with a slash,
+    // because operations using storage assumes folders end with a slash
+    bool missingSlash(std::string newStorageLoc);
+
+	// appends a slash to the string using pass-by-reference
+    void appendSlash(std::string &str);
+
+    // saves previous storage location into history 
+    // this will be used if the user wants to undo
+    void recordInHistory(std::string prevLoc);
+
+public:
+    StorageCmd(void);
+    ~StorageCmd(void);
+    void cmdType(std::string detail);
+    UIObject execute();
+    UIObject undo();
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\StorageCmd.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\StorageTest.cpp
+	 */
+
+#include "stdafx.h"
+#include "CppUnitTest.h"
+#include <stdio.h>
+#include <fstream>
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+static const std::string SAMPLE_TASKLIST_LOC = "../../";
+
+namespace MyCalTestSuite {
+    
+	TEST_CLASS(StorageTest) {
+	public:
+   		TEST_METHOD(TestSetStorageLoc) {
+            std::string initialTaskListLoc = "";
+            std::string newTaskListLoc = "../";       
+            std::string initialFile = initialTaskListLoc + "tasklist.txt";
+            std::string movedFile = newTaskListLoc + "tasklist.txt";
+
+            MockStorage::initMockStorage(TaskStub::getSmallTaskList(), initialTaskListLoc);
+
+            //File not moved yet and should exist
+            Assert::IsTrue(StorageUtils::isFileExist(initialFile.c_str()));
+            //File should not be in new location
+            Assert::IsFalse(StorageUtils::isFileExist(movedFile.c_str()));
+            //Original contents of file
+            std::string originalContents = StorageUtils::readFile(initialFile);
+            
+            //Modify storage location
+            Storage *storage = Storage::getInstance();
+            storage->setStorageLoc(newTaskListLoc);
+            std::string storageLocExpected = storage->getStorageLoc();
+            Assert::AreEqual(storageLocExpected, newTaskListLoc);
+
+            //File is moved and should not exist
+            Assert::IsFalse(StorageUtils::isFileExist(initialFile.c_str()));            
+            //File should be in new location
+            Assert::IsTrue(StorageUtils::isFileExist(movedFile.c_str()));
+            //Contents should be unchanged
+            std::string newContents = StorageUtils::readFile(movedFile);
+            Assert::AreEqual(originalContents, newContents);
+
+            MockStorage::cleanMockStorage(newTaskListLoc);
+		}
+        
+        TEST_METHOD(TestUpdateStorage) {
+            MockStorage::initMockStorage(TaskStub::getLargeTaskList());
+
+            // Check the list is correct just after update
+            Storage *storage = Storage::getInstance();         
+            storage->updateStorage(TaskStub::getSmallTaskList());
+            TaskList listAfterUpdate = storage->getTaskList();
+
+            std::string expectedList = TaskStub::getSmallTaskList().toString();
+            Assert::AreEqual(expectedList, listAfterUpdate.toString());
+
+            // Check the list is read correctly after storage is reset.
+            Storage::resetInstance();        
+            Storage *storage2 = Storage::getInstance();
+            TaskList listAfterInit = storage2->getTaskList();
+            Assert::AreEqual(expectedList, listAfterInit.toString());
+
+            MockStorage::cleanMockStorage();
+        }
+	};
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\StorageTest.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\StorageUtils.cpp
+	 */
+
+#include "StorageUtils.h"
+#include <sstream>
+StorageUtils::StorageUtils(void) {
+}
+
+
+StorageUtils::~StorageUtils(void) {
+}
+
+bool StorageUtils::isFileExist(const char *fileName) {
+    std::ifstream infile(fileName);
+    return infile.good();
+}
+void StorageUtils::backupExistingFiles() {
+    //copy settings.txt and tasklist.txt to safe place
+    if (isFileExist("settings.txt")) {
+        rename("settings.txt", "settings_backup.txt");
+    }
+
+    if (isFileExist("tasklist.txt")) {
+        rename("tasklist.txt", "tasklist_backup.txt");
+    }
+}
+
+void StorageUtils::restoreExistingFiles() {
+    //restore original files
+    if (isFileExist("settings_backup.txt")) {
+        rename("settings_backup.txt", "settings.txt");
+    }
+
+    if (isFileExist("tasklist_backup.txt")) {
+        rename("tasklist_backup.txt", "tasklist.txt");
+    }
+}
+
+void StorageUtils::createSettingsFile(std::string contents) {
+    std::ofstream writeFile("settings.txt");
+    writeFile << contents;
+    writeFile.close();
+}
+        
+void StorageUtils::removeTaskListFile(std::string path) {
+    std::string filename = path + "tasklist.txt";
+    remove(filename.c_str());
+}
+
+void StorageUtils::removeSettingsFile() {
+    remove("settings.txt");
+}
+
+std::string StorageUtils::readFile(std::string filepath) {
+    std::string line;
+    std::ifstream read(filepath); 
+    std::ostringstream oss;
+    while (std::getline(read, line)) {
+        oss << line << std::endl;
+    }
+
+    return oss.str();
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\StorageUtils.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\StorageUtils.h
+	 */
+
+#pragma once
+#include <fstream>
+
+class StorageUtils {
+public:
+    StorageUtils(void);
+    ~StorageUtils(void);
+    static bool isFileExist(const char *fileName);
+    static void backupExistingFiles();
+    static void restoreExistingFiles();
+    static void createSettingsFile(std::string contents);
+    static void removeTaskListFile(std::string path);
+    static void removeSettingsFile();
+    static std::string readFile(std::string filepath);
+};
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\StorageUtils.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Task.cpp
+	 */
+
+#define _CRT_SECURE_NO_WARNINGS
+#include "Task.h"
+#include <sstream> 
+#include <iomanip> // put_time
+
+Task::Task(void): 
+    _taskID(0), 
+    _isDone(false), 
+    _isFloating(true),
+    _taskBegin(0), 
+    _taskEnd(0) {
+
+}
+
+
+Task::~Task(void) {
+}
+void Task::setTaskName(std::string name) {
+    _taskName = name;
+}
+
+std::string Task::getTaskName() const {
+    return _taskName;
+}
+
+void Task::setFloating() {
+	_isFloating = true;
+	_taskBegin = 0;
+}
+
+void Task::setNotFloating() {
+	_isFloating = false;
+}
+
+
+bool Task::isFloating() const {
+    return _isFloating;
+}
+
+//@Ratna
+bool Task::taskWithoutTime() const{
+	return _isWithoutTime;
+}
+
+void Task::checkTaskWithoutTime() {
+	struct tm * timeinfo;
+	timeinfo = localtime (&_taskBegin);
+	if(timeinfo->tm_hour == 1){
+		_isWithoutTime = true;
+	}else {
+		_isWithoutTime = false;
+	}
+}
+
+//@Seow Yan Yi A0086626W
+std::string Task::getDateStr() const {
+    //refer to std::put_time fmt
+    tm beginStruct;
+    localtime_s(&beginStruct, &_taskBegin);
+    std::ostringstream beginOss;
+    beginOss << std::put_time(&beginStruct, "%a %b %d %Y");
+    return beginOss.str();
+}
+
+std::string Task::getBeginStr() const {
+    //refer to std::put_time fmt
+    tm beginStruct;
+    localtime_s(&beginStruct, &_taskBegin);
+    std::ostringstream beginOss;
+    beginOss << std::put_time(&beginStruct, "%I:%M %p");
+    return beginOss.str();
+}
+
+std::string Task::getEndStr() const {
+    tm endStruct;
+    localtime_s(&endStruct, &_taskEnd);
+    std::ostringstream endOss;
+    endOss << std::put_time(&endStruct, "%I:%M %p");
+    return endOss.str();
+}
+
+time_t Task::getTaskBegin() const {
+    return _taskBegin;
+}
+
+time_t Task::getTaskEnd() const {
+    return _taskEnd;
+}
+
+void Task::setTaskBegin(time_t begin) {
+    _taskBegin = begin;
+
+    if (_taskBegin == 0) {
+        _isFloating = true;
+    } else {
+        _isFloating = false;
+    }
+
+	checkTaskWithoutTime();
+}
+
+void Task::setTaskEnd(time_t end) {
+    _taskEnd = end;
+}
+    
+void Task::markDone() {
+    _isDone = true;
+}
+
+void Task::markUndone() {
+    _isDone = false;
+}
+
+bool Task::isDone() const {
+    return _isDone;
+}
+
+unsigned Task::getTaskID() const {
+    return _taskID;
+}
+
+void Task::setTaskID(unsigned id) {
+    _taskID = id;
+}
+
+std::string Task::toString() const {
+    std::ostringstream oss;
+    oss << getTaskID() << " ";
+    oss << getTaskName() << std::endl;
+    oss << getDateStr() << " ";
+    oss << getBeginStr() << " - ";
+    oss << getEndStr() << std::endl;
+    oss << "done: " << isDone() << " ";
+	oss << "float: " << isFloating();
+
+    return oss.str();
+}
+
+std::string Task::toStringWithoutDate() const {
+    std::ostringstream oss;
+    oss << getTaskID() << " ";
+    oss << getTaskName() << std::endl;
+    oss << getBeginStr() << " - ";
+    oss << getEndStr() << std::endl;
+    oss << "done: " << isDone() << " ";
+	oss << "float: " << isFloating();
+    return oss.str();
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Task.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\Task.h
+	 */
+
+#pragma once
+#include <ctime> // time_t
+#include <string>
+
+class Task {
+public:
+    Task(void);
+    ~Task(void);
+
+    void setTaskName(std::string name);
+    std::string getTaskName() const;
+
+	// Tasks which do not have their begin times set are floating by default.
+	// Tasks which have their begin times = 0 are also set to floating.
+	// Nevertheless, the use of setFloating() method provides a clearer way to set a Task as floating.
+	void setFloating();
+	void setNotFloating();
+    bool isFloating() const; 
+
+    bool taskWithoutTime() const;
+    void checkTaskWithoutTime();
+
+    std::string getDateStr() const;
+    std::string getBeginStr() const;
+    std::string getEndStr() const;
+
+    time_t getTaskBegin() const;
+    time_t getTaskEnd() const;
+
+    void setTaskBegin(time_t begin);
+    void setTaskEnd(time_t end);
+    
+    void markDone();
+    void markUndone();
+    bool isDone() const;
+
+    unsigned getTaskID() const;
+    void setTaskID(unsigned id);
+
+    std::string toString() const;
+	std::string toStringWithoutDate() const; // for testing purpose
+
+private:
+    unsigned _taskID;
+    std::string _taskName;
+    time_t _taskBegin;
+    time_t _taskEnd;
+    bool _isFloating;
+    bool _isDone;
+	bool _isWithoutTime;
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\Task.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\TaskList.cpp
+	 */
+
+#define _CRT_SECURE_NO_WARNINGS
+#include "TaskList.h"
+#include <sstream>
+#include <iomanip> //put_time
+#include <time.h>
+#include <iostream>
+
+
+TaskList::TaskList(void) {
+}
+
+
+TaskList::~TaskList(void) {
+}
+
+void TaskList::add(Task task) {
+    _taskList.push_back(task);
+    sortByDate();
+}
+
+void TaskList::update(Task task) {
+    taskIt it;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        unsigned targetId = task.getTaskID();
+        unsigned curId = it->getTaskID();
+
+        if (foundTask(targetId, curId)) {
+            replaceTask(it, task);
+            sortByDate();
+            break;
+        }
+    }
+}
+
+void TaskList::remove(unsigned id) {
+    taskIt it;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        unsigned curId = it->getTaskID();
+
+        if (foundTask(id, curId)) {
+            _taskList.erase(it);
+            break;
+        }
+    }
+}
+
+TaskList::TList TaskList::getDay(time_t day) const {
+    TaskList retList;
+    constTaskIt it;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        time_t begin = it->getTaskBegin();
+        if (isSameDay(day, begin)) {
+            retList.add((*it));
+        }
+    }
+    
+    return retList.getAll();
+}
+
+TaskList::TList TaskList::getToday() const {
+    time_t curTime;
+    time(&curTime); //get today
+
+    return getDay(curTime);    
+}
+//@Ratnawati Kwanditanto A0113736J
+TaskList::TList TaskList::getTomorrow() const {
+    time_t curTime = time(NULL);	//get today
+	curTime += 86400; // add number of seconds in a day
+    return getDay(curTime);    
+}
+//@Ratnawati Kwanditanto A0113736J
+TaskList::TList TaskList::getWeekly() const {	
+	TaskList retList;
+    constTaskIt it;
+
+	time_t curTime;
+	time_t day;
+	struct tm * timeinfo;
+	int diff = 0;
+
+	time (&curTime);
+	timeinfo = localtime(&curTime);
+
+	if(timeinfo->tm_wday != 1){
+		diff = timeinfo->tm_wday - 1;
+		day = curTime - (diff+1)*86400;
+	}else{
+		day = time(&curTime);
+	}
+	
+	for (int i = 0; i<=6; i++){
+		day = day + 86400;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        time_t begin = it->getTaskBegin();
+        if (isSameDay(day, begin)) {
+            retList.add((*it));
+        }
+	}
+    }
+    return retList.getAll();
+}
+//@Seow Yan Yi A0086626W
+TaskList::TList TaskList::getAll() const {
+    return _taskList;
+}
+
+void TaskList::loadTaskList(TList list) {
+    _taskList = list;
+}
+
+int TaskList::totalTasks() const {
+    return _taskList.size();
+}
+
+std::string TaskList::toString() const {
+    std::ostringstream oss;
+    constTaskIt it;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        oss << it->toString() << std::endl;
+    }
+
+    return oss.str();
+}
+
+std::string TaskList::toStringWithoutDate() const {
+      std::ostringstream oss;
+    constTaskIt it;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        oss << it->toStringWithoutDate() << std::endl;
+    }
+
+    return oss.str();
+}
+
+bool TaskList::isSameDay(time_t time1, time_t time2) const {
+    tm tmstruct1;
+    localtime_s(&tmstruct1, &time1);
+    std::ostringstream oss;
+    oss << std::put_time(&tmstruct1, "%d/%m/%y");
+
+    tm tmstruct2;
+    localtime_s(&tmstruct2, &time2);
+    std::ostringstream oss2;
+    oss2 << std::put_time(&tmstruct2, "%d/%m/%y");
+
+    return oss.str() == oss2.str();
+}
+
+bool TaskList::isEarlier(Task task1, Task task2) {
+    time_t task1Time = task1.getTaskBegin();
+    time_t task2Time = task2.getTaskBegin();
+    double diff = difftime(task1Time, task2Time);
+    if (diff < 0) {
+        return true;
+    }
+
+    return false;
+}
+//@Ratnawati Kwanditanto A0113736J
+void TaskList::markDone(unsigned id){
+    taskIt it;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        unsigned curId = it->getTaskID();
+
+        if (foundTask(id, curId)) {
+            it->markDone();
+            break;
+        }
+    }
+}
+//@Ratnawati Kwanditanto A0113736J
+void TaskList::markUndone(unsigned id){
+    taskIt it;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        unsigned curId = it->getTaskID();
+
+        if (foundTask(id, curId)) {
+            it->markUndone();
+            break;
+        }
+    }
+}
+
+//@Seow Yan Yi A0086626W
+void TaskList::sortByDate() {
+    _taskList.sort(isEarlier);
+}
+
+//@Ratnawati Kwanditanto A0113736J
+Task TaskList::findTask(unsigned idActual) const{
+	constTaskIt it;
+    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
+        unsigned curId = it->getTaskID();
+        if (foundTask(idActual, curId)) {
+			return(*it);
+        }
+    }
+}
+
+//@Seow Yan Yi A0086626W
+bool TaskList::foundTask(unsigned idExpected, unsigned idActual) const {
+    return idExpected == idActual;
+}
+
+void TaskList::replaceTask(taskIt pos, Task newTask) {
+    _taskList.insert(pos, newTask);
+    _taskList.erase(pos);
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\TaskList.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\TaskList.h
+	 */
+
+#pragma once
+#include <list>
+#include "Task.h"
+
+class TaskList {
+public:
+    TaskList(void);
+    ~TaskList(void);
+    
+    typedef std::list<Task> TList;
+    typedef std::list<Task>::iterator taskIt;
+	typedef std::list<Task>::const_iterator constTaskIt;
+
+    void add(Task task);
+    void update(Task task);
+    void remove(unsigned id);
+	void markDone(unsigned id);
+	void markUndone(unsigned id);
+
+	Task findTask(unsigned idActual) const;
+	TList getTomorrow() const;
+	//given any time_t value, returns tasks which falls within that day
+    TList getDay(time_t day) const; 
+    TList getToday() const;
+    TList getAll() const;
+	TList getWeekly() const;
+    void loadTaskList(TList list);
+    int totalTasks() const;
+    std::string toString() const;
+	std::string toStringWithoutDate() const;
+
+private:
+    TList _taskList;
+    bool isSameDay(time_t time1, time_t time2) const;
+    static bool isEarlier(Task task1, Task task2);
+
+	//Sorts tasks by date, in ascending order (earliest first)
+    void sortByDate();
+    bool foundTask(unsigned idExpected, unsigned idActual) const;
+    void replaceTask(taskIt pos, Task newTask);
+};
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\TaskList.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\TaskMasterTest.cpp
+	 */
+
+#include "stdafx.h"
+#include "CppUnitTest.h"
+#include <string>
+#include <ctime>
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+
+namespace MyCalTestSuite {
+	TEST_CLASS(TaskMasterTest) {
+	public:
+		TEST_METHOD(TestTaskConstructor) {     
+            Task task;
+
+            Assert::IsFalse(task.isDone());
+            Assert::IsTrue(task.isFloating());
+            Assert::AreEqual((unsigned)0, task.getTaskID());
+            Assert::AreEqual(std::string("Thu Jan 01 1970"), task.getDateStr());
+            Assert::AreEqual(std::string("08:00 AM"), task.getBeginStr());
+            Assert::AreEqual(std::string("08:00 AM"), task.getEndStr());
+		}
+
+        TEST_METHOD(TestTaskAPI) {
+            Task task;
+            
+            task.setTaskName("do CS2103 tutorial");
+            Assert::AreEqual(std::string("do CS2103 tutorial"), task.getTaskName());
+           
+            task.markDone();
+            Assert::IsTrue(task.isDone());
+            
+            task.setTaskID((unsigned)123);
+            Assert::AreEqual((unsigned)123, task.getTaskID());
+
+            task.setTaskBegin(TaskStub::getSampleTime());
+            Assert::AreEqual(std::string("Mon Mar 09 2015"), task.getDateStr());
+            Assert::AreEqual(std::string("07:23 AM"), task.getBeginStr());
+        }
+
+        TEST_METHOD(TestTaskList) {
+            TaskList list;
+            list.add(TaskStub::getSampleTask8());
+            list.add(TaskStub::getSampleTask2());
+            list.add(TaskStub::getSampleTask5());
+            
+            std::string expected = 
+                TaskStub::getSampleTask2().toString() + "\n" +
+                TaskStub::getSampleTask5().toString() + "\n" + 
+                TaskStub::getSampleTask8().toString() + "\n";
+
+            Assert::AreEqual(expected, list.toString());
+        }
+
+	};
+
+
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\TaskMasterTest.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\TaskNotFoundException.cpp
+	 */
+
+#include "TaskNotFoundException.h"
+#include "MCLogger.h"
+
+TaskNotFoundException::TaskNotFoundException(std::string msg) {
+	MCLogger::log("EXCEPTION: " + msg);
+    _message = msg;
+}
+
+TaskNotFoundException::~TaskNotFoundException(void) {
+}
+
+const char* TaskNotFoundException::what() const throw() {
+     return _message.c_str();
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\TaskNotFoundException.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\TaskNotFoundException.h
+	 */
+
+#pragma once
+#include <exception>
+#include <string>
+
+class TaskNotFoundException : public std::exception {
+private:
+    std::string _message;
+
+public:
+    TaskNotFoundException(std::string msg);    
+    ~TaskNotFoundException(void);
+    virtual const char* what() const throw();
+};
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\TaskNotFoundException.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\TaskStub.cpp
+	 */
+
+#include "TaskStub.h"
+#include <iomanip> // put_time
+#include <sstream>
+
+int TaskStub::_secsInADay = 86400;
+int TaskStub::_secsInHalfDay = 43200;
+int TaskStub::_secsInAnHour = 3600;
+int TaskStub::_secsInThreeDays = 259200;
+time_t TaskStub::_9Mar723AM = getSampleTime();
+time_t TaskStub::_9Mar723PM = _9Mar723AM + _secsInHalfDay;
+time_t TaskStub::_10Mar723AM = _9Mar723AM + _secsInADay;
+time_t TaskStub::_10Mar723PM = _10Mar723AM + _secsInHalfDay;
+time_t TaskStub::_11Mar723AM = _10Mar723AM + _secsInADay;
+time_t TaskStub::_11Mar723PM = _11Mar723AM + _secsInHalfDay;
+time_t TaskStub::_6Apr9AM = getSampleTimeApr();
+time_t TaskStub::_7Apr9AM = _6Apr9AM + _secsInADay;
+time_t TaskStub::_8Apr9AM = _7Apr9AM + _secsInADay;
+time_t TaskStub::_9Apr9AM = _8Apr9AM + _secsInADay;
+time_t TaskStub::_10Apr9AM = _9Apr9AM + _secsInADay;
+time_t TaskStub::_12Apr9AM = _10Apr9AM + 2*_secsInADay;
+time_t TaskStub::_13Apr9AM = _12Apr9AM + _secsInADay;
+time_t TaskStub::_14Apr9AM = _13Apr9AM + _secsInADay;
+time_t TaskStub::_15Apr9AM = _14Apr9AM + _secsInADay;
+time_t TaskStub::_16Apr9AM = _15Apr9AM + _secsInADay;
+time_t TaskStub::_17Apr9AM = _16Apr9AM + _secsInADay;
+time_t TaskStub::_19Apr9AM = _17Apr9AM + 2*_secsInADay;
+time_t TaskStub::_Today9AM = getToday9AM();
+time_t TaskStub::_Tomorrow9AM = _Today9AM+ _secsInADay;
+
+std::string TaskStub::timetToString(time_t timing) {
+    //refer to std::put_time fmt
+    tm tmstruct;
+    localtime_s(&tmstruct, &timing);
+    std::ostringstream oss;
+    oss << std::put_time(&tmstruct, "%d/%m/%y %I:%M %p");
+    return oss.str();
+}
+
+TaskStub::TaskStub(void) {
+}
+
+
+TaskStub::~TaskStub(void) {
+}
+
+time_t TaskStub::getSampleTime() {
+    time_t rawTime;
+    tm sampleTime;
+    sampleTime.tm_hour = 7;
+    sampleTime.tm_isdst = 0;
+    sampleTime.tm_mday = 9;
+    sampleTime.tm_min = 23;
+    sampleTime.tm_mon = 2;
+    sampleTime.tm_sec = 45;
+    sampleTime.tm_wday = 1;
+    sampleTime.tm_yday = 67;
+    sampleTime.tm_year = 115;
+           
+    rawTime = mktime(&sampleTime);
+    return rawTime;
+}
+
+time_t TaskStub::getSampleTimeApr() {
+    time_t rawTime;
+    tm sampleTime;
+    sampleTime.tm_hour = 9;
+    sampleTime.tm_isdst = 0;
+    sampleTime.tm_mday = 6;
+    sampleTime.tm_min = 0;
+    sampleTime.tm_mon = 3;
+    sampleTime.tm_sec = 45;
+    sampleTime.tm_wday = 2;
+    sampleTime.tm_yday = 96;
+    sampleTime.tm_year = 115;
+           
+    rawTime = mktime(&sampleTime);
+    return rawTime;
+}
+
+
+time_t TaskStub::getToday9AM() {
+    time_t rawTime;
+    time_t curTime;
+
+    struct tm  *sampleTime;
+    time (&curTime);
+    sampleTime = localtime(&curTime);
+
+    sampleTime->tm_hour = 9;
+    sampleTime->tm_isdst = 0;
+    sampleTime->tm_min = 0;
+    sampleTime->tm_sec = 0;
+
+    rawTime = mktime(sampleTime);
+    
+    return rawTime;
+}
+
+std::string TaskStub::getCurrentDate() {
+    time_t curTime = getToday9AM();
+    tm dateStruct;
+    localtime_s(&dateStruct, &curTime);
+    std::ostringstream beginOss;
+    beginOss << std::put_time(&dateStruct, "%a %b %d %Y");
+    return beginOss.str();
+}
+
+std::string TaskStub::getTomorrowDate() {
+    time_t curTime = getToday9AM() + _secsInADay;
+    tm dateStruct;
+    localtime_s(&dateStruct, &curTime);
+    std::ostringstream beginOss;
+    beginOss << std::put_time(&dateStruct, "%a %b %d %Y");
+    return beginOss.str();
+}
+
+Task TaskStub::getSampleTask1() {
+    Task task;
+    task.setTaskID((unsigned) 1);
+    task.setTaskName("dummy T1");
+    task.setTaskBegin(_9Mar723AM);
+    task.setTaskEnd(_9Mar723AM + _secsInAnHour);
+    return task;
+}
+
+Task TaskStub::getSampleTask2() {
+    Task task;
+    task.setTaskID((unsigned) 2);
+    task.setTaskName("dummy T2");
+    task.setTaskBegin(_9Mar723AM);
+    task.setTaskEnd(_9Mar723PM);
+    task.markDone();
+    return task;
+}
+
+Task TaskStub::getSampleTask3() {
+    Task task;
+    task.setTaskID((unsigned) 3);
+    task.setTaskName("dummy T3");
+    task.setTaskBegin(_9Mar723PM);
+    task.setTaskEnd(_9Mar723PM + _secsInAnHour);
+    return task;
+}
+
+Task TaskStub::getSampleTask4() {
+    Task task;
+    task.setTaskID((unsigned) 4);
+    task.setTaskName("dummy T4");
+    task.setTaskBegin(_10Mar723AM);
+    task.setTaskEnd(_10Mar723AM + _secsInAnHour);
+    return task;
+}
+
+Task TaskStub::getSampleTask5() {
+    Task task;
+    task.setTaskID((unsigned) 5);
+    task.setTaskName("dummy T5");
+    task.setTaskBegin(_10Mar723PM);
+    task.setTaskEnd(_10Mar723PM + _secsInAnHour);
+    return task;
+}
+
+Task TaskStub::getSampleTask6() {
+    Task task;
+    task.setTaskID((unsigned) 6);
+    task.setTaskName("dummy T6");
+    task.setTaskBegin(_11Mar723AM);
+    task.setTaskEnd(_11Mar723PM);
+    task.markDone();
+    return task;
+}
+
+Task TaskStub::getSampleTask7() {
+    Task task;
+    task.setTaskID((unsigned) 7);
+    task.setTaskName("dummy T7");
+    task.setTaskBegin(_11Mar723AM);
+    task.setTaskEnd(_11Mar723PM);
+    task.markDone();
+    return task;
+}
+
+Task TaskStub::getSampleTask8() {
+    Task task;
+    task.setTaskID((unsigned) 8);
+    task.setTaskName("dummy T8");
+    task.setTaskBegin(_11Mar723AM);
+    task.setTaskEnd(_11Mar723AM + _secsInAnHour);
+    return task;
+}
+
+Task TaskStub::getSampleTask9() {
+    Task task;
+    task.setTaskID((unsigned) 9);
+    task.setTaskName("dummy T9");
+    task.setTaskBegin(_6Apr9AM);
+    task.setTaskEnd(_6Apr9AM + _secsInAnHour);
+    return task;
+}
+
+Task TaskStub::getSampleTask10() {
+    Task task;
+    task.setTaskID((unsigned) 10);
+    task.setTaskName("dummy T10");
+    task.setTaskBegin(_7Apr9AM);
+    task.setTaskEnd(_7Apr9AM + _secsInHalfDay);
+    return task;
+}
+
+Task TaskStub::getSampleTask11() {
+    Task task;
+    task.setTaskID((unsigned) 11);
+    task.setTaskName("dummy T11");
+    task.setTaskBegin(_8Apr9AM);
+    task.setTaskEnd(_8Apr9AM + _secsInHalfDay);
+    return task;
+}
+
+Task TaskStub::getSampleTask12() {
+    Task task;
+    task.setTaskID((unsigned) 12);
+    task.setTaskName("dummy T12");
+    task.setTaskBegin(_9Apr9AM);
+    task.setTaskEnd(_9Apr9AM + _secsInAnHour);
+    return task;
+}
+
+Task TaskStub::getSampleTask13() {
+    Task task;
+    task.setTaskID((unsigned) 13);
+    task.setTaskName("dummy T13");
+    task.setTaskBegin(_10Apr9AM);
+    task.setTaskEnd(_10Apr9AM + _secsInHalfDay);
+    return task;
+}
+
+
+Task TaskStub::getSampleTask14() {
+    Task task;
+    task.setTaskID((unsigned) 14);
+    task.setTaskName("dummy T14");
+    task.setTaskBegin(_10Apr9AM);
+    task.setTaskEnd(_10Apr9AM + _secsInAnHour);
+    return task;
+}
+
+Task TaskStub::getSampleTask15() {
+    Task task;
+    task.setTaskID((unsigned) 15);
+    task.setTaskName("dummy T15");
+    task.setTaskBegin(_12Apr9AM);
+    task.setTaskEnd(_12Apr9AM + _secsInHalfDay);
+    return task;
+}
+
+Task TaskStub::getSampleTask16() {
+    Task task;
+    task.setTaskID((unsigned) 16);
+    task.setTaskName("dummy T16");
+    task.setTaskBegin(_13Apr9AM);
+    task.setTaskEnd(_13Apr9AM + _secsInAnHour);
+    return task;
+}
+
+Task TaskStub::getSampleTask17() {
+    Task task;
+    task.setTaskID((unsigned) 17);
+    task.setTaskName("dummy T17");
+    task.setTaskBegin(_14Apr9AM);
+    task.setTaskEnd(_14Apr9AM + _secsInHalfDay);
+    return task;
+}
+
+Task TaskStub::getSampleTask18() {
+    Task task;
+    task.setTaskID((unsigned) 18);
+    task.setTaskName("dummy T18");
+    task.setTaskBegin(_15Apr9AM);
+    task.setTaskEnd(_15Apr9AM + _secsInHalfDay);
+    return task;
+}
+
+Task TaskStub::getSampleTask19() {
+    Task task;
+    task.setTaskID((unsigned) 19);
+    task.setTaskName("dummy T19");
+    task.setTaskBegin(_16Apr9AM);
+    task.setTaskEnd(_16Apr9AM + _secsInAnHour);
+    return task;
+}
+
+Task TaskStub::getSampleTask20() {
+    Task task;
+    task.setTaskID((unsigned) 20);
+    task.setTaskName("dummy T20");
+    task.setTaskBegin(_16Apr9AM);
+    task.setTaskEnd(_16Apr9AM + _secsInHalfDay);
+    return task;
+}
+
+
+Task TaskStub::getSampleTask21() {
+    Task task;
+    task.setTaskID((unsigned) 21);
+    task.setTaskName("dummy T21");
+    task.setTaskBegin(_17Apr9AM);
+    task.setTaskEnd(_17Apr9AM + _secsInAnHour);
+    return task;
+}
+
+Task TaskStub::getSampleTask22() {
+    Task task;
+    task.setTaskID((unsigned) 22);
+    task.setTaskName("dummy T22");
+    task.setTaskBegin(_19Apr9AM);
+    task.setTaskEnd(_19Apr9AM + _secsInHalfDay);
+    return task;
+}
+
+Task TaskStub::getSampleTask23() {
+    Task task;
+    task.setTaskID((unsigned) 23);
+    task.setTaskName("dummy T23");
+    task.setTaskBegin(_Today9AM);
+    task.setTaskEnd(_Today9AM + _secsInHalfDay);
+    return task;
+}
+
+Task TaskStub::getSampleTask24() {
+    Task task;
+    task.setTaskID((unsigned) 24);
+    task.setTaskName("dummy T24");
+    task.setTaskBegin(_Tomorrow9AM);
+    task.setTaskEnd(_Tomorrow9AM + _secsInHalfDay);
+    return task;
+}
+
+TaskList TaskStub::getLargeTaskList() {
+    TaskList list;
+    list.add(getSampleTask1());
+    list.add(getSampleTask2());
+    list.add(getSampleTask3());
+    list.add(getSampleTask4());
+    list.add(getSampleTask5());
+    list.add(getSampleTask6());
+    list.add(getSampleTask7());
+    list.add(getSampleTask8());
+    return list;
+}
+
+TaskList TaskStub::getSmallTaskList() {
+    TaskList list;
+    list.add(getSampleTask1());
+    list.add(getSampleTask3());
+    list.add(getSampleTask5());
+    return list;
+}
+
+TaskList TaskStub::getAprTaskList() {
+    TaskList list;
+    list.add(getSampleTask9());
+    list.add(getSampleTask10());
+    list.add(getSampleTask11());
+    list.add(getSampleTask12());
+    list.add(getSampleTask13());
+    list.add(getSampleTask14());
+    list.add(getSampleTask15());
+	list.add(getSampleTask16());
+    list.add(getSampleTask17());
+    list.add(getSampleTask18());
+    list.add(getSampleTask19());
+    list.add(getSampleTask20());
+    list.add(getSampleTask21());
+    list.add(getSampleTask22());
+    return list;
+}
+
+TaskList TaskStub::getCurrentTaskList() {
+    TaskList list;
+    list.add(getSampleTask23());
+	list.add(getSampleTask24());
+	return list;
+}
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\TaskStub.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\TaskStub.h
+	 */
+
+#pragma once
+#define _CRT_SECURE_NO_WARNINGS
+#include "TaskList.h"
+
+class TaskStub {
+private:
+    static int _secsInADay;
+    static int _secsInHalfDay;
+    static int _secsInAnHour;
+	static int _secsInThreeDays;
+    static time_t _9Mar723AM;
+    static time_t _9Mar723PM;
+    static time_t _10Mar723AM;
+    static time_t _10Mar723PM;
+    static time_t _11Mar723AM;
+    static time_t _11Mar723PM;
+	static time_t _6Apr9AM;
+	static time_t _7Apr9AM;
+	static time_t _8Apr9AM;
+	static time_t _9Apr9AM;
+	static time_t _10Apr9AM;
+	static time_t _12Apr9AM;
+	static time_t _13Apr9AM;
+	static time_t _14Apr9AM;
+	static time_t _15Apr9AM;
+	static time_t _16Apr9AM;
+	static time_t _17Apr9AM;
+	static time_t _19Apr9AM;
+	static time_t _Today9AM;
+	static time_t _Tomorrow9AM;
+
+public:
+    TaskStub(void);
+    ~TaskStub(void);
+    // given a type time_t, returns local time in the format
+    // DD/MM/YY HH:MM AM
+    static std::string timetToString(time_t timing);
+    // returns an arbitrary hard coded time 09/03/15 07:23 AM
+    static time_t getSampleTime();
+	// returns an arbitrary hard coded time 13/04/15 09:00 AM
+	static time_t getSampleTimeApr();
+	static time_t getToday9AM();
+    static std::string getCurrentDate();
+    static std::string getTomorrowDate();
+
+    // 9 March 15, undone, 07:23 AM
+    static Task getSampleTask1();
+	// 9 March 15, done
+    static Task getSampleTask2();
+    // 9 March 15, undone, 07:23 PM
+    static Task getSampleTask3();
+    // 10 March 15, undone, 07:23 AM
+    static Task getSampleTask4();
+    // 10 March 15, undone, 07:23 PM
+    static Task getSampleTask5();
+    // 11 March 15, done
+    static Task getSampleTask6();
+    // 11 March 15, done
+    static Task getSampleTask7();
+    // 11 March 15, undone, 07:23 AM
+    static Task getSampleTask8();
+	 // 6 Apr 15, undone, 09:00 AM
+	static Task getSampleTask9();
+	 // 7 Apr 15, undone, 09:00 AM
+	static Task getSampleTask10();
+	 // 8 Apr 15, undone, 09:00 AM
+	static Task getSampleTask11();
+	 // 9 Apr 15, undone, 09:00 AM
+	static Task getSampleTask12();
+	 // 10 Apr 15, undone, 09:00 AM
+	static Task getSampleTask13();
+	 // 10 Apr 15, undone, 09:00 AM
+	static Task getSampleTask14();
+	 // 12 Apr 15, undone, 09:00 AM
+	static Task getSampleTask15();
+	 // 13 Apr 15, undone, 09:00 AM
+	static Task getSampleTask16();
+	 // 14 Apr 15, undone, 09:00 AM
+	static Task getSampleTask17();
+	 // 15 Apr 15, undone, 09:00 AM
+	static Task getSampleTask18();
+	 // 16 Apr 15, undone, 09:00 AM
+	static Task getSampleTask19();
+	 // 16 Apr 15, undone, 09:00 AM
+	static Task getSampleTask20();
+	 // 17 Apr 15, undone, 09:00 AM
+	static Task getSampleTask21();
+	 // 19 Apr 15, undone, 09:00 AM
+	static Task getSampleTask22();
+	static Task getSampleTask23();
+	static Task getSampleTask24();
+
+    // returns a tasklist containing eight sample tasks with ids 1 to 8.
+	// order after internal TaskList sorting: 1, 3, 2, 4, 5, 6, 7, 8
+    // do not use this if you require tasks to adhere to
+    // specific ranges of dates, for reasons such as equivalence 
+    // partioning and boundary value analysis.
+    static TaskList getLargeTaskList();
+
+    // returns a tasklist containing only three sample tasks with ids 1, 3, 5
+    static TaskList getSmallTaskList();
+	 // returns a tasklist containing only three sample tasks with ids from 9 to 22
+	// Tasklist begins on 6 April 
+	static TaskList getAprTaskList();
+	static TaskList getCurrentTaskList();
+};
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\TaskStub.h
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\tocollate\TextUI.h
+	 */
+
+// TextUI Component is only responsible for:
+// 1) displaying of messages and printing out tasks. 
+// 2) Getting user input
+// As much as possible, ordering of tasks and deciding what 
+// header text to print is done by the Task Master.
+//
+// TextUI has no idea whether it is a add, edit or whatever. 
+// It Just prints what is given to it.
+//
+
+///////////////////////////////////////////////////////////////////////////
+///////////////// SAMPLE USER INTERFACE AND ITS COMPONENTS ////////////////
+///////////////////////////////////////////////////////////////////////////
+//
+// Tasks due this week:      <---- THIS IS THE "HEADER TEXT"
+//
+// [Unscheduled Tasks]		Description						<--- DATE BAR
+//
+// 1.  ----------------	    comp club meeting			    <--- TASK
+//
+// [Today Fri Jan 1]		Description						<--- DATE BAR
+//
+// 2.  ----------------	    Remember to bring pencil	    <--- TASK [done]
+// 3. [8:45am - 11:30am]    Brunch with Jane			    <--- TASK  
+// 4. [12pm]			    Submit CS2103 CE2			    <--- TASK
+//
+	// End of segment: C:\Users\YanYi\Documents\MyCal\tocollate\TextUI.h
+
+
+
+
+
