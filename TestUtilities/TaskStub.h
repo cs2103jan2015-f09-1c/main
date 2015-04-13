@@ -1,4 +1,4 @@
-//@Seow Yan Yi A0086626W
+//@author A0086626W
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include "TaskList.h"

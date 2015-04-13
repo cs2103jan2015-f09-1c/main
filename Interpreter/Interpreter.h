@@ -4,7 +4,7 @@
 #include "TaskList.h"
 #include "MappingNumber.h"
 
-//Liu Dongdong A0113856A
+//@author A0113856A
 #define LENGTH  200
 typedef struct Cal
 {

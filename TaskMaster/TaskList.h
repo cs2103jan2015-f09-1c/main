@@ -1,7 +1,6 @@
-//@Seow Yan Yi A0086626W
+//@author A0086626W
 #pragma once
 #include <list>
-//@Seow Yan Yi A0086626W
 #include "Task.h"
 
 class TaskList {

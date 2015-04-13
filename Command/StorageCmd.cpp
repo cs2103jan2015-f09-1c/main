@@ -1,4 +1,4 @@
-//@Seow Yan Yi A0086626W
+//@author A0086626W
 #include <assert.h>
 #include "StorageCmd.h"
 #include "Storage.h"
