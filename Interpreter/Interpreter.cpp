@@ -4,6 +4,7 @@
 #include <sstream>
 #include <algorithm>
 #include "MappingNumber.h"
+#include <assert.h>
 #include "StorageAlias.h"
 #include "DoneAlias.h"
 #include "DeleteAlias.h"
@@ -60,41 +61,43 @@ bool Interpreter::searchSubStr(std::string keyword, Task task) {
 	}
 }
 
+//Liu Dongdong A0113856A
 Task Interpreter::parseAddCmd(std::string detail) {
+	MCLogger::log("Interpreter.cpp: add command");
 	Task a;
 
 	if (AddAlias::isHelp(detail)){
 		int TaskId = -1;
 		a.setTaskID (TaskId);
-	}
-	else{
-	int flag;
+	} else {
+		int flag;
 
-	CalEvent EventOut;
+		CalEvent EventOut;
 
-	string event;
-	const char *cal = detail.c_str();
-	event.assign(cal);
-	flag = parse(event, &EventOut);
-	if (flag <= -1){
-		throw InvalidInputException("Unrecognized time or date. Please check your input.");
-	}
+		string event;
+		const char *cal = detail.c_str();
+		event.assign(cal);
+		flag = parse(event, &EventOut);
+		if (flag <= -1){
+			throw InvalidInputException("Unrecognized time or date. Please check your input.");
+		}
 	
-	time_t starttime, endtime;
-	if (EventOut.year!=-1)
-		tmConvert(EventOut, &starttime, &endtime);
-	else{
-		starttime = 0;
-		endtime = 0;
-	}
-	a.setTaskBegin(starttime);
-	a.setTaskEnd(endtime);
-	a.setTaskName(EventOut.event);
+		time_t starttime, endtime;
+		if (EventOut.year!=-1)
+			tmConvert(EventOut, &starttime, &endtime);
+		else{
+			starttime = 0;
+			endtime = 0;
+		}
+		a.setTaskBegin(starttime);
+		a.setTaskEnd(endtime);
+		a.setTaskName(EventOut.event);
 	}
 	return a;
 }
 
 Task Interpreter::parseEditCmd(std::string input) {
+	MCLogger::log("Interpreter.cpp: edit command");
 	int taskID; 
     std::string filtered = CommandType::filterOutCmd(input);
 	if (DeleteAlias::isInteger(filtered) || !DeleteAlias::isHelp(filtered)){
@@ -183,12 +186,10 @@ Task Interpreter::parseEditCmd(std::string input) {
         if (caseInsensitiveFind(exitCheck, ":exit") != string::npos) {
             throw InvalidInputException("Edit canceled.");
         }
-
 		cout << "    new name: " << curStr << endl;
 		toEdit.setTaskName(curStr);
 		a = toEdit;
-	}
-	else{
+	} else {
 		cout << "previous event:" << toEdit.getTaskName() << endl;
         if (!toEdit.isFloating()) {
 		    cout << "previous date:" << toEdit.getDateStr() << endl;
@@ -271,6 +272,7 @@ std::string Interpreter::parseViewCmd(std::string input){
 }
 
 TaskList::TList Interpreter::parseSearchCmd (std::string input){
+	MCLogger::log("Interpreter.cpp: parse search command");
 	Storage *storage = Storage::getInstance();
 	TaskList tasklist = storage->getTaskList();
 	TaskList::TList list = tasklist.getAll();
@@ -281,14 +283,13 @@ TaskList::TList Interpreter::parseSearchCmd (std::string input){
 		Task task;
 		task.setTaskID(-1);
 			foundTaskList.push_back(task);
-	}
-	else{
-	for (it = list.begin(); it != list.end(); ++it) {
-		Task _task = *it;
-		if (searchSubStr(input, _task)) {
-			foundTaskList.push_back(_task);
+	} else{
+		for (it = list.begin(); it != list.end(); ++it) {
+			Task _task = *it;
+			if (searchSubStr(input, _task)) {
+				foundTaskList.push_back(_task);
+			}
 		}
-	}
 	}
 	if (foundTaskList.empty()){
 			Task task;
@@ -305,8 +306,7 @@ Interpreter::~Interpreter(void) {
 }
 
 
-
-
+//Liu Dongdong A0113856A
 int Interpreter::parse(string event, CalEvent *calEventOut) {
 	char week[7][10] = { "sun", "mon", "tues", "wed", "thur", "fri", "sat" };
 	int posOn, posAt, posTmr1, posTmr2, posNext, posFrom, posEvent;
