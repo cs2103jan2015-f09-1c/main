@@ -20,11 +20,11 @@ namespace IntegrationTestSuite {
 			MockStorage::cleanMockStorage();
 		}
 		
-		/*TEST_METHOD(AddOnDate) {
+		TEST_METHOD(AddOnDate) {
 			MockStorage::initMockStorage(TaskStub::getSmallTaskList());
 
 			UIObject output = Controller::handleInput("add submit application :on 01/01/2017");
-			Assert::AreEqual(std::string("Task added."), output.getHeaderText());
+			Assert::AreEqual(std::string("Task added"), output.getHeaderText());
 
 			TaskList taskList;
 			taskList.loadTaskList(output.getTaskList());
@@ -33,52 +33,5 @@ namespace IntegrationTestSuite {
 
 			MockStorage::cleanMockStorage();
 		}
-
-
-		TEST_METHOD(AddFromTo) {
-			MockStorage::initMockStorage(TaskStub::getSmallTaskList());
-
-			UIObject output = Controller::handleInput("add drama performance @UCC :from 8pm to 10pm");
-			
-			MockStorage::cleanMockStorage();
-		}
-
-		TEST_METHOD(AddAt) {
-			MockStorage::initMockStorage(TaskStub::getSmallTaskList());
-			MockStorage::cleanMockStorage();
-		}
-
-		TEST_METHOD(AddTomorrow) {
-			MockStorage::initMockStorage(TaskStub::getSmallTaskList());
-			MockStorage::cleanMockStorage();
-		}
-
-		TEST_METHOD(AddNextWeek) {
-			MockStorage::initMockStorage(TaskStub::getSmallTaskList());
-			MockStorage::cleanMockStorage();
-		}
-
-		TEST_METHOD(InvalidAdd) {
-			MockStorage::initMockStorage(TaskStub::getSmallTaskList());
-			// something not a time
-			//typo errors
-			// invalid date
-			// start time later than end time
-			// adding a date which has already passed
-			MockStorage::cleanMockStorage();
-		}
-
-		TEST_METHOD(AddHelp) {
-			UIObject noSpecifier = Controller::handleInput("add");
-			Assert::AreEqual(std::string("Add command help goes here"), noSpecifier.getHeaderText());
-			Assert::IsTrue(noSpecifier.getTaskList().empty());
-		}
-
-
-		TEST_METHOD(UndoAfterAdd) {
-			MockStorage::initMockStorage(TaskStub::getSmallTaskList());
-
-			MockStorage::cleanMockStorage();
-		}*/
 	};
 }

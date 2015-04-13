@@ -18,11 +18,9 @@ public:
 	void setNotFloating();
     bool isFloating() const; 
 
-    //@Ratna
     bool taskWithoutTime() const;
     void checkTaskWithoutTime();
 
-    //@Seow Yan Yi A0086626W
     std::string getDateStr() const;
     std::string getBeginStr() const;
     std::string getEndStr() const;

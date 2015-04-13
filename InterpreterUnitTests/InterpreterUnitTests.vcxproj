@@ -90,7 +90,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\MyCalTestSuite\InterpreterTest.cpp" />
     <ClCompile Include="InterpreterAddTestNegative.cpp" />
     <ClCompile Include="InterpreterAddTestPositive.cpp" />
     <ClCompile Include="InterpreterSearchTest.cpp" />

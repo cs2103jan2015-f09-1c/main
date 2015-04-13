@@ -1,3 +1,5 @@
+
+//@Ratnawati Kwanditanto A0113736J
 #define _CRT_SECURE_NO_WARNINGS
 #include <vector>
 #include <iostream>

@@ -64,13 +64,13 @@ TaskList::TList TaskList::getToday() const {
 
     return getDay(curTime);    
 }
-
+//@Ratnawati Kwanditanto A0113736J
 TaskList::TList TaskList::getTomorrow() const {
     time_t curTime = time(NULL);	//get today
 	curTime += 86400; // add number of seconds in a day
     return getDay(curTime);    
 }
-
+//@Ratnawati Kwanditanto A0113736J
 TaskList::TList TaskList::getWeekly() const {	
 	TaskList retList;
     constTaskIt it;
@@ -101,7 +101,7 @@ TaskList::TList TaskList::getWeekly() const {
     }
     return retList.getAll();
 }
-
+//@Seow Yan Yi A0086626W
 TaskList::TList TaskList::getAll() const {
     return _taskList;
 }
@@ -158,7 +158,7 @@ bool TaskList::isEarlier(Task task1, Task task2) {
 
     return false;
 }
-
+//@Ratnawati Kwanditanto A0113736J
 void TaskList::markDone(unsigned id){
     taskIt it;
     for (it = _taskList.begin(); it != _taskList.end(); ++it) {
@@ -170,7 +170,7 @@ void TaskList::markDone(unsigned id){
         }
     }
 }
-
+//@Ratnawati Kwanditanto A0113736J
 void TaskList::markUndone(unsigned id){
     taskIt it;
     for (it = _taskList.begin(); it != _taskList.end(); ++it) {
@@ -183,38 +183,12 @@ void TaskList::markUndone(unsigned id){
     }
 }
 
-
+//@Seow Yan Yi A0086626W
 void TaskList::sortByDate() {
     _taskList.sort(isEarlier);
 }
 
-std::string TaskList::findTaskName(unsigned idActual) const{
-	constTaskIt it;
-	std::string taskName;
-    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
-        unsigned curId = it->getTaskID();
-        if (foundTask(idActual, curId)) {
-			taskName = it->getTaskName();
-            break;
-        }
-    }
-	return taskName;
-}
-
-time_t TaskList:: findTaskDate(unsigned idActual) const{
-	constTaskIt it;
-	time_t taskTime;
-	time (&taskTime);
-    for (it = _taskList.begin(); it != _taskList.end(); ++it) {
-        unsigned curId = it->getTaskID();
-        if (foundTask(idActual, curId)) {
-			taskTime = it->getTaskBegin();
-            break;
-        }
-    }
-	return taskTime;
-}
-
+//@Ratnawati Kwanditanto A0113736J
 Task TaskList::findTask(unsigned idActual) const{
 	constTaskIt it;
     for (it = _taskList.begin(); it != _taskList.end(); ++it) {
@@ -225,6 +199,7 @@ Task TaskList::findTask(unsigned idActual) const{
     }
 }
 
+//@Seow Yan Yi A0086626W
 bool TaskList::foundTask(unsigned idExpected, unsigned idActual) const {
     return idExpected == idActual;
 }

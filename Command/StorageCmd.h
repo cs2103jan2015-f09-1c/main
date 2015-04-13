@@ -1,3 +1,4 @@
+//@Seow Yan Yi A0086626W
 #pragma once
 #include "CommandInterface.h"
 
@@ -32,8 +33,6 @@ private:
     // saves previous storage location into history 
     // this will be used if the user wants to undo
     void recordInHistory(std::string prevLoc);
-
-
 
 public:
     StorageCmd(void);

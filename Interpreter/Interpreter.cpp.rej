@@ -1,0 +1,67 @@
+diff a/Interpreter/Interpreter.cpp b/Interpreter/Interpreter.cpp	(rejected hunks)
+@@ -307,56 +307,30 @@
+ 
+ 
+ 
+-int Interpreter::parse(string event, CalEvent *calEventOut) {
+-	char week[7][10] = { "sun", "mon", "tues", "wed", "thur", "fri", "sat" };
+-	int posOn, posAt, posTmr1, posTmr2, posNext, posFrom, posEvent;
+-	size_t i, j, k;
+-	CalEvent curEvent;
+ 
+-	curEvent.year = -1;
+-	curEvent.month = -1;
+-	curEvent.day = -1;
+-	curEvent.wday = -1;
+-	curEvent.time = 800;
+-	curEvent.endtime = 1000;
+-	curEvent.event = "\0";
++int Interpreter::parseNext(string event, CalEvent *calEventOut)	//deal with "next" in a command
++{
++	char week[7][10] = { "Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat" };
++	int posNext, i, k;
+ 
+-	//get time of "today"
+ 	time_t rawtime;
+ 	struct tm  timeinfo;
+ 	time(&rawtime);
+ 	localtime_s(&timeinfo, &rawtime);
+-	const char *cal = event.c_str();
+-
+-	string cureve;
+-	posEvent = event.find(":", 0);
+-	if (posEvent != -1)
+-		cureve.assign(cal, 0, posEvent);
+-	else
+-		cureve.assign(cal, 0, strlen(cal));
+-	const char *cheve = cureve.c_str();
+-	curEvent.event = cureve;    
+ 
+-    if (posEvent != -1) {
+-        event.erase(std::remove(event.begin() + posEvent, event.end(), ' '), event.end());
+-    }
+-    
+-    cal = event.c_str();
+-
+-	//deal with "next" in a command
++	const char *cal = event.c_str();
+ 	posNext = caseInsensitiveFind(event, ":next");
+ 	if (posNext != -1){
+ 		i = posNext + 5;
+ 		k = 0;
+-		char weekx[10]; 
++		char weekx[10];
+ 		strcpy_s(weekx, "\0");
+-
+-        while (i<strlen(cal)){
+-			if (cal[i] >= 'A' && cal[i] <= 'Z' || cal[i] >= 'a' && cal[i] <= 'z') { 
++		while (i<strlen(cal)){
++			if (cal[i] >= 'A' && cal[i] <= 'Z' || cal[i] >= 'a' && cal[i] <= 'z') {
+ 				weekx[k] = cal[i];
+ 				k++;
+ 			}
+-			else if (cal[i] == ' ') { 
++			else if (cal[i] == ' ') {
+ 				if (k != 0) break;
+ 			}
+ 			else {
