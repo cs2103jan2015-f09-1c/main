@@ -241,6 +241,7 @@ std::string Interpreter::parseStoreCmd(std::string input) {
     return input;
 }
 
+//@Pham Thi Hong A0113955A
 int Interpreter::parseDelCmd(std::string input){
 	int TaskId; 
 	if (DeleteAlias::isInteger(input) || !DeleteAlias::isHelp(input)){
@@ -250,7 +251,7 @@ int Interpreter::parseDelCmd(std::string input){
 	}
 	return TaskId;
 }
-
+//@Ratnawati Kwanditanto A0113736J
 int Interpreter::parseDoneCmd(std::string input){
 	int TaskId;
 
@@ -269,6 +270,7 @@ std::string Interpreter::parseViewCmd(std::string input){
 	return detail;
 }
 
+//@Pham Thi Hong A0113955A
 TaskList::TList Interpreter::parseSearchCmd (std::string input){
 	MCLogger::log("Interpreter.cpp: parse search command");
 	Storage *storage = Storage::getInstance();
@@ -752,7 +754,7 @@ void Interpreter::Monthday(int year, int yearDay, int *pMonth, int *pDay)
 
 }
 
-
+//@Pham Thi Hong A0113955A
 Task Interpreter::prepareTask(std::string input) {
     //std::string taskToDel = input.substr(lengthCommand);
     Storage *storage = Storage::getInstance();
@@ -783,6 +785,7 @@ Task Interpreter::prepareTask(std::string input) {
 
 }
 
+//@Pham Thi Hong A0113955A
 int Interpreter::ConvertStrtoNum(std::string str){
 	int integer;
 	std::stringstream convert (str);
@@ -797,6 +800,7 @@ int Interpreter::ConvertStrtoNum(std::string str){
 	return integer;
 }
 
+//@Pham Thi Hong A0113955A
 int Interpreter::gettingTaskID(std::string input){
 	MappingNumber *mapping = MappingNumber::getInstance();
 	Task _task = prepareTask(input);

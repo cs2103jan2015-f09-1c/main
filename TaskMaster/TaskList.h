@@ -17,11 +17,6 @@ public:
 	void markDone(unsigned id);
 	void markUndone(unsigned id);
 
-	//given taskID, returns taskName of the task
-	std::string findTaskName(unsigned idActual) const;
-
-	//given taskID, returns date of the task (in terms of begin time)
-	time_t findTaskDate(unsigned idActual) const;
 	Task findTask(unsigned idActual) const;
 	TList getTomorrow() const;
 	//given any time_t value, returns tasks which falls within that day
