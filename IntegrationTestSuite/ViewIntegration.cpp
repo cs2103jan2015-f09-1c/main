@@ -1,4 +1,3 @@
-//@Ratnawati Kwanditanto A0113736J
 #include "stdafx.h"
 #include "CppUnitTest.h"
 

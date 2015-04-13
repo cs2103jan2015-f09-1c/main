@@ -1,4 +1,3 @@
-//@Pham Thi Hong A0113955A
 #include "SearchCmd.h"
 #include "Storage.h"
 #include "TaskList.h"

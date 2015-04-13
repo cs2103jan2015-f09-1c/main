@@ -20,7 +20,6 @@ void AddCmd::prepareTask(Task task) {
     _task = task;
 }
 
-//@Pham Thi Hong A0113955A
 void AddCmd::recordInHistory(Task task) {
     State prevState; 
     prevState.recordTask (task);
@@ -62,7 +61,6 @@ UIObject AddCmd::execute() {
     return addObj;
 }
 
-//@Pham Thi Hong A0113955A
 UIObject AddCmd::undo() {
 	History *hist = History::getInstance();
 
@@ -92,7 +90,6 @@ UIObject AddCmd::undo() {
     return undoMessage;
 }
 
-//@Pham Thi Hong A0113955A
 std::string AddCmd::getHelp() const{
 		std::string help;
 
