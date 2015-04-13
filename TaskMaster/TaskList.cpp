@@ -1,3 +1,4 @@
+//@Seow Yan Yi A0086626W
 #define _CRT_SECURE_NO_WARNINGS
 #include "TaskList.h"
 #include <sstream>
@@ -123,7 +124,6 @@ std::string TaskList::toString() const {
     return oss.str();
 }
 
-//For testing purpose
 std::string TaskList::toStringWithoutDate() const {
       std::ostringstream oss;
     constTaskIt it;

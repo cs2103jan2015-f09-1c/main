@@ -1,10 +1,15 @@
+//@Seow Yan Yi A0086626W
 #define _CRT_SECURE_NO_WARNINGS
 #include "Task.h"
 #include <sstream> 
 #include <iomanip> // put_time
 
-Task::Task(void): _taskID(0), _isDone(false), _isFloating(true),
-    _taskBegin(0), _taskEnd(0) {
+Task::Task(void): 
+    _taskID(0), 
+    _isDone(false), 
+    _isFloating(true),
+    _taskBegin(0), 
+    _taskEnd(0) {
 
 }
 
@@ -33,6 +38,7 @@ bool Task::isFloating() const {
     return _isFloating;
 }
 
+//@Ratna
 bool Task::taskWithoutTime() const{
 	return _isWithoutTime;
 }
@@ -47,6 +53,7 @@ void Task::checkTaskWithoutTime() {
 	}
 }
 
+//@Seow Yan Yi A0086626W
 std::string Task::getDateStr() const {
     //refer to std::put_time fmt
     tm beginStruct;

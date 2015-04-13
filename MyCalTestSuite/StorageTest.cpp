@@ -1,3 +1,4 @@
+//@Seow Yan Yi A0086626W
 #include "stdafx.h"
 #include "CppUnitTest.h"
 #include <stdio.h>
@@ -46,14 +47,15 @@ namespace MyCalTestSuite {
         TEST_METHOD(TestUpdateStorage) {
             MockStorage::initMockStorage(TaskStub::getLargeTaskList());
 
-            Storage *storage = Storage::getInstance();
+            // Check the list is correct just after update
+            Storage *storage = Storage::getInstance();         
             storage->updateStorage(TaskStub::getSmallTaskList());
             TaskList listAfterUpdate = storage->getTaskList();
 
             std::string expectedList = TaskStub::getSmallTaskList().toString();
-
             Assert::AreEqual(expectedList, listAfterUpdate.toString());
 
+            // Check the list is read correctly after storage is reset.
             Storage::resetInstance();        
             Storage *storage2 = Storage::getInstance();
             TaskList listAfterInit = storage2->getTaskList();

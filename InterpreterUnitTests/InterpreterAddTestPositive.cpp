@@ -1,3 +1,4 @@
+//@Seow Yan Yi A0086626W
 #include "stdafx.h"
 #include "CppUnitTest.h"
 #include "CommandType.h"
@@ -7,6 +8,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace MyCalTestSuite {
 	TEST_CLASS(InterpreterAddPositiveTest) {
 	public:
+        // Equivalence partioning according to the different input formats entered.
 		TEST_METHOD(TestFloating) {
             Task floatingTask = Interpreter::parseAddCmd("CS2103 tutorial");
             Assert::AreEqual(std::string("CS2103 tutorial"), floatingTask.getTaskName());
@@ -140,7 +142,8 @@ namespace MyCalTestSuite {
             Assert::AreEqual(std::string("07:00 AM"), task.getBeginStr());
             Assert::AreEqual(std::string("09:32 PM"), task.getEndStr());
         }       
-
+        
+        // Boundary value analysis by date boundaries
         // Test boundary of dates, e.g. last day, first day of months 
         TEST_METHOD(TestJanBoundary) {
             Task taskFirstDay = Interpreter::parseAddCmd("blah :on 01/01/2015");

@@ -1,3 +1,4 @@
+//@Seow Yan Yi A0086626W
 #pragma once
 #include <ctime> // time_t
 #include <string>
@@ -15,10 +16,13 @@ public:
 	// Nevertheless, the use of setFloating() method provides a clearer way to set a Task as floating.
 	void setFloating();
 	void setNotFloating();
-    void checkTaskWithoutTime();
     bool isFloating() const; 
-	bool taskWithoutTime() const;
 
+    //@Ratna
+    bool taskWithoutTime() const;
+    void checkTaskWithoutTime();
+
+    //@Seow Yan Yi A0086626W
     std::string getDateStr() const;
     std::string getBeginStr() const;
     std::string getEndStr() const;

@@ -1,3 +1,4 @@
+//@Seow Yan Yi A0086626W
 #pragma once
 #include "CommandType.h"
 #include "State.h"
@@ -31,7 +32,7 @@
 class History {
 public:
     static History* getInstance();
-    static void resetInstance(); // work in progress. Do not call reset instance as History will be erased
+    static void resetInstance(); 
 
     CommandType::Command getPreviousCommand() const;
     void saveCommand(CommandType::Command cmd);

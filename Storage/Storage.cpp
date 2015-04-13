@@ -1,3 +1,4 @@
+//@Seow Yan Yi A0086626W
 #include "Storage.h"
 #include "MCLogger.h"
 #include <fstream>
@@ -110,15 +111,15 @@ void Storage::initSessionStore() {
 
     Task *curTask = NULL;
     std::string line;
-    int counter = 0;
+    int c = 0;
 
     while (std::getline(readFile, line)) {
-        counter++;
+        c++;
         unsigned id;
         time_t begin;
         time_t end;
 
-        switch(counter) {
+        switch(c) {
         case 1:
             curTask = new Task;
             id = std::stoul(line);
@@ -140,7 +141,7 @@ void Storage::initSessionStore() {
                 curTask->markDone();
             } 
 
-            counter = 0;
+            c = 0;
             _sessionStore.add(*curTask);
             delete curTask;
         }
