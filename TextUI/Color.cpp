@@ -1,4 +1,4 @@
-//@author A0113736J
+//@author A0113736J-reused
 #include "Color.h"
 
 Color:: Color(void){

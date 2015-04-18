@@ -295,7 +295,7 @@ void TextUI::showOutput(UIObject uiObj) {
 	printTasks(uiObj.getTaskList());
 	mappingNumber(uiObj.getTaskList());
 }
-
+//@author A0113736J-reused
 void TextUI:: clearScreen(){
 
   hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );

@@ -1,4 +1,4 @@
-//@author A0113736J
+//@author A0113736J-reused
 #pragma once
 #include <windows.h>
 
