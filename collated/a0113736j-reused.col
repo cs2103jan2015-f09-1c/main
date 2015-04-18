@@ -1,0 +1,88 @@
+//@author: a0113736j-reused
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\TextUI\Color.cpp
+	 */
+
+#include "Color.h"
+
+Color:: Color(void){
+}
+
+Color:: ~Color(void){
+}
+
+void Color:: TextColor(int fontcolor,int backgroundcolor,HANDLE screen)
+{
+   int color_attribute;
+   color_attribute = backgroundcolor;
+   color_attribute = _rotl(color_attribute,4) | fontcolor;
+   SetConsoleTextAttribute(screen,color_attribute);
+}
+	// End of segment: C:\Users\YanYi\Documents\MyCal\TextUI\Color.cpp
+
+
+
+
+
+	/**
+	 * origin: C:\Users\YanYi\Documents\MyCal\TextUI\TextUI.cpp
+	 */
+
+void TextUI:: clearScreen(){
+
+  hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+  if (hStdOut == INVALID_HANDLE_VALUE){
+	  return;
+  }
+
+  // Get the number of cells in the current buffer 
+  if (!GetConsoleScreenBufferInfo( hStdOut, &csbi )){
+	  return;
+  }
+  
+  cellCount = csbi.dwSize.X *csbi.dwSize.Y;
+
+  // Fill the entire buffer with spaces
+  if (!FillConsoleOutputCharacter(
+    hStdOut,
+    (TCHAR) ' ',
+    cellCount,
+    homeCoords,
+    &count
+    )){
+		return;
+  }
+  // Fill the entire buffer with the current colors and attributes
+  if (!FillConsoleOutputAttribute(
+    hStdOut,
+    csbi.wAttributes,
+    cellCount,
+    homeCoords,
+    &count
+    )){
+		return;
+  }
+
+  // Move the cursor home
+  SetConsoleCursorPosition( hStdOut, homeCoords );
+  
+}
+
+
+TextUI::TextUI(void) {
+}
+
+
+TextUI::~TextUI(void) {
+}
+
+
+	// End of segment: C:\Users\YanYi\Documents\MyCal\TextUI\TextUI.cpp
+
+
+
+
+
